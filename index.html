@@ -7,10 +7,10 @@
 <meta name="description" content="國小四年級自然科「水的流動」單元的 AI 輔助命題歷程：三棟知識建築與六個真實修訂案例。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&family=Huninn&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#2e2418; --ink2:#54463a; --muted:#7a6a58;
+  --ink:#2e2418; --ink2:#4a3d31; --muted:#5f5142;   /* 小字（資料來源、題號、註記）加深：對比由約 4.8:1 提高到約 7:1 */
   --cream:#fbf4e3; --cream2:#f5ead2; --line:#e3d2ad;
   --blue:#3d6fc0; --blue-d:#264f93; --blue-l:#e6eefb;
   --orange:#d9782b; --orange-d:#9c4f12; --orange-l:#fdeedd;
@@ -82,6 +82,22 @@ button{font-family:inherit;color:inherit}
   opacity:0;transition:opacity .2s;will-change:transform}
 #charBubble::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border:7px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
 #charBubble.show{opacity:1}
+/* 第一次進站的導覽小卡（只出現一次，位置貼著下方選單上緣） */
+#guide{position:fixed;left:50%;bottom:90px;transform:translate(-50%,8px);z-index:21;width:min(360px,calc(100vw - 24px));
+  padding:12px 14px 12px 16px;border-radius:14px;background:#fbf4e3;color:var(--ink);border:1px solid var(--gold-d);
+  box-shadow:0 14px 34px rgba(10,12,30,.45);opacity:0;transition:opacity .3s,transform .3s;display:flex;gap:10px;align-items:flex-start}
+#guide.show{opacity:1;transform:translate(-50%,0)}
+#guide[hidden]{display:none}
+#guide::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border:8px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
+#guide .gtxt{flex:1;font-size:.92rem;line-height:1.65}
+#guide .gtxt b{color:var(--blue-d)}
+#guide .gbtns{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+#guide .gstart{border:0;border-radius:999px;padding:.45rem .95rem;background:var(--blue-d);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer}
+#guide .gstart:hover{background:var(--blue)}
+#guide .gx{flex:none;border:0;background:transparent;font-size:1.25rem;line-height:1;width:32px;height:32px;border-radius:8px;cursor:pointer;color:var(--ink2)}
+#guide .gx:hover{background:rgba(168,130,60,.18)}
+#guide button:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px}
+html.reduce-motion #guide{transition:none}
 /* 學院城堡不是知識館：用較小、較淡的次要名牌 */
 .blabel.b-about{font-size:.74rem;padding:.2rem .55rem .2rem .25rem;background:rgba(20,25,56,.7)}
 .blabel.b-about .num{width:1.05rem;height:1.05rem;font-size:.62rem}
@@ -99,6 +115,7 @@ button{font-family:inherit;color:inherit}
 #dock .sep{width:1px;background:rgba(216,178,106,.4);margin:4px 2px}
 #dock .short{display:none}
 #musicBtn[hidden]{display:none}
+#dock #musicBtn .note{color:inherit;font-size:inherit;line-height:inherit}   /* 和面板內的 .note（灰色小字）同名，這裡要蓋掉，不然深色選單上看不到 ♪ */
 #musicBtn[aria-pressed="true"]{background:rgba(216,178,106,.24);color:var(--gold-l)}
 #musicBtn[aria-pressed="true"] .note{animation:notebob 1.2s ease-in-out infinite}
 @keyframes notebob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
@@ -109,6 +126,21 @@ html.reduce-motion #musicBtn .note{animation:none!important}   /* 跟著下方�
 /* 點擊音效開關：和「音樂」「動畫」按鈕同一種樣式 */
 #sfxBtn[aria-pressed="true"]{background:rgba(216,178,106,.24);color:var(--gold-l)}
 #sfxBtn .ico{display:inline-block;width:1em;text-align:center}
+/* 三個開關的「關閉」狀態要一眼看得出來：字變淡、圖示加一條斜線；右上角小燈：亮金色＝開、灰色＝關 */
+#musicBtn,#motionBtn,#sfxBtn{position:relative}
+#musicBtn .note,#motionBtn .ico,#sfxBtn .ico{position:relative;display:inline-block;width:1em;text-align:center}
+#musicBtn[aria-pressed="false"],#motionBtn[aria-pressed="false"],#sfxBtn[aria-pressed="false"]{color:rgba(241,230,204,.5)}
+#musicBtn[aria-pressed="false"] .note::after,#motionBtn[aria-pressed="false"] .ico::after,#sfxBtn[aria-pressed="false"] .ico::after{
+  content:"";position:absolute;left:-.12em;right:-.12em;top:50%;height:2px;border-radius:2px;background:#f08a7a;transform:rotate(-42deg);box-shadow:0 0 0 1px rgba(14,17,40,.6)}
+#musicBtn::before,#motionBtn::before,#sfxBtn::before{content:"";position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;
+  background:#6c6a7c;box-shadow:0 0 0 1px rgba(14,17,40,.7)}
+#musicBtn[aria-pressed="true"]::before,#motionBtn[aria-pressed="true"]::before,#sfxBtn[aria-pressed="true"]::before{background:#ffd56b;box-shadow:0 0 6px #ffd56b,0 0 0 1px rgba(14,17,40,.5)}
+/* 音樂開始播放時，在「音樂」按鈕上方出現一次的小提示 */
+#toast{position:fixed;left:0;top:0;z-index:22;pointer-events:none;max-width:min(280px,80vw);padding:.4rem .75rem;border-radius:10px;
+  background:#fbf4e3;color:var(--ink);border:1px solid var(--gold-d);font-size:.84rem;font-weight:500;line-height:1.5;box-shadow:0 8px 20px rgba(10,12,30,.4);
+  opacity:0;transition:opacity .25s}
+#toast.show{opacity:1}
+#toast::after{content:"";position:absolute;left:var(--ax,50%);bottom:-7px;transform:translateX(-50%);border:7px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
 #dock{transition:left .55s cubic-bezier(.22,1,.36,1)}
 @media (min-width:761px){body.panel-open #dock{left:calc((100vw - min(620px,100vw)) / 2)} body.panel-open #topbar details, body.panel-open #topbar .hint{display:none}}
 /* 桌面寬度但面板打開時，下方選單只能用面板左邊的空間：改成短名稱、音樂與動畫只留圖示，避免超出畫面或被面板蓋住 */
@@ -196,6 +228,7 @@ html.reduce-motion #musicBtn .note{animation:none!important}   /* 跟著下方�
 .p-nav button{flex:none;border:1px solid rgba(216,178,106,.4);background:rgba(255,255,255,.05);border-radius:999px;padding:.35rem .75rem;font-size:.82rem;font-weight:700;cursor:pointer;color:#e9dcc0}
 .p-nav button:hover,.p-nav button.on{background:var(--accent);border-color:var(--gold-l);color:#fff}
 .p-nav button:focus-visible{outline:2px solid var(--gold-l);outline-offset:1px}
+body.has-nl-badge .p-body{padding-bottom:calc(76px + env(safe-area-inset-bottom))!important}   /* Netlify 標誌不蓋住面板最後幾行 */
 .p-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 18px calc(40px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 120px),var(--cream)}
 .sec{scroll-margin-top:12px;margin-bottom:22px}
@@ -213,7 +246,7 @@ html.reduce-motion #musicBtn .note{animation:none!important}   /* 跟著下方�
 .chip.b-diagnosis{background:var(--orange-l);border-color:#f3c9a3;color:var(--orange-d)}
 .chip.b-strategy{background:var(--green-l);border-color:#bfdcb8;color:var(--green-d)}
 blockquote.prompt{margin:0;padding:12px 14px;background:#f7f3ea;border-left:5px solid var(--accent);border-radius:8px;line-height:1.85;font-size:.95rem}
-.note{font-size:.84rem;color:var(--muted);line-height:1.7}
+.note{font-size:.88rem;color:var(--muted);line-height:1.75}
 .callout{border-radius:12px;padding:11px 14px;margin:8px 0;line-height:1.75;font-size:.92rem;border:1px solid}
 .callout.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn-ink)}
 .callout.danger{background:var(--danger-bg);border-color:var(--danger-line);color:var(--danger-ink)}
@@ -277,13 +310,13 @@ table.data td.r,table.data th.r{text-align:right}
 /* case selector + card */
 .casepick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .casepick button{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:.45rem .7rem;font-size:.84rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.35;color:var(--ink2)}
-.casepick button b{display:block;font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+.casepick button b{display:block;font-size:.78rem;color:var(--muted);letter-spacing:.06em}
 .casepick button.on{border-color:var(--accent);background:var(--accent-l);color:var(--ink)}
 .casepick button:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
 .casecard{background:#fff;border:1.5px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}
 .cc-head{padding:12px 14px 10px;background:linear-gradient(180deg,#fffdf7,#fff);border-bottom:1px solid var(--line)}
 .cc-head h4{margin:0;font-size:1.06rem;font-weight:900}
-.cc-head .id{font-size:.72rem;color:var(--muted);font-weight:700;letter-spacing:.08em}
+.cc-head .id{font-size:.78rem;color:var(--muted);font-weight:700;letter-spacing:.08em}
 .numchain{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px;font-size:.8rem}
 .numchain .nc{padding:.15rem .5rem;border-radius:6px;background:var(--cream2);border:1px solid var(--line);font-weight:700}
 .numchain .arr{color:var(--muted)}
@@ -294,12 +327,44 @@ table.data td.r,table.data th.r{text-align:right}
 .cc-tabs button.v2[aria-selected="true"]{border-bottom-color:var(--danger-line)}
 .cc-tabs button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .cc-body{padding:12px 14px 14px}
-.cc-src{padding:8px 14px 12px;font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);line-height:1.65}
+.cc-src{padding:8px 14px 12px;font-size:.84rem;color:var(--muted);border-top:1px dashed var(--line);line-height:1.65}
+.cc-src summary{cursor:pointer;font-weight:700;color:var(--ink2);list-style:none;display:inline-flex;align-items:center;gap:.3rem}
+.cc-src summary::-webkit-details-marker{display:none}
+.cc-src summary::before{content:"▸";transition:transform .2s}
+.cc-src[open] summary::before{transform:rotate(90deg)}
+.cc-src summary:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px;border-radius:4px}
+.cc-src .srcbody{margin-top:4px}
+.cc-key{margin:6px 0 0;font-size:.92rem;line-height:1.6;color:var(--ink);font-weight:500}
+.cc-key b{display:inline-block;margin-right:.4rem;padding:0 .45rem;border-radius:6px;background:var(--accent-l);color:var(--accent-d);font-size:.8rem;font-weight:900}
+.cc-ver{padding:6px 14px 0;font-size:.84rem;color:var(--ink2)}
+/* 收合區塊（學生原始提示詞） */
+details.fold>summary{cursor:pointer;font-weight:700;color:var(--ink2);list-style:none;display:inline-flex;align-items:center;gap:.3rem;font-size:.92rem}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:"▸";transition:transform .2s}
+details.fold[open]>summary::before{transform:rotate(90deg)}
+details.fold>summary:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px;border-radius:4px}
+details.fold[open]>summary{margin-bottom:8px}
+/* 診斷館開頭的一句話摘要 */
+.sumcard{border-left:5px solid var(--accent);background:#fffdf7}
+.sumcard .big{font-size:1.02rem;font-weight:700;line-height:1.75;margin:0}
+/* 閱讀模式：大字、高對比、圓體（只影響面板內文） */
+#pRead[aria-pressed="true"]{background:var(--gold);color:#1b1408;border-color:var(--gold-l)}
+/* 手機：標題列多了「Aa」，按鈕縮小、「全景」只留圖示，避免館名被擠成兩行 */
+@media (max-width:760px){
+  .p-actions{gap:4px}
+  .p-actions .iconbtn{min-width:34px;height:34px;padding:0 6px}
+  #pHome .stxt{display:none}
+}
+body.read-mode .p-body{--muted:#3b3026;--ink2:#2a2016;--line:#c8ad7a;background:#fffdf8}
+body.read-mode .p-body>*{zoom:1.12}
+body.read-mode .p-body,body.read-mode .p-body *{font-family:"Huninn",var(--font)!important;letter-spacing:.02em}
+body.read-mode .p-body .card,body.read-mode .p-body .casecard,body.read-mode .p-body .cc-head{background:#fff}
+body.read-mode .p-body p,body.read-mode .p-body li{line-height:1.9}
 .q{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fffefb}
 .q-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
 .vtag{font-size:.75rem;font-weight:900;padding:.15rem .5rem;border-radius:6px;background:#eef1ec;color:#3c4a3e}
 .vtag.v1{background:#eceff3;color:#3d4a5c}.vtag.v2{background:var(--danger-bg);color:var(--danger-ink)}.vtag.v3{background:var(--green-l);color:var(--green-d)}
-.qnum{font-size:.78rem;color:var(--muted);font-weight:700}
+.qnum{font-size:.84rem;color:var(--muted);font-weight:700}
 .examhead{margin:4px 0 8px;padding:6px 10px;border:2px dashed var(--fail);border-radius:8px;background:#fff7f0;font-size:.9rem}
 .examhead .tag{display:block;font-size:.72rem;color:var(--orange-d);font-weight:900;margin-bottom:2px}
 .stem{margin:.2rem 0 .5rem;line-height:1.85;font-size:.98rem}
@@ -383,8 +448,16 @@ html.reduce-motion *{transition:none!important;animation:none!important}
   <button type="button" data-open="about" aria-label="說明" title="網站說明與資料聲明"><span aria-hidden="true">ⓘ</span><span class="long">說明</span><span class="short">說明</span></button>
   <button type="button" id="musicBtn" hidden aria-pressed="false" aria-label="背景音樂" title="播放背景音樂（快捷鍵 M）"><span class="note" aria-hidden="true">♪</span><span class="long">音樂</span></button>
   <button type="button" id="motionBtn" aria-pressed="true" aria-label="動畫效果" title="關閉動畫效果（快捷鍵 A）"><span class="ico" aria-hidden="true">✦</span><span class="long">動畫</span></button>
-  <button type="button" id="sfxBtn" aria-pressed="true" aria-label="點擊音效" title="關閉點擊音效（快捷鍵 S）"><span class="ico" aria-hidden="true">♬</span><span class="long">音效</span></button>
+  <button type="button" id="sfxBtn" aria-pressed="true" aria-label="音效" title="關閉音效（操作與角色聲音）（快捷鍵 S）"><span class="ico" aria-hidden="true">♬</span><span class="long">音效</span></button>
 </nav>
+
+<div id="guide" role="dialog" aria-label="第一次來的建議路線" hidden>
+  <div class="gtxt">第一次來嗎？建議從 <b>① AI 命題歷程館</b>開始，依序看完三棟建築。
+    <div class="gbtns"><button type="button" class="gstart">開始探索</button></div></div>
+  <button type="button" class="gx" aria-label="關閉建議" title="關閉">×</button>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
 
 <aside id="panel" role="dialog" aria-modal="false" aria-labelledby="pTitle">
   <div class="p-head">
@@ -392,6 +465,7 @@ html.reduce-motion *{transition:none!important;animation:none!important}
       <div class="p-icon" id="pIcon" aria-hidden="true"></div>
       <div class="p-title"><div class="kicker" id="pKicker"></div><h2 id="pTitle"></h2></div>
       <div class="p-actions">
+        <button type="button" class="iconbtn" id="pRead" aria-pressed="false" title="閱讀模式：大字、高對比、圓體" aria-label="閱讀模式（大字、高對比）"><span aria-hidden="true" style="font-size:1rem">Aa</span></button>
         <button type="button" class="iconbtn" id="pHome" title="返回島嶼全景"><span aria-hidden="true">⟲</span><span class="txt">返回島嶼全景</span><span class="stxt">全景</span></button>
         <button type="button" class="iconbtn close" id="pClose" title="關閉面板（Esc）" aria-label="關閉面板">×</button>
       </div>
@@ -618,12 +692,14 @@ function renderCaseCard(c, building){
   var chain=c.chain.map(function(x){return '<span class="nc">'+esc(x[0])+esc(x[1])+'</span>';}).join('<span class="arr" aria-hidden="true">→</span>');
   var card=el('<article class="casecard" id="card-'+uid+'">'+
     '<div class="cc-head"><div class="id">案例 '+c.no+'｜'+c.id+'</div><h4>案例 '+c.no+'：'+esc(c.title)+'</h4>'+
+    '<p class="cc-key"><b>重點</b>'+esc(c.principle)+'</p>'+
     '<div class="numchain" aria-label="題號對照">'+chain+'</div>'+
     '<div class="chips" style="margin-top:6px">'+bChips(c.buildings)+'</div></div>'+
     '<div class="cc-tabs" role="tablist" aria-label="案例 '+c.no+' 內容切換">'+
       tabs.map(function(t,i){return '<button type="button" role="tab" id="tab-'+uid+'-'+t[0]+'" aria-controls="tp-'+uid+'" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-t="'+t[0]+'"'+(t[0]==="v2"?' class="v2"':'')+'>'+(t[0]==="v2"?"⚠ ":"")+t[1]+'</button>';}).join("")+
     '</div><div class="cc-body" role="tabpanel" id="tp-'+uid+'"></div>'+
-    '<div class="cc-src"><b>資料來源：</b>'+c.sources.map(esc).join(" ")+(c.v2?'<br><b>版本說明：</b>本案例呈現初版、第二版（雙重答案）與第三版三個版本。':'')+'</div>'+
+    (c.v2?'<p class="cc-ver"><b>版本說明：</b>本案例呈現初版、第二版（雙重答案）與第三版三個版本。</p>':'')+
+    '<details class="cc-src"><summary>資料來源與版本</summary><div class="srcbody">'+c.sources.map(esc).join(" ")+'</div></details>'+
   '</article>');
   var body=card.querySelector(".cc-body");
   function show(t){
@@ -699,7 +775,7 @@ builders.history=function(body){
   body.appendChild(s1);
 
   var s2=sec("h-prompt",2,"學生原始提示詞");
-  s2.appendChild(el('<div class="card"><p class="note" style="margin-top:0">第一輪提示詞原文：</p><blockquote class="prompt">「你是一位國小自然科老師，我需要你幫忙出25題關於四下水的流動的選擇題題目，內容範圍是關於毛細現象、虹吸現象、連通管原理。」</blockquote></div>'));
+  s2.appendChild(el('<div class="card"><details class="fold"><summary>展開第一輪提示詞原文</summary><blockquote class="prompt">「你是一位國小自然科老師，我需要你幫忙出25題關於四下水的流動的選擇題題目，內容範圍是關於毛細現象、虹吸現象、連通管原理。」</blockquote></details></div>'));
   body.appendChild(s2);
 
   var s3=sec("h-timeline",3,"四輪 AI 命題時間線");
@@ -745,6 +821,8 @@ builders.history=function(body){
 };
 
 builders.diagnosis=function(body){
+  body.appendChild(el('<div class="card sumcard"><p class="big">初版 25 題的「答案正確」全數通過，但「誘答性」有 22 題未通過——答案正確不等於題目品質良好。</p>'+
+    '<p class="note" style="margin-bottom:0">數字是命題者對初版題目的品質檢核結果，不是學生作答錯誤題數。<button type="button" class="linkbtn" data-goto="diagnosis" data-sec="d-stats">（看統計）</button></p></div>'));
   var s1=sec("d-ind",1,"四項品質指標");
   s1.appendChild(el('<div><div class="grid2">'+
     '<div class="ind"><h4>① 題目語法</h4><p>題幹與選項敘述是否清楚、用語前後一致，並適合四年級學生閱讀（例如「色水」需要先定義）。</p></div>'+
@@ -832,6 +910,8 @@ builders.about=function(body){
     '<li>鍵盤：<span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> 開啟三棟建築、<span class="kbd">H</span> 返回島嶼全景、<span class="kbd">Esc</span> 關閉面板；也可用 <span class="kbd">Tab</span> 移到畫面下方的建築選單。</li>'+
     '<li>不方便操作 3D 時，直接使用畫面下方的建築選單即可閱讀全部內容。</li>'+
     '<li>動畫開關：畫面下方選單的「動畫」按鈕（或 <span class="kbd">A</span>）可以開啟或關閉島上的動態效果（雲、蠟燭、光帶、瀑布、自動旋轉等）。預設跟隨裝置的「減少動態效果」設定。</li>'+
+    '<li>聲音：進站時會以小音量播放背景音樂；只有開關面板、切換案例與時間線等重要操作才有短音效，摸到島上的角色時，他們也會發出一點聲音。畫面下方的「音樂」（<span class="kbd">M</span>）與「音效」（<span class="kbd">S</span>）按鈕可以分別關閉，按鈕上的小燈亮金色表示開啟、灰色並加斜線表示關閉。</li>'+
+    '<li>閱讀模式：面板右上角的「Aa」按鈕會把面板文字放大、提高對比並改用圓體字，再按一次即可恢復。</li>'+
     '<li>島上的小角色：滑鼠移到角色身上（手機點一下），他們會打招呼並說一句操作提示。</li></ul></div>'));
   body.appendChild(s1);
   var s2=sec("a-data",2,"資料來源與版本對照");
@@ -848,7 +928,7 @@ builders.about=function(body){
     '<p style="margin-bottom:0"><button type="button" class="linkbtn" data-goto="strategy" data-sec="s-pending">查看「待確認的科學與命題問題」→</button></p></div>'));
   body.appendChild(s3);
   var s4=sec("a-tech",4,"技術與隱私");
-  s4.appendChild(el('<div class="card"><ul><li>以 Three.js（WebGL）即時繪製 3D 場景，從 jsDelivr CDN 載入；建築模型以 Tripo 生成後放在網站資料夾中。</li><li>不需要登入、API Key 或後端；不收集任何使用者資料，也沒有追蹤或分析程式。</li><li>動畫開關的選擇只存在你自己的瀏覽器裡，不會上傳。</li></ul></div>'));
+  s4.appendChild(el('<div class="card"><ul><li>以 Three.js（WebGL）即時繪製 3D 場景，從 jsDelivr CDN 載入；建築模型以 Tripo 生成後放在網站資料夾中。</li><li>不需要登入、API Key 或後端；不收集任何使用者資料，也沒有追蹤或分析程式。</li><li>動畫、音樂、音效與閱讀模式的開關選擇只存在你自己的瀏覽器裡，不會上傳。</li></ul></div>'));
   body.appendChild(s4);
 };
 
@@ -889,6 +969,7 @@ pBody.addEventListener("scroll",function(){
 function open(id, opts){
   opts=opts||{};
   if(!BUILDINGS[id])return;
+  if(typeof dismissGuide==="function") dismissGuide();
   if(!panel.classList.contains("open")) lastFocus=document.activeElement;
   if(current!==id) fill(id);
   current=id;
@@ -937,6 +1018,15 @@ pBody.addEventListener("click",function(e){
 
 document.getElementById("pClose").addEventListener("click",close);
 document.getElementById("pHome").addEventListener("click",home);
+/* 閱讀模式（大字、高對比、圓體）：選擇只存在這個瀏覽器的 localStorage */
+(function(){
+  var btn=document.getElementById("pRead"), on=false;
+  try{ on=localStorage.getItem("ki-read")==="on"; }catch(e){}
+  function apply(){ document.body.classList.toggle("read-mode",on); btn.setAttribute("aria-pressed",on);
+    btn.title=(on?"關閉":"開啟")+"閱讀模式：大字、高對比、圓體"; }
+  btn.addEventListener("click",function(){ on=!on; try{ localStorage.setItem("ki-read",on?"on":"off"); }catch(e){} apply(); });
+  apply();
+})();
 document.getElementById("homeBtn").addEventListener("click",home);
 document.querySelectorAll("#dock [data-open]").forEach(function(b){b.addEventListener("click",function(){open(b.dataset.open);});});
 document.addEventListener("keydown",function(e){
@@ -954,14 +1044,26 @@ document.addEventListener("keydown",function(e){
 /* 背景音樂：資料夾內有 bgm.mp3 才顯示按鈕。
    預設開啟：載入後先嘗試自動播放；瀏覽器擋下有聲自動播放時，等訪客第一次點擊、觸控或按鍵就開始播。
    訪客按「音樂」（或快捷鍵 M）關掉後，選擇會存在這台電腦的瀏覽器（localStorage），下次來就不會自動播放。 */
-var BGM_SRC="bgm.mp3",BGM_VOLUME=0.35;
+var BGM_SRC="bgm.mp3",BGM_VOLUME=0.2;   // 評審建議：背景音樂當襯底，音量調低（原 0.35）
 var musicBtn=document.getElementById("musicBtn"),bgm=null,bgmWanted=true;
 try{ if(localStorage.getItem("ki-music")==="off") bgmWanted=false; }catch(e){}
 function syncMusicBtn(){
   var on=!!bgm&&!bgm.paused;
   musicBtn.setAttribute("aria-pressed",on);
-  musicBtn.title=(on?"暫停背景音樂":"播放背景音樂")+"（快捷鍵 M）";
+  musicBtn.title=(on?"背景音樂：播放中，按一下關閉":"背景音樂：已關閉，按一下播放")+"（快捷鍵 M）";
 }
+/* 小提示：貼在某個按鈕上方，幾秒後消失 */
+var toastEl=document.getElementById("toast"),toastTimer=0;
+function showToast(msg,anchor,ms){
+  if(!anchor||anchor.hidden)return;
+  toastEl.textContent=msg; toastEl.classList.add("show");
+  var r=anchor.getBoundingClientRect(), tw=toastEl.offsetWidth, th=toastEl.offsetHeight;
+  var cx=r.left+r.width/2, x=Math.max(8,Math.min(innerWidth-tw-8,cx-tw/2));
+  toastEl.style.transform="translate("+Math.round(x)+"px,"+Math.round(r.top-th-12)+"px)";
+  toastEl.style.setProperty("--ax",Math.round(cx-x)+"px");
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){toastEl.classList.remove("show");},ms||4000);
+}
+var musicHinted=false;
 function saveMusicPref(){ try{ localStorage.setItem("ki-music",bgmWanted?"on":"off"); }catch(e){} }
 function toggleMusic(){
   if(!bgm||musicBtn.hidden)return;
@@ -984,7 +1086,10 @@ try{
   bgm=new Audio();bgm.loop=true;bgm.volume=BGM_VOLUME;bgm.preload="auto";
   bgm.addEventListener("loadedmetadata",function(){musicBtn.hidden=false;autoStartMusic();});
   bgm.addEventListener("error",function(){musicBtn.hidden=true;stopWaitingGesture();});
-  bgm.addEventListener("play",function(){syncMusicBtn();stopWaitingGesture();});
+  bgm.addEventListener("play",function(){syncMusicBtn();stopWaitingGesture();
+    // 第一次開始播放時提醒一次：音樂在播，可以從這裡關掉
+    if(!musicHinted){ musicHinted=true; setTimeout(function(){ if(!bgm.paused) showToast("♪ 背景音樂播放中，按這裡可以關閉",musicBtn,4500); },300); }
+  });
   bgm.addEventListener("pause",syncMusicBtn);
   GESTURES.forEach(function(t){document.addEventListener(t,onFirstGesture,true);});
   bgm.src=BGM_SRC;
@@ -1064,8 +1169,54 @@ function sfxNote(ctx,freq,start,dur,vol,type){
 var SFX={
   tap:function(ctx,t){ sfxNote(ctx,1568,t,0.22,0.35,"triangle"); sfxNote(ctx,2349,t+0.045,0.28,0.22); },
   open:function(ctx,t){ [1047,1319,1568,2093].forEach(function(f,i){ sfxNote(ctx,f,t+i*0.06,0.5,0.28-i*0.03); }); sfxNote(ctx,3136,t+0.26,0.6,0.08); },
-  close:function(ctx,t){ sfxNote(ctx,1568,t,0.25,0.22,"triangle"); sfxNote(ctx,1047,t+0.08,0.35,0.2,"triangle"); }
+  close:function(ctx,t){ sfxNote(ctx,1568,t,0.25,0.22,"triangle"); sfxNote(ctx,1047,t+0.08,0.35,0.2,"triangle"); },
+  /* 島上角色打招呼的聲音（2026-11-14：原本想用 Gemini 生成音檔，但它的音訊生成工具無法使用，改成和其他音效一樣即時合成，不需要音檔） */
+  scholar:function(ctx,t){ sfxNoise(ctx,t,0.16,1800,5200,0.5); sfxNoise(ctx,t+0.2,0.14,2200,6000,0.4); },          // 翻書：兩下紙頁沙沙聲
+  apprentice:function(ctx,t){ sfxNote(ctx,2637,t,0.35,0.22); sfxNote(ctx,3951,t+0.07,0.45,0.12); },                 // 放大鏡閃光：清脆的「叮」
+  alchemist:function(ctx,t){ [0,0.11,0.19,0.3,0.42].forEach(function(d,i){ sfxBlip(ctx,t+d,320+i*70+Math.random()*80,0.09,0.32); }); },  // 鍋子冒泡
+  walkerPlaza:function(ctx,t){ sfxGlide(ctx,t,660,880,0.16,0.2,"triangle"); sfxGlide(ctx,t+0.17,990,1175,0.22,0.18,"triangle"); },  // 學生：輕快的「嗨～」
+  walkerPath:function(ctx,t){ sfxGlide(ctx,t,740,988,0.16,0.2,"triangle"); sfxGlide(ctx,t+0.17,880,1319,0.24,0.18,"triangle"); },
+  owl:function(ctx,t){ sfxGlide(ctx,t,420,360,0.32,0.34,"sine",5); sfxGlide(ctx,t+0.42,430,350,0.5,0.32,"sine",5); },  // 貓頭鷹：咕、咕～
+  cat:function(ctx,t){ sfxMeow(ctx,t); }                                                                              // 黑貓：小聲的喵
 };
+/* 角色聲音用的小工具：濾波雜訊（紙聲）、短促的泡泡聲、滑音、貓叫 */
+var sfxNoiseBuf=null;
+function sfxNoise(ctx,start,dur,f0,f1,vol){
+  if(!sfxNoiseBuf){ sfxNoiseBuf=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate); var d=sfxNoiseBuf.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  var src=ctx.createBufferSource(), bp=ctx.createBiquadFilter(), g=ctx.createGain();
+  src.buffer=sfxNoiseBuf; bp.type="bandpass"; bp.Q.value=0.9;
+  bp.frequency.setValueAtTime(f0,start); bp.frequency.exponentialRampToValueAtTime(f1,start+dur);
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(vol,start+dur*0.3); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  src.connect(bp); bp.connect(g); g.connect(sfxBus); src.start(start); src.stop(start+dur+0.02);
+}
+function sfxBlip(ctx,start,freq,dur,vol){
+  var o=ctx.createOscillator(), g=ctx.createGain();
+  o.type="sine"; o.frequency.setValueAtTime(freq,start); o.frequency.exponentialRampToValueAtTime(freq*2.2,start+dur);
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(vol,start+0.01); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g); g.connect(sfxBus); o.start(start); o.stop(start+dur+0.02);
+}
+function sfxGlide(ctx,start,f0,f1,dur,vol,type,vib){
+  var o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type||"sine"; o.frequency.setValueAtTime(f0,start); o.frequency.exponentialRampToValueAtTime(f1,start+dur);
+  if(vib){ var l=ctx.createOscillator(), lg=ctx.createGain(); l.frequency.value=vib; lg.gain.value=f0*0.015; l.connect(lg); lg.connect(o.frequency); l.start(start); l.stop(start+dur+0.05); }
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(vol,start+Math.min(0.06,dur*0.3)); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g); g.connect(sfxBus); o.start(start); o.stop(start+dur+0.05);
+}
+function sfxMeow(ctx,start){
+  var o=ctx.createOscillator(), f=ctx.createBiquadFilter(), g=ctx.createGain(), dur=0.5;
+  o.type="sawtooth"; o.frequency.setValueAtTime(560,start); o.frequency.linearRampToValueAtTime(820,start+0.15); o.frequency.exponentialRampToValueAtTime(480,start+dur);
+  f.type="bandpass"; f.Q.value=3; f.frequency.setValueAtTime(900,start); f.frequency.linearRampToValueAtTime(1600,start+0.15); f.frequency.exponentialRampToValueAtTime(800,start+dur);
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(0.16,start+0.06); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(f); f.connect(g); g.connect(sfxBus); o.start(start); o.stop(start+dur+0.05);
+}
+var charVoiceLast={};
+/* 角色打招呼的聲音：同一個角色 2.5 秒內只出聲一次，避免滑鼠來回移動時一直響；跟著「音效」開關 */
+function playCharVoice(id){
+  var now=performance.now();
+  if(!SFX[id] || (charVoiceLast[id] && now-charVoiceLast[id]<2500)) return;
+  charVoiceLast[id]=now;
+  playSfx(id);
+}
 function playSfx(kind,force){
   if(!sfxOn && !force)return;
   var now=performance.now();
@@ -1078,7 +1229,7 @@ function playSfx(kind,force){
 function syncSfxBtn(){
   sfxBtn.setAttribute("aria-pressed",String(sfxOn));
   sfxBtn.querySelector(".ico").textContent=sfxOn?"♬":"♩";
-  sfxBtn.title=(sfxOn?"關閉點擊音效":"開啟點擊音效")+"（快捷鍵 S）";
+  sfxBtn.title=(sfxOn?"關閉音效（操作與角色聲音）":"開啟音效（操作與角色聲音）")+"（快捷鍵 S）";
 }
 function toggleSfx(){
   sfxOn=!sfxOn;
@@ -1089,20 +1240,67 @@ function toggleSfx(){
 }
 sfxBtn.addEventListener("click",toggleSfx);
 syncSfxBtn();
-// 一般可點擊的東西（按鈕、分頁、展開框）都給一聲叮；放在 document 冒泡階段，晚於各按鈕自己的處理，
+// 重要操作給一聲叮；放在 document 冒泡階段，晚於各按鈕自己的處理，
 // 所以開啟建築或關閉面板時只會聽到對應的開啟／關閉音
 document.addEventListener("click",function(e){
-  var t=e.target.closest&&e.target.closest("button, summary, a[href], [role=tab]");
+  // 評審建議：音效只留給重要操作（開關面板另有音效；這裡是切換案例、切換分頁、時間線與幾個開關）
+  var t=e.target.closest&&e.target.closest(".casepick button, .cc-tabs [role=tab], .tl button, .linkcase, #pRead, #motionBtn, .gstart");
   if(!t||t===sfxBtn||t.disabled)return;
   playSfx("tap");
 });
-window.KISfx={play:playSfx};
+window.KISfx={play:playSfx,charVoice:playCharVoice};
 
 /* 簡介框：桌面預設展開 */
+/* ---------------- Netlify 標誌避讓 ----------------
+   Netlify 免費方案會在右下角插入「Powered by Netlify」標誌（iframe#nl-badge-frame，固定在最上層、非同步載入）。
+   偵測到它時：底部選單若與標誌重疊，就整個往上移到標誌上方；面板底部也多留空間，避免最後幾行被蓋住。
+   本機預覽與 GitHub Pages 沒有這個標誌，不受影響。 */
+(function(){
+  var dock=document.getElementById("dock");
+  function place(){
+    var b=document.getElementById("nl-badge-frame");
+    document.body.classList.toggle("has-nl-badge",!!b);
+    dock.style.bottom="";
+    if(!b) return;
+    var br=b.getBoundingClientRect(), dr=dock.getBoundingClientRect();
+    var visTop=br.top+3, visLeft=br.left+3;            // 標誌外圍有約 3px 透明邊
+    if(dr.right>visLeft && dr.bottom>visTop) dock.style.bottom=Math.ceil(innerHeight-visTop+8)+"px";
+  }
+  try{ new MutationObserver(place).observe(document.body,{childList:true}); }catch(e){}
+  try{ new ResizeObserver(place).observe(dock); }catch(e){}
+  window.addEventListener("resize",place);
+  place();
+})();
+
 /* 簡介預設收合，讓 3D 知識島成為首頁主角；點「關於這座島」即可展開 */
 
 /* 載入與錯誤 */
-function hideLoading(){var l=document.getElementById("loading");l.classList.add("hide");}
+function hideLoading(){var l=document.getElementById("loading");l.classList.add("hide");showGuide();}
+/* 第一次進站的導覽小卡：關掉、按「開始探索」或自己開了任何面板後，就不再出現 */
+var guide=document.getElementById("guide"), guideTimer=0;
+function guideSeen(){ try{ return localStorage.getItem("ki-guide")==="seen"; }catch(e){ return false; } }
+function dismissGuide(){
+  clearTimeout(guideTimer);
+  try{ localStorage.setItem("ki-guide","seen"); }catch(e){}
+  if(guide.hidden) return;
+  guide.classList.remove("show"); setTimeout(function(){ guide.hidden=true; },300);
+}
+function placeGuide(){
+  if(guide.hidden) return;
+  var d=document.getElementById("dock").getBoundingClientRect();
+  guide.style.bottom=Math.round(innerHeight-d.top+12)+"px";
+}
+function showGuide(){
+  if(guideSeen()||!guide.hidden) return;
+  guideTimer=setTimeout(function(){
+    if(panel.classList.contains("open")||guideSeen()) return;
+    guide.hidden=false; placeGuide();
+    requestAnimationFrame(function(){ guide.classList.add("show"); });
+  },700);
+}
+guide.querySelector(".gstart").addEventListener("click",function(){ dismissGuide(); open("history"); });
+guide.querySelector(".gx").addEventListener("click",dismissGuide);
+window.addEventListener("resize",placeGuide);
 function showError(msg){
   hideLoading();
   document.getElementById("errorMsg").textContent=msg;
@@ -1731,7 +1929,8 @@ const actors = [];     // { id, node, h(泡泡高度), line(對話), update(t), 
 const charHits = [];   // 角色的隱形感應區（比角色本身大一點，比較容易移到）
 function addActor(o){
   o.k = 0; o.lt = 0; o.y0 = o.node.position.y;
-  const hit = new THREE.Mesh(new THREE.SphereGeometry(o.r || 0.75, 8, 6), new THREE.MeshBasicMaterial());
+  // 觸控裝置的手指比滑鼠粗，感應區放大 1.6 倍
+  const hit = new THREE.Mesh(new THREE.SphereGeometry((o.r || 0.75) * (coarse ? 1.6 : 1), 8, 6), new THREE.MeshBasicMaterial());
   hit.visible = false; hit.position.y = o.cy ?? 0.65; hit.userData.charId = o.id; hit.userData.keep = true;
   o.node.add(hit); charHits.push(hit); actors.push(o); return o;
 }
@@ -2210,7 +2409,7 @@ function pickAny(cx, cy){
   return hit.object.userData.charId ? { char:true, id:hit.object.userData.charId } : { char:false, id:hit.object.userData.id };
 }
 function pick(cx, cy){ const h = pickAny(cx, cy); return h && !h.char ? h.id : null; }
-function setCharHover(id){ if (charHovered !== id){ charHovered = id; clearTimeout(charTapTimer); } }
+function setCharHover(id){ if (charHovered !== id){ charHovered = id; clearTimeout(charTapTimer); if (id && window.KISfx && window.KISfx.charVoice) window.KISfx.charVoice(id); } }
 function setHover(id){
   hovered = id;
   for (const k in labels) labels[k].classList.toggle("hot", k === id);
@@ -2220,7 +2419,8 @@ let down = null;
 canvas.addEventListener("pointerdown", e=>{ cancelTween(); zoomGoal = null; down = { x:e.clientX, y:e.clientY, t:performance.now() }; if (e.pointerType === "mouse") canvas.style.cursor = "grabbing"; });
 canvas.addEventListener("pointermove", e=>{ if (e.pointerType !== "mouse" || (down && e.buttons)) return;
   const h = pickAny(e.clientX, e.clientY); setHover(h && !h.char ? h.id : null); setCharHover(h && h.char ? h.id : null); });
-canvas.addEventListener("pointerleave", ()=>{ setHover(null); setCharHover(null); });
+// 只處理滑鼠：手機／平板放開手指後，瀏覽器也會送出 pointerleave，若照樣清除，點角色的打招呼會立刻被取消
+canvas.addEventListener("pointerleave", e=>{ if (e.pointerType !== "mouse") return; setHover(null); setCharHover(null); });
 window.addEventListener("pointerup", e=>{
   if (!down) return;
   const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t;
