@@ -100,7 +100,11 @@ body.talk-open #skyLabel{opacity:0}
 #guide::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border:8px solid transparent;border-bottom:0;border-top-color:var(--gold)}
 #guide .gtxt{flex:1;font-size:.92rem;line-height:1.65}
 #guide .gtxt b{color:var(--gold-l)}
-#guide .gbtns{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+#guide .gbtns{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#guide .gstart[hidden]{display:none}
+#guide .gdots{display:inline-flex;gap:5px;margin-left:auto}
+#guide .gdots i{width:7px;height:7px;border-radius:50%;background:rgba(243,224,168,.3)}
+#guide .gdots i.on{background:var(--gold-l);box-shadow:0 0 6px var(--gold-l)}
 #guide .gstart{border:0;border-radius:999px;padding:.45rem 1.05rem;background:linear-gradient(180deg,var(--gold-l),var(--gold));color:#1b1408;font-family:var(--serif);font-weight:900;font-size:.92rem;letter-spacing:.05em;cursor:pointer}
 #guide .gstart:hover{background:linear-gradient(180deg,#fff0c0,var(--gold-l))}
 #guide .gx{flex:none;border:0;background:transparent;font-size:1.25rem;line-height:1;width:32px;height:32px;border-radius:8px;cursor:pointer;color:#d9cfb8}
@@ -146,6 +150,9 @@ body.read-mode .hl{background-image:linear-gradient(transparent 50%,rgba(255,190
 /* 底部選單：看過的建築，圓點上打勾 */
 #dock .dot{position:relative}
 #dock button.visited .dot::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-size:.56rem;line-height:1;color:#fff;font-weight:900;font-family:var(--font)}
+/* 2026-11-14：建築名稱改畫在場景裡的布條上（banners）。HTML 名牌保留給鍵盤與讀屏軟體，平常透明，用鍵盤移到時才顯示 */
+body.inworld-labels .blabel{opacity:0}
+body.inworld-labels .blabel:focus-visible{opacity:1}
 /* 學院城堡不是知識館：用較小、較淡的次要名牌 */
 .blabel.b-about{font-size:.74rem;padding:.2rem .55rem .2rem .25rem;background:rgba(20,25,56,.7)}
 .blabel.b-about .num{width:1.05rem;height:1.05rem;font-size:.62rem}
@@ -555,6 +562,13 @@ i.who.h{background:#e3a33a}i.who.ai{background:#4a7cc0}
 .t-msg .q{margin-top:6px}
 .t-msg .t-note{display:block;margin-top:6px;font-size:.9rem;color:var(--muted)}
 .t-msg.ok{border-left:4px solid #3f9658}.t-msg.no{border-left:4px solid #d9782b}
+/* 角色「思考中」：三個跳動的圓點，模擬等待 AI 回答 */
+.t-msg.typing{display:inline-flex;gap:5px;align-items:center;padding:13px 15px}
+.t-msg.typing i{width:7px;height:7px;border-radius:50%;background:#8a7354;animation:tDot 1.1s ease-in-out infinite}
+.t-msg.typing i:nth-child(2){animation-delay:.16s}.t-msg.typing i:nth-child(3){animation-delay:.32s}
+@keyframes tDot{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+html.reduce-motion .t-msg.typing i{animation:none;opacity:.7}
+#tChoices.busy{opacity:.45;pointer-events:none;transition:opacity .2s}
 @keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .t-choices{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 14px;border-top:1px solid rgba(216,178,106,.25)}
 .t-choices button{border:1px solid rgba(216,178,106,.55);background:rgba(255,255,255,.06);color:#f3e7cc;border-radius:999px;
@@ -611,9 +625,9 @@ html.reduce-motion *{transition:none!important;animation:none!important}
   <button type="button" id="sfxBtn" aria-pressed="true" aria-label="音效" title="關閉音效（操作與角色聲音）（快捷鍵 S）"><span class="ico" aria-hidden="true">♬</span><span class="long">音效</span></button>
 </nav>
 
-<div id="guide" role="dialog" aria-label="第一次來的建議路線" hidden>
-  <div class="gtxt"><div class="gttl">✦ 第一次來嗎？</div>建議從 <b>① AI 命題歷程館</b>開始，依序看完三棟建築。
-    <div class="gbtns"><button type="button" class="gstart">開始探索</button></div></div>
+<div id="guide" role="dialog" aria-label="第一次來的操作導覽" hidden>
+  <div class="gtxt"><div class="gttl" id="gTtl"></div><div id="gBody" aria-live="polite"></div>
+    <div class="gbtns"><button type="button" class="gstart gnext">下一步</button><button type="button" class="gstart gfin" hidden>開始探索</button><span class="gdots" id="gDots" aria-hidden="true"></span></div></div>
   <button type="button" class="gx" aria-label="關閉建議" title="關閉">×</button>
 </div>
 
@@ -1548,10 +1562,10 @@ window.KISfx={play:playSfx,charVoice:playCharVoice};
 function hideLoading(){var l=document.getElementById("loading");l.classList.add("hide");showGuide();}
 /* 第一次進站的導覽小卡：關掉、按「開始探索」或自己開了任何面板後，就不再出現 */
 var guide=document.getElementById("guide"), guideTimer=0;
-function guideSeen(){ try{ return localStorage.getItem("ki-guide")==="seen"; }catch(e){ return false; } }
+function guideSeen(){ try{ return localStorage.getItem("ki-guide2")==="seen"; }catch(e){ return false; } }
 function dismissGuide(){
   clearTimeout(guideTimer);
-  try{ localStorage.setItem("ki-guide","seen"); }catch(e){}
+  try{ localStorage.setItem("ki-guide2","seen"); }catch(e){}
   if(guide.hidden) return;
   guide.classList.remove("show"); setTimeout(function(){ guide.hidden=true; },300);
 }
@@ -1568,7 +1582,25 @@ function showGuide(){
     requestAnimationFrame(function(){ guide.classList.add("show"); });
   },700);
 }
-guide.querySelector(".gstart").addEventListener("click",function(){ dismissGuide(); open("history"); });
+/* 導覽分四步：旋轉與縮放 → 點建築 → 點角色聊天 → 建議路線。每一步只講一件事，最後一步才是「開始探索」 */
+var GUIDE_STEPS=[
+  ["✦ 歡迎登上知識島","按住<b>拖曳</b>可以旋轉島嶼；<b>滾輪</b>（手機用雙指）可以放大、縮小，靠近一點看看建築和角色。"],
+  ["✦ 點建築看內容","點選建築或它上方的<b>名稱布條</b>，會打開那一館的知識面板。下方選單也可以直接進入。"],
+  ["✦ 角色可以點","三棟建築門口的<b>小學者、觀星學徒、煉金師</b>可以點，他們會和你聊天，還有小挑戰。其他角色和天上比較亮的星星，也可以摸摸看。"],
+  ["✦ 建議路線","建議從 <b>① AI 命題歷程館</b>開始，依序看完三棟建築。"]
+];
+var guideStep=0;
+function renderGuide(){
+  var st=GUIDE_STEPS[guideStep], last=guideStep===GUIDE_STEPS.length-1;
+  document.getElementById("gTtl").textContent=st[0];
+  document.getElementById("gBody").innerHTML=st[1];
+  guide.querySelector(".gnext").hidden=last; guide.querySelector(".gfin").hidden=!last;
+  document.getElementById("gDots").innerHTML=GUIDE_STEPS.map(function(_,i){return '<i'+(i===guideStep?' class="on"':'')+'></i>';}).join("");
+  placeGuide();
+}
+renderGuide();
+guide.querySelector(".gnext").addEventListener("click",function(){ guideStep=Math.min(guideStep+1,GUIDE_STEPS.length-1); renderGuide(); guide.querySelector(guideStep===GUIDE_STEPS.length-1?".gfin":".gnext").focus({preventScroll:true}); });
+guide.querySelector(".gfin").addEventListener("click",function(){ dismissGuide(); open("history"); });
 guide.querySelector(".gx").addEventListener("click",dismissGuide);
 window.addEventListener("resize",placeGuide);
 function showError(msg){
@@ -1630,19 +1662,51 @@ var talkId=null, talkStep={find:0,fix:0}, talkFocusBack=null;
 function talkIsOpen(){return !!talkId;}
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 var talkMark=null;
-function tSay(html,cls){var m=el('<div class="t-msg c'+(cls?' '+cls:'')+'"></div>');m.innerHTML=html;tLog.appendChild(m);if(!talkMark)talkMark=m;return m;}
+/* 2026-11-14：角色的回覆不再瞬間全部出現。tSay() 與 tChoicesSet() 只是把內容排進佇列，由 tPump() 依序顯示：
+   先出現「思考中」的跳動圓點，停頓一下才換成回覆；多則回覆一則一則出來，最後才出現下一組選項。
+   停頓時間依文字長度決定（第一則較久，像在思考；後續較短）。對話關閉或換角色時，佇列作廢（talkRun 遞增）。 */
+var talkQueue=[], talkBusy=false, talkRun=0, talkFirst=true;
+function tSay(html,cls){var m=el('<div class="t-msg c'+(cls?' '+cls:'')+'"></div>');m.innerHTML=html;talkQueue.push({say:m});tPump();return m;}
+function tReset(){ talkRun++; talkQueue=[]; talkBusy=false; talkFirst=true; tChoices.classList.remove("busy"); }
+function tPump(){
+  if(talkBusy) return;
+  var item=talkQueue.shift(); if(!item) return;
+  var run=talkRun;
+  if(item.choices){ tChoicesRender(item.choices); talkFirst=true; return tPump(); }
+  talkBusy=true;
+  var m=item.say, len=(m.textContent||"").length, isBlock=!!m.querySelector(".t-q");
+  var wait=isBlock ? 450 : Math.max(talkFirst?750:420, Math.min(talkFirst?1700:950, (talkFirst?520:260)+len*16));
+  talkFirst=false;
+  var dots=el('<div class="t-msg c typing" aria-hidden="true"><i></i><i></i><i></i></div>');
+  tLog.appendChild(dots); tLog.scrollTo({top:tLog.scrollHeight,behavior:motionReduced()?"auto":"smooth"});
+  setTimeout(function(){
+    if(run!==talkRun) return;                      // 對話已關閉或換了角色
+    if(dots.parentNode) dots.parentNode.removeChild(dots);
+    tLog.appendChild(m); if(!talkMark) talkMark=m;
+    tLog.scrollTo({top:Math.max(0,(talkMark.offsetTop-tLog.offsetTop-6)),behavior:motionReduced()?"auto":"smooth"});
+    talkBusy=false; tPump();
+  },wait);
+}
 function tUser(text){var m=el('<div class="t-msg u"></div>');m.textContent=text;tLog.appendChild(m);if(!talkMark)talkMark=m;}
 /* 一個回合結束：捲到這回合的第一則訊息（題目很長時，不會直接跳到底部看不到題幹） */
 function tFlush(){ if(talkMark){ var top=talkMark.offsetTop-tLog.offsetTop-6; tLog.scrollTo({top:Math.max(0,top),behavior:motionReduced()?"auto":"smooth"}); } talkMark=null; }
-function tChoicesSet(list){
-  tChoices.innerHTML="";
+function tChoicesSet(list){ talkQueue.push({choices:list}); tPump(); }
+function tChoicesRender(list){
+  var hadFocus=talkEl.contains(document.activeElement)||document.activeElement===document.body;
+  tChoices.innerHTML=""; tChoices.classList.remove("busy");
   list.forEach(function(c){
     var b=el('<button type="button"'+(c.cls?' class="'+c.cls+'"':'')+'></button>');
     b.innerHTML=c.html||esc(c.label);
-    b.addEventListener("click",function(){ playSfx("tap"); c.fn(b); });
+    b.addEventListener("click",function(){
+      if(tChoices.classList.contains("busy")) return;
+      playSfx("tap"); tChoices.classList.add("busy");            // 等角色回覆時，舊選項變淡、不能再按
+      c.fn(b);
+      if(!talkQueue.length && !talkBusy) tChoices.classList.remove("busy");   // 這個選項沒有後續回覆（例如開啟建築）
+    });
     tChoices.appendChild(b);
   });
   tFlush();
+  if(hadFocus && talkId){ var f=tChoices.querySelector("button"); if(f) f.focus({preventScroll:true}); }
 }
 function tMenu(){
   var t=TALKERS[talkId], list=TOPICS[talkId].map(function(tp){
@@ -1771,7 +1835,7 @@ function talkOpen(id){
   document.getElementById("tFace").textContent=t.face;
   document.getElementById("tName").textContent=t.name;
   document.getElementById("tSub").textContent=t.sub;
-  tLog.innerHTML=""; talkMark=null;
+  tLog.innerHTML=""; talkMark=null; tChoices.innerHTML=""; tReset();
   tSay(esc(t.hello)); tMenu();
   talkEl.hidden=false; document.body.classList.add("talk-open");
   requestAnimationFrame(function(){ talkEl.classList.add("show"); var f=tChoices.querySelector("button"); if(f) f.focus({preventScroll:true}); });
@@ -1781,7 +1845,7 @@ function talkOpen(id){
 /* back=true：鏡頭飛回對話前的位置；開啟建築面板時傳 false（由面板自己飛過去） */
 function talkClose(back){
   if(!talkId) return;
-  talkId=null;
+  talkId=null; tReset();
   talkEl.classList.remove("show"); document.body.classList.remove("talk-open");
   setTimeout(function(){ if(!talkId) talkEl.hidden=true; },300);
   if(window.Island3D && window.Island3D.talkEnd) window.Island3D.talkEnd(back);
@@ -2262,7 +2326,92 @@ async function loadModel(cfg){
   }
 }
 const lateLoaders = [];   // 建築載完後才載的小模型（角色），一樣一次一個
-(async ()=>{ for (const id in MODELS) await loadModel(MODELS[id]); for (const f of lateLoaders) await f(); window.__modelsDone = true; })();
+(async ()=>{ await loadIsland(); await loadCastleExtras(); for (const id in MODELS) await loadModel(MODELS[id]); for (const f of lateLoaders) await f(); window.__modelsDone = true; })();
+/* 浮空島本體（2026-11-14）：用 Tripo 模型 models/island.glb 取代程式繪製的草地、土層與岩石；載入失敗就保留原本的。
+   島上所有東西都是照「平坦的地面、高度 Y0」擺放的，但 AI 生成的頂面有起伏（放大後落差約 1.3），
+   所以載入時把頂面附近的頂點壓到同一個高度，再讓這個平面對齊 Y0。 */
+/* 漂浮石階（models/stairs.glb）：載入失敗就保留程式繪製的石板。 */
+async function loadCastleExtras(){
+  const tryLoad = async url => { for (let i = 0; i < 3; i++){ try { return await gltfLoader.parseAsync(await fetchBuffer(url), "models/"); }
+      catch (err){ if (i === 2 || err.permanent){ console.warn("模型載入失敗：" + url, err); return null; } await new Promise(r => setTimeout(r, 500*(i+1))); } } return null; };
+  // 城堡的浮空岩用主島模型的縮小版（見 loadIsland）：另外生成的岩石草地顏色與岩石質感和主島差太多，使用者要求一致
+  const st = await tryLoad("models/stairs.glb");
+  if (st){
+    // 模型的階梯沿著自己的 X 軸由低到高（寬 1、高 0.84、深 0.27）；轉 90 度後高的一端朝城堡，再分別縮放成需要的長、高、寬
+    const model = st.scene, bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), ctr = bb.getCenter(new THREE.Vector3());
+    const RUN = 1.9, RISE = 1.345, WIDTH = 1.5, zMid = 5.15, topY = 0.44;      // 城堡座標：從岩石邊緣（z≈4.2）往下跨過兩島之間的空隙，接到主島邊緣（z≈6.1）。起點不能再往內，否則上半段會埋進草地，只露出一階
+    const sx = RUN / size.x, sy = RISE / (size.y * 0.76), sz = WIDTH / size.z;   // 0.76：最低一階的階面到最高一階的階面，約佔模型總高的 76%
+    model.scale.set(sx, sy, sz); model.position.set(-ctr.x*sx, -bb.max.y*sy, -ctr.z*sz);
+    model.traverse(o=>{ if (!o.isMesh) return; o.castShadow = o.receiveShadow = true; const m = o.material; m.envMapIntensity = 0.5;
+      if (m.map){ m.emissiveMap = m.map; m.emissive.setRGB(0.16, 0.15, 0.12); } });
+    const h = new THREE.Group(); h.userData.keep = true; h.rotation.y = Math.PI/2; h.position.set(0, topY, zMid); h.add(model); castle.add(h);
+    for (const o of castle.userData.steps || []) o.visible = false;
+  }
+}
+/* 把島嶼模型頂面附近的頂點壓成同一個高度（cutK、flatK 是相對模型高度的比例），回傳壓平後的高度 */
+function flattenIslandTop(g, cutK, flatK){
+  const pos = g.attributes.position, nor = g.attributes.normal;
+  if (!pos || pos.isInterleavedBufferAttribute) return null;
+  g.computeBoundingBox(); const bb = g.boundingBox, H = bb.max.y - bb.min.y, cut = bb.max.y - cutK*H, fy = bb.max.y - flatK*H;
+  for (let i = 0; i < pos.count; i++) if (pos.getY(i) > cut){ pos.setY(i, fy); if (nor && !nor.isInterleavedBufferAttribute) nor.setXYZ(i, 0, 1, 0); }
+  pos.needsUpdate = true; if (nor) nor.needsUpdate = true; g.computeBoundingBox(); g.computeBoundingSphere();
+  return fy;
+}
+/* 島嶼模型的材質：壓暗、降低飽和度，並讓貼圖上偏藍青色的水晶自己發光 */
+function styleIslandMaterial(m){
+  const NL = String.fromCharCode(10);
+  m.envMapIntensity = 0.3; m.color.setRGB(...ISLAND_MODEL.tint);
+  m.onBeforeCompile = sh => {
+    sh.fragmentShader = sh.fragmentShader.replace("#include <map_fragment>", "#include <map_fragment>" + NL +
+      "  diffuseColor.rgb = mix(vec3(dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11))), diffuseColor.rgb, " + ISLAND_MODEL.saturation.toFixed(2) + ");" + NL +
+      "  float kiCry = smoothstep(0.1, 0.26, sampledDiffuseColor.b - max(sampledDiffuseColor.r, sampledDiffuseColor.g * 0.86));" + NL +
+      "  totalEmissiveRadiance += sampledDiffuseColor.rgb * kiCry * uCrystalGlow;")
+      .replace("void main() {", "uniform float uCrystalGlow;" + NL + "void main() {");
+    sh.uniforms.uCrystalGlow = crystalGlow; };
+}
+const crystalGlow = { value:1.6 };   // 島嶼岩石上水晶的發光強度（每幀在 updateSky 裡微調，做出呼吸般的明暗）
+const ISLAND_MODEL = { width:24.6, depthScale:0.68, tint:[0.8, 0.8, 0.86], saturation:0.58, rotY:Math.PI*0.75 };   // rotY：讓邊緣較寬的兩側對準兩道瀑布
+async function loadIsland(){
+  for (let attempt = 0; attempt < 3; attempt++){
+    try {
+      const gltf = await gltfLoader.parseAsync(await fetchBuffer("models/island.glb"), "models/");
+      const model = gltf.scene; let flatY = null;
+      model.traverse(o=>{
+        if (!o.isMesh) return;
+        const g = o.geometry, pos = g.attributes.position, nor = g.attributes.normal;
+        if (pos && !pos.isInterleavedBufferAttribute){
+          g.computeBoundingBox(); const bb = g.boundingBox, H = bb.max.y - bb.min.y, cut = bb.max.y - 0.075*H, fy = bb.max.y - 0.035*H;
+          for (let i = 0; i < pos.count; i++) if (pos.getY(i) > cut){ pos.setY(i, fy); if (nor && !nor.isInterleavedBufferAttribute) nor.setXYZ(i, 0, 1, 0); }
+          pos.needsUpdate = true; if (nor) nor.needsUpdate = true; g.computeBoundingBox(); g.computeBoundingSphere(); flatY = fy;
+        }
+        o.receiveShadow = true; o.castShadow = false;
+        const m = o.material; m.envMapIntensity = 0.3; m.color.setRGB(...ISLAND_MODEL.tint);   // 原始貼圖的草綠太鮮豔：整體壓暗一點，並在著色器裡降低飽和度，配合黃昏的色調
+        m.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace("#include <map_fragment>",
+          "#include <map_fragment>" + String.fromCharCode(10) + "  diffuseColor.rgb = mix(vec3(dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11))), diffuseColor.rgb, " + ISLAND_MODEL.saturation.toFixed(2) + ");" + String.fromCharCode(10) +
+          // 水晶發光：貼圖上偏藍青色的部分（水晶）自己發亮，亮度由 crystalGlow 控制，會緩慢明暗
+          "  float kiCry = smoothstep(0.1, 0.26, sampledDiffuseColor.b - max(sampledDiffuseColor.r, sampledDiffuseColor.g * 0.86));" + String.fromCharCode(10) +
+          "  totalEmissiveRadiance += sampledDiffuseColor.rgb * kiCry * uCrystalGlow;")
+          .replace("void main() {", "uniform float uCrystalGlow;" + String.fromCharCode(10) + "void main() {");
+          sh.uniforms.uCrystalGlow = crystalGlow; };
+      });
+      const bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), ctr = bb.getCenter(new THREE.Vector3());
+      const sc = ISLAND_MODEL.width / Math.max(size.x, size.z), sy = sc * ISLAND_MODEL.depthScale;
+      model.scale.set(sc, sy, sc);
+      model.position.set(-ctr.x*sc, Y0 - 0.012 - (flatY ?? bb.max.y)*sy, -ctr.z*sc);
+      const holder = new THREE.Group(); holder.userData.keep = true; holder.rotation.y = ISLAND_MODEL.rotY; holder.add(model); island.add(holder);
+      for (const o of [top, rim, dirt, rock, rockB, rockC]) o.visible = false;
+      // 城堡下面的浮空岩：用同一個模型縮小、換個角度（共用幾何與貼圖，不必多下載一個檔案）。城堡群組的地面高度是 0.4
+      const cw = 8.8, csc = cw / Math.max(size.x, size.z), csy = csc * 1.1;
+      const m2 = model.clone(); m2.scale.set(csc, csy, csc); m2.position.set(-ctr.x*csc, 0.4 - 0.012 - (flatY ?? bb.max.y)*csy, -ctr.z*csc);
+      const h2 = new THREE.Group(); h2.userData.keep = true; h2.rotation.y = 0.9; h2.add(m2); castle.add(h2); castle.userData.cloneBase = h2;
+      for (const o of castle.userData.baseParts || []) o.visible = false;
+      return;
+    } catch (err){
+      if (attempt === 2 || err.permanent){ console.warn("島嶼模型載入失敗，保留程式繪製的島：", err); return; }
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+    }
+  }
+}
 /* 角色模型：把 Tripo 模型放進角色節點，取代程式繪製的造型；失敗時保留原本的造型。回傳模型的外層群組（做動作用）或 null */
 async function loadCharModel(url, node, height, rotY = 0, maxW = 0){
   for (let attempt = 0; attempt < 3; attempt++){
@@ -2325,7 +2474,7 @@ const lily = mesh(new THREE.CylinderGeometry(0.25,0.25,0.03,7), mat(C.leaf3), fa
 blockers.push({ p: pondPos.clone(), r: 1.9 });
 
 /* ---------- 學院城堡：島後方的浮空岩上，以石橋連接；點選開啟「網站說明」 ---------- */
-const castlePos = at(0, -17.6);
+const castlePos = at(0, -20.2);   // 2026-11-14：往後移（原 -17.6），兩座島之間留出空隙，由石階相連
 const CASTLE_SCALE = 1.45, CASTLE_LIFT = 1.4;
 const CASTLE_GROUND = -CASTLE_LIFT / CASTLE_SCALE;   // 主島地面在城堡座標中的高度
 const castle = new THREE.Group();
@@ -2337,6 +2486,7 @@ const castle = new THREE.Group();
   const rk = new THREE.ConeGeometry(3.1,6,10,3); rk.rotateX(Math.PI);
   const rock = mesh(jitter(rk,0.3,0.4), mat(C.rock)); rock.position.y = -4.4; g.add(rock);
   for (const o of [top, dirt, rock]) o.userData.keep = true;   // 換成 Tripo 模型時，浮空岩與石階保留
+  g.userData.baseParts = [top, dirt, rock];                    // 島嶼模型載入後，城堡的浮空岩也換成同一個模型（見 loadIsland）
   const B = 0.4;   // 地面高度（相對城堡群組）
   // 主堡
   const keep = box(2.8,4.2,2.2,C.castle); keep.position.set(0,B+2.1,-0.6); g.add(keep);
@@ -2363,11 +2513,11 @@ const castle = new THREE.Group();
   const flagTex = textTexture("✦", { w:96, h:192, bg:"#7a2a3a", fg:"#f3e0a8", font:"900 80px", border:"#d8b26a", radius:6 });
   for (const x of [-1.15,1.15]){ const f = mesh(new THREE.PlaneGeometry(0.5,1.0), new THREE.MeshLambertMaterial({ map:flagTex, side:THREE.DoubleSide }), false, false); f.position.set(x,B+1.35,1.16); g.add(f); }
   // 漂浮石階：從浮空岩前緣一階一階往下，接到主島邊緣
-  const STEP_N = 8, yTop = 0.36, yBot = CASTLE_GROUND - 0.02, z0 = 3.3, z1 = 5.5;
+  const STEP_N = 7, yTop = 0.36, yBot = CASTLE_GROUND - 0.02, z0 = 4.35, z1 = 5.9;
   for (let i=0;i<STEP_N;i++){
     const k = i/(STEP_N-1);
     const st = box(1.3,0.16,0.36, i%2 ? C.stone : C.stone2);
-    st.position.set(0, yTop + (yBot - yTop)*k, z0 + (z1 - z0)*k); st.userData.keep = true; g.add(st);
+    st.position.set(0, yTop + (yBot - yTop)*k, z0 + (z1 - z0)*k); st.userData.keep = true; g.add(st); (g.userData.steps ||= []).push(st);
   }
   g.add(glowSprite(0xffc46b, 2.2, B+0.7)).children.at(-1).position.z = 1.3;
   g.userData.labelY = B + 9.6;
@@ -2777,7 +2927,7 @@ controls.enablePan = false;
 controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.8;
 controls.minPolarAngle = 0.32; controls.maxPolarAngle = 1.32;
 controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
-const HOME_TARGET = at(0, -3.6).setY(2.6);   // 稍微往後、往上，讓後方的城堡也完整進入全景
+const HOME_TARGET = at(0, -4.5).setY(2.6);   // 稍微往後、往上，讓後方的城堡也完整進入全景
 const POLAR = 0.98;   // 稍微再俯視一點：後方城堡的大門與階梯會高過中央塔樓
 const HOME_DIR = new THREE.Vector3(Math.sin(Math.PI/4)*Math.sin(POLAR), Math.cos(POLAR), Math.cos(Math.PI/4)*Math.sin(POLAR)).normalize();
 
@@ -2859,6 +3009,7 @@ const meteor = (()=>{
 })();
 const _sv = new THREE.Vector3(), _sr = new THREE.Vector3(), _su = new THREE.Vector3(), _sf = new THREE.Vector3();
 function updateSky(t, dt){
+  crystalGlow.value = REDUCED ? 1.6 : 1.7 + Math.sin(t*1.4)*0.6;
   // 遠方浮島：很慢的上下浮動、窗光微微明暗
   if (!REDUCED) for (const g of farIsles){ g.position.y = g.userData.y0 + Math.sin(t*0.22 + g.userData.ph)*0.7; if (g.userData.light) g.userData.light.opacity = 0.75 + Math.sin(t*1.3 + g.userData.ph)*0.15; }
   // 星座：算出螢幕位置（給游標判定用），連線淡入淡出
@@ -2907,7 +3058,7 @@ function homeDistance(){
   const aspect = viewAspect();
   const vHalf = THREE.MathUtils.degToRad(camera.fov/2);
   const hHalf = Math.atan(Math.tan(vHalf)*aspect);
-  const radius = aspect < 0.8 ? 15.2 : 15.8;
+  const radius = aspect < 0.8 ? 15.8 : 16.3;   // 城堡後移後，全景要再退一點才看得到整座城堡
   const d = radius / Math.sin(Math.min(vHalf, hHalf));
   return Math.max(30, Math.min(d, 95));
 }
@@ -3016,6 +3167,57 @@ for (const id of Object.keys(buildings)){
   b.addEventListener("pointerleave", ()=> setHover(null));
   labelLayer.appendChild(b); labels[id] = b;
 }
+/* 場景裡的名稱布條：深藍布面、金邊、編號印章，飄在建築上方；會被前面的東西遮住、隨遠近縮放，正對鏡頭。
+   名稱與副標畫在同一張貼圖上（正式館名＋主題名稱與操作提示）。
+   2026-11-14 試過改成立在地上的木牌，全景時字太小又容易被建築擋住，使用者決定回到布條。 */
+const banners = {};
+function makeBanner(id, num, name, sub, color, W){
+  const cw = 1024, ch = sub ? 300 : 210, c = document.createElement("canvas"); c.width = cw; c.height = ch;   // 沒有副標時做成較扁的單行布條
+  const g = c.getContext("2d"), SERIF = '"Noto Serif TC","Songti TC","PMingLiU","Noto Sans TC",serif';
+  const shape = (inset)=>{ const n = 46, x0 = inset, x1 = cw - inset, y0 = 14 + inset, y1 = ch - 14 - inset, ym = ch/2;   // 兩端燕尾的布條
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y0); g.lineTo(x1 - n, ym); g.lineTo(x1, y1); g.lineTo(x0, y1); g.lineTo(x0 + n, ym); g.closePath(); };
+  const draw = ()=>{
+    g.clearRect(0,0,cw,ch);
+    const gr = g.createLinearGradient(0,0,0,ch); gr.addColorStop(0,"#232a5e"); gr.addColorStop(1,"#111533");
+    shape(4); g.fillStyle = gr; g.fill(); g.lineWidth = 8; g.strokeStyle = "#d8b26a"; g.stroke();
+    shape(20); g.lineWidth = 2.5; g.strokeStyle = "rgba(243,224,168,.55)"; g.stroke();
+    const sx = 150, sy = ch/2, sr = 62;
+    g.beginPath(); g.arc(sx, sy, sr, 0, Math.PI*2); g.fillStyle = color; g.fill(); g.lineWidth = 7; g.strokeStyle = "#f3e0a8"; g.stroke();
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = "900 78px " + SERIF; g.fillText(num, sx, sy + 5);
+    g.textAlign = "left"; g.fillStyle = "#f8ecc8"; g.font = "900 92px " + SERIF;
+    let tw = g.measureText(name).width; const maxW = cw - 245 - 70;
+    if (tw > maxW){ g.font = "900 " + Math.floor(92*maxW/tw) + "px " + SERIF; }
+    g.fillText(name, 245, sub ? 120 : ch/2 + 4);
+    if (sub){ g.fillStyle = "#d8b26a"; g.font = "700 44px " + SERIF; g.fillText(sub, 248, 212); }
+  };
+  draw();
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  if (document.fonts && document.fonts.load) Promise.all([document.fonts.load("900 92px " + SERIF, name + num), document.fonts.load("700 44px " + SERIF, sub || name)]).then(()=>{ draw(); tex.needsUpdate = true; }).catch(()=>{});
+  const mat = new THREE.MeshBasicMaterial({ map:tex, transparent:true, opacity:0.96, side:THREE.DoubleSide, fog:false, toneMapped:false, depthWrite:false });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(W, W*ch/cw), mat);
+  m.userData.id = id; m.renderOrder = 2; scene.add(m);
+  banners[id] = { mesh:m, k:0, ph:Object.keys(banners).length*1.7, W };
+}
+// 2026-11-14 使用者要求大小合宜、不要擋到場景：縮小（7.4 → 4.9）、拿掉副標改成單行
+makeBanner("history",   "1", KI.names.history,   "", "#3d6fc0", 4.9);
+makeBanner("diagnosis", "2", KI.names.diagnosis, "", "#d9782b", 4.9);
+makeBanner("strategy",  "3", KI.names.strategy,  "", "#3f9658", 4.9);
+makeBanner("about",     "✦", "學院城堡", "", "#7a2a3a", 3.7);
+document.body.classList.add("inworld-labels");
+function updateBanners(t, dt){
+  for (const id in banners){
+    const b = banners[id], [obj, ay0] = anchors[id];
+    const ay = (obj.userData.modelTop ? obj.userData.modelTop + 1.0 : ay0) + (id === "about" ? -0.6 : 0.45);
+    tmpV.set(0, ay, 0); obj.localToWorld(tmpV);
+    if (!REDUCED) tmpV.y += Math.sin(t*1.1 + b.ph)*0.09;
+    b.mesh.position.copy(tmpV);
+    b.mesh.quaternion.copy(camera.quaternion); if (!REDUCED) b.mesh.rotateZ(Math.sin(t*0.8 + b.ph)*0.014);   // 正對鏡頭（只繞垂直軸轉會被透視拉歪），加一點飄動
+    const want = hovered === id ? 1 : 0;
+    b.k = REDUCED ? want : b.k + (want - b.k)*damp(want ? 10 : 6, dt);
+    b.mesh.scale.setScalar(1 + 0.1*b.k); b.mesh.material.opacity = 0.94 + 0.06*b.k;
+    b.mesh.visible = !talkingId;
+  }
+}
 // 城堡名牌：開啟網站說明
 {
   const b = document.createElement("button");
@@ -3084,7 +3286,7 @@ function updateLabels(){
 /* ---------- picking & hover ---------- */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 let hovered = null, charHovered = null, charTapTimer = 0;
-const pickTargets = [...hitboxes, ...charHits];
+const pickTargets = [...hitboxes, ...charHits, ...Object.values(banners).map(b => b.mesh)];   // 布條也可以點
 /* 取最靠近鏡頭的建築或角色：角色站在建築前面時，以角色為準 */
 function pickAny(cx, cy){
   const r = canvas.getBoundingClientRect();
@@ -3275,6 +3477,7 @@ function frame(now){
   }
   updateSparkles(t, dt, hovered);
   updateSky(t, dt);
+  updateBanners(t, dt);
   // hover / focus highlight
   for (const id in buildings){
     const b = buildings[id];
