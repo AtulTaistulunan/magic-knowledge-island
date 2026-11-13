@@ -449,6 +449,38 @@ body.read-mode .p-body p,body.read-mode .p-body li{line-height:1.9}
 .pending li::before{counter-increment:pd;content:counter(pd);flex:none;width:1.5rem;height:1.5rem;border-radius:50%;background:#e7b93e;color:#fff;display:grid;place-items:center;font-weight:900;font-size:.8rem;margin-top:.1rem}
 .foot{margin-top:24px;padding:12px 14px;border-radius:12px;background:#f3eee2;font-size:.84rem;line-height:1.75;color:var(--ink2)}
 .kbd{display:inline-block;border:1px solid #cfc4ab;border-bottom-width:2px;border-radius:5px;padding:0 .35rem;font-size:.8rem;background:#fff;font-family:inherit}
+/* 說明面板「操作方式」：三張裝置小卡＋開關對照列 */
+.howgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.howcard{background:#fffdf7;border:1px solid var(--line);border-top:3px solid var(--gold-d);border-radius:14px;padding:12px 12px 10px;box-shadow:0 1px 0 rgba(168,130,60,.12)}
+.howcard h4{margin:0 0 8px;font-family:var(--serif);font-size:1rem;color:var(--ink);display:flex;align-items:center;gap:.45rem}
+.howcard h4 .hi{font-size:1.25rem;line-height:1}
+.howcard dl{margin:0;font-size:.9rem;line-height:1.5}
+.howcard dt{font-weight:700;color:var(--ink2)}
+.howcard dd{margin:0 0 7px;color:var(--ink)}
+.howcard dd:last-child{margin-bottom:0}
+.howcard dd::before{content:"→ ";color:var(--gold-d)}
+.howtip{display:flex;gap:.55rem;align-items:baseline;margin:0 0 10px;padding:9px 13px;border-radius:12px;background:#f6efdc;border:1px dashed var(--line);font-size:.9rem;line-height:1.65;color:var(--ink2)}
+.howtip .hi{flex:none;color:var(--gold-d)}
+.swlist{list-style:none;margin:0;padding:0}
+.card .swlist{padding-left:0}
+.swlist li{display:grid;grid-template-columns:38px 6.6em 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);line-height:1.6}
+.swlist li:last-child{border-bottom:0}
+.swchip{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#1f2654,#141938);border:1px solid var(--gold-d);color:var(--gold-l);font-weight:700;font-size:1rem;position:relative}
+.swchip.lamp::after{content:"";position:absolute;top:1px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold)}
+.swname{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.swdesc{font-size:.9rem;color:var(--ink2)}
+.swlegend{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;margin:8px 0 6px;font-size:.84rem;color:var(--muted)}
+.swlegend span{display:inline-flex;align-items:center;gap:.35rem}
+.swlegend i{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px var(--gold);display:inline-block}
+.swlegend i.off{background:#9a9388;box-shadow:none}
+@media (max-width:760px){
+  .howgrid{grid-template-columns:1fr}
+  .howcard:nth-child(2){order:-1}   /* 手機上把「手機／平板」排第一 */
+  .howcard dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:baseline}
+  .howcard dd{margin:0}
+  .swlist li{grid-template-columns:38px 1fr}
+  .swlist .swdesc{grid-column:2}
+}
 @media (max-width:760px){
   .p-head{padding:12px 14px 8px}
   .p-title h2{font-size:1.15rem}
@@ -459,6 +491,36 @@ body.read-mode .p-body p,body.read-mode .p-body li{line-height:1.9}
   .tl .dot{width:40px;height:40px}.tl::before{top:19px}
   .tl button{font-size:.72rem}
 }
+/* ===== 面板文字收斂（2026-11-14）：字級只用三級，避免十幾種大小並存 =====
+   標籤 .8rem（12.8px）｜輔助 .9rem（14.4px）｜內文 1rem（16px）；標題另計 */
+.p-body .chip,.p-body .kbd,.p-body .vtag,.p-body .badge,.p-body .pr-card h4 .pn,.p-body .cc-key b,.p-body .numchain,
+.p-body .seg,.p-body .seg .tt,.p-body .sec>h3 .n,.p-body .casepick button b,.p-body .tl button,.p-body .cc-also{font-size:.8rem}
+.p-body .note,.p-body .qnum,.p-body .cc-src,.p-body .legend,.p-body .swlegend,.p-body .casepick button,.p-body .dg .item h5,
+.p-body .cc-tabs button,.p-body .ind p,.p-body .howcard dl,.p-body .howtip,.p-body .swdesc,.p-body .tl-detail h5,
+.p-body .examhead,.p-body .examhead .tag,.p-body .ansline,.p-body table,.p-body .pr-card p,.p-body .pending li,.p-body .callout,
+.p-body details.fold>summary,.p-body .cc-key,.p-body .nextstop small,.p-body .chg-note,.p-body .cc-ver,.p-body .lab,.p-body .lab small{font-size:.9rem}
+.p-body .opts li,.p-body .opts .L,.p-body .opts .T,.p-body .stem,.p-body blockquote.prompt,.p-body .dg .item p,.p-body .kv dt,.p-body .kv dd,
+.p-body .flow .step,.p-body .check label{font-size:1rem}
+.p-body .ind h4,.p-body .pr-card h4,.p-body .tl-detail h4,.p-body .cc-head h4,.p-body .howcard h4{font-size:1.06rem}
+/* 原題上方「會提示答案」的說明是案例 1 的重點，不再用最小字 */
+.p-body .examhead .tag{color:var(--orange-d);margin-bottom:4px}
+/* 斷行：避免段落最後一行只剩一兩個字；標題左右平衡 */
+.p-body p,.p-body li,.p-body dd,.p-body .callout,.p-intro{text-wrap:pretty}
+.p-body h3,.p-body h4,.p-title h2,.tl button>span:last-child,.p-body .chip{text-wrap:balance}
+.sumcard .hl{white-space:nowrap}
+/* 案例卡「也收錄於」 */
+.cc-also{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;color:var(--muted);font-weight:700}
+.cc-also .chip{cursor:pointer;font-family:inherit}
+.cc-also .chip:hover{filter:brightness(.97);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.cc-also .chip:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px}
+/* 協作分工：角色改成左側色條（圖例同樣用色條） */
+.p-body .flow .step{gap:10px}
+.flow .step.h{border-left:4px solid #e3a33a}.flow .step.ai{border-left:4px solid #4a7cc0}
+.p-body i.who{display:inline-block;width:4px;height:14px;border-radius:2px;padding:0;flex:none}
+i.who.h{background:#e3a33a}i.who.ai{background:#4a7cc0}
+.who-legend{display:flex;gap:1rem;margin:0 0 8px;font-size:.9rem;color:var(--muted);font-weight:700}
+.who-legend span{display:inline-flex;align-items:center;gap:.4rem}
+@media (max-width:760px){ .p-body .tl button{font-size:.8rem} }
 /* 動畫關閉時（跟隨系統「減少動態效果」，或訪客按下方選單的「動畫」關閉），介面轉場也一起關掉 */
 html.reduce-motion *{transition:none!important;animation:none!important}
 </style>
@@ -766,11 +828,13 @@ function renderCaseCard(c, building){
   tabs.push(["revised","修訂後題目"],["diag","品質診斷"],["princ","命題原則"]);
   var uid=c.id+"-"+building;
   var chain=c.chain.map(function(x){return '<span class="nc">'+esc(x[0])+esc(x[1])+'</span>';}).join('<span class="arr" aria-hidden="true">→</span>');
-  var card=el('<article class="casecard" id="card-'+uid+'">'+
-    '<div class="cc-head"><div class="id">案例 '+c.no+'｜'+c.id+'</div><h4>案例 '+c.no+'：'+esc(c.title)+'</h4>'+
+  // 「也收錄於」：同一案例在其他館的入口（點了直接切過去）；歷程館的段落標題已是案例名稱，卡片內不再重複
+  var others=c.buildings.filter(function(b){return b!==building;});
+  var also=others.length?'<div class="cc-also"><span>也收錄於</span>'+others.map(function(b){return '<button type="button" class="chip linkcase b-'+b+'" data-case="'+c.id+'" data-b="'+b+'">'+esc(BUILDINGS[b].name)+' →</button>';}).join("")+'</div>':'';
+  var card=el('<article class="casecard" id="card-'+uid+'" aria-label="案例 '+c.no+'：'+esc(c.title)+'">'+
+    '<div class="cc-head">'+(building==="history"?'':'<h4>案例 '+c.no+'：'+esc(c.title)+'</h4>')+
     '<p class="cc-key"><b>重點</b>'+esc(c.principle)+'</p>'+
-    '<div class="numchain" aria-label="題號對照">'+chain+'</div>'+
-    '<div class="chips" style="margin-top:6px">'+bChips(c.buildings)+'</div></div>'+
+    '<div class="numchain" aria-label="題號對照">'+chain+'</div>'+also+'</div>'+
     '<div class="cc-tabs" role="tablist" aria-label="案例 '+c.no+' 內容切換">'+
       tabs.map(function(t,i){return '<button type="button" role="tab" id="tab-'+uid+'-'+t[0]+'" aria-controls="tp-'+uid+'" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-t="'+t[0]+'"'+(t[0]==="v2"?' class="v2"':'')+'>'+(t[0]==="v2"?"⚠ ":"")+t[1]+'</button>';}).join("")+
     '</div><div class="cc-body" role="tabpanel" id="tp-'+uid+'"></div>'+
@@ -840,10 +904,14 @@ function renderCasePicker(ids, building, container){
 function sec(id,n,title){return el('<section class="sec" id="'+id+'" data-nav="'+esc(title)+'"><h3><span class="n">'+n+'</span>'+esc(title)+'</h3></section>');}
 function caseLinkBtn(id,label,b){var c=CASE_BY_ID[id];return '<button type="button" class="chip linkcase" data-case="'+id+'" data-b="'+(b||"")+'" style="cursor:pointer">📌 案例 '+c.no+'：'+esc(c.title)+(label?'｜'+esc(label):'')+'</button>';}
 
-function collabBlock(){
-  return '<div class="card"><div class="flow">'+COLLAB_STEPS.map(function(s){return '<div class="step"><span class="who '+s[0]+'">'+(s[0]==="h"?"學生":"AI")+'</span><span>'+esc(s[1])+'</span></div>';}).join("")+
-  '</div><p class="motto">人工診斷與提出修訂要求 → AI 協助改寫 → 人工檢查與選用</p>'+
-  '<p class="note" style="margin-top:8px">說明：網站中各版本的題目文字由 AI 依學生的命題與修訂要求產生，學生負責檢查品質、指出問題、提出修訂要求，並檢查與選用修訂結果；題目文字並非學生完全獨立手寫。</p></div>';
+/* 協作分工：步驟文字已寫出「學生／AI」，角色只用色點區分（另有圖例與報讀文字）。
+   歷程館完整呈現；策略館先顯示固定說法，六個步驟收進可展開區，避免兩館整段重複 */
+function collabBlock(compact){
+  var steps='<p class="who-legend" aria-hidden="true"><span><i class="who h"></i>學生</span><span><i class="who ai"></i>AI</span></p><div class="flow">'+COLLAB_STEPS.map(function(s){return '<div class="step '+s[0]+'"><span class="sr-only">'+(s[0]==="h"?"學生：":"AI：")+'</span><span>'+esc(s[1])+'</span></div>';}).join("")+'</div>';
+  var motto='<p class="motto">人工診斷與提出修訂要求 → AI 協助改寫 → 人工檢查與選用</p>';
+  var note='<p class="note" style="margin-top:8px">說明：網站中各版本的題目文字由 AI 依學生的命題與修訂要求產生，學生負責檢查品質、指出問題、提出修訂要求，並檢查與選用修訂結果；題目文字並非學生完全獨立手寫。</p>';
+  if(compact) return '<div class="card">'+motto.replace('class="motto"','class="motto" style="margin-top:0"')+'<details class="fold" style="margin-top:10px"><summary>展開六個分工步驟與說明</summary>'+steps+note+'</details></div>';
+  return '<div class="card">'+steps+motto+note+'</div>';
 }
 
 var builders = {};
@@ -902,7 +970,7 @@ builders.history=function(body){
 
 builders.diagnosis=function(body){
   body.appendChild(el('<div class="card sumcard"><p class="big">初版 25 題的「答案正確」全數通過，但<span class="hl">「誘答性」有 22 題未通過</span>——<span class="hl">答案正確不等於題目品質良好</span>。</p>'+
-    '<p class="note" style="margin-bottom:0">數字是命題者對初版題目的品質檢核結果，不是學生作答錯誤題數。<button type="button" class="linkbtn" data-goto="diagnosis" data-sec="d-stats">（看統計）</button></p></div>'));
+    '<p class="note" style="margin-bottom:0"><button type="button" class="linkbtn" data-goto="diagnosis" data-sec="d-stats">看四項指標的完整統計 →</button></p></div>'));
   var s1=sec("d-ind",1,"四項品質指標");
   s1.appendChild(el('<div><div class="grid2">'+
     '<div class="ind"><h4>① 題目語法</h4><p>題幹與選項敘述是否清楚、用語前後一致，並適合四年級學生閱讀（例如「色水」需要先定義）。</p></div>'+
@@ -956,7 +1024,7 @@ builders.diagnosis=function(body){
 
 builders.strategy=function(body){
   var s1=sec("s-collab",1,"人工診斷與 AI 改寫的分工");
-  s1.appendChild(el(collabBlock()));
+  s1.appendChild(el(collabBlock(true)));
   body.appendChild(s1);
 
   var s2=sec("s-cases",2,"五張案例修訂卡");
@@ -984,15 +1052,29 @@ builders.strategy=function(body){
 
 builders.about=function(body){
   var s1=sec("a-howto",1,"操作方式");
-  s1.appendChild(el('<div class="card"><ul>'+
-    '<li>滑鼠：左鍵拖曳旋轉島嶼、滾輪縮放、點選建築或建築名牌開啟知識面板。</li>'+
-    '<li>手機／平板：單指拖曳旋轉、雙指縮放、點選建築或名牌。</li>'+
-    '<li>鍵盤：<span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> 開啟三棟建築、<span class="kbd">H</span> 返回島嶼全景、<span class="kbd">Esc</span> 關閉面板；也可用 <span class="kbd">Tab</span> 移到畫面下方的建築選單。</li>'+
-    '<li>不方便操作 3D 時，直接使用畫面下方的建築選單即可閱讀全部內容。</li>'+
-    '<li>動畫開關：畫面下方選單的「動畫」按鈕（或 <span class="kbd">A</span>）可以開啟或關閉島上的動態效果（雲、蠟燭、光帶、瀑布、自動旋轉等）。預設跟隨裝置的「減少動態效果」設定。</li>'+
-    '<li>聲音：進站時會以小音量播放背景音樂；只有開關面板、切換案例與時間線等重要操作才有短音效，摸到島上的角色時，他們也會發出一點聲音。畫面下方的「音樂」（<span class="kbd">M</span>）與「音效」（<span class="kbd">S</span>）按鈕可以分別關閉，按鈕上的小燈亮金色表示開啟、灰色並加斜線表示關閉。</li>'+
-    '<li>閱讀模式：面板右上角的「Aa」按鈕會把面板文字放大、提高對比並改用圓體字，再按一次即可恢復。</li>'+
-    '<li>島上的小角色：滑鼠移到角色身上（手機點一下），他們會打招呼並說一句操作提示。</li></ul></div>'));
+  function k(t){return '<span class="kbd">'+t+'</span>';}
+  // 三張裝置小卡：內容與原本的條列相同，只是拆成「動作 → 結果」
+  s1.appendChild(el('<div class="howgrid">'+
+    '<div class="howcard"><h4><span class="hi" aria-hidden="true">🖱️</span>滑鼠</h4><dl>'+
+      '<dt>左鍵拖曳</dt><dd>旋轉島嶼</dd><dt>滾輪</dt><dd>縮放</dd><dt>點建築或名牌</dt><dd>開啟知識面板</dd></dl></div>'+
+    '<div class="howcard"><h4><span class="hi" aria-hidden="true">👆</span>手機／平板</h4><dl>'+
+      '<dt>單指拖曳</dt><dd>旋轉島嶼</dd><dt>雙指</dt><dd>縮放</dd><dt>點建築或名牌</dt><dd>開啟知識面板</dd></dl></div>'+
+    '<div class="howcard"><h4><span class="hi" aria-hidden="true">⌨️</span>鍵盤</h4><dl>'+
+      '<dt>'+k(1)+' '+k(2)+' '+k(3)+'</dt><dd>開啟三棟建築</dd><dt>'+k("H")+'</dt><dd>返回島嶼全景</dd><dt>'+k("Esc")+'</dt><dd>關閉面板</dd><dt>'+k("Tab")+'</dt><dd>移到下方建築選單</dd></dl></div>'+
+    '</div>'));
+  s1.appendChild(el('<p class="howtip"><span class="hi" aria-hidden="true">✦</span><span>不方便操作 3D 時，直接使用畫面下方的建築選單即可閱讀全部內容。</span></p>'));
+  s1.appendChild(el('<p class="howtip"><span class="hi" aria-hidden="true">✦</span><span>島上的小角色：滑鼠移到角色身上（手機點一下），他們會打招呼並說一句操作提示。</span></p>'));
+  // 開關對照列：圖示與畫面下方選單的按鈕相同
+  s1.appendChild(el('<div class="card"><ul class="swlist">'+
+    '<li><span class="swchip lamp" aria-hidden="true">✦</span><span class="swname">動畫 '+k("A")+'</span><span class="swdesc">開啟或關閉島上的動態效果。</span></li>'+
+    '<li><span class="swchip lamp" aria-hidden="true">♪</span><span class="swname">音樂 '+k("M")+'</span><span class="swdesc">進站時會以小音量播放背景音樂。</span></li>'+
+    '<li><span class="swchip lamp" aria-hidden="true">♬</span><span class="swname">音效 '+k("S")+'</span><span class="swdesc">重要操作的短音效，以及島上角色的聲音。</span></li>'+
+    '<li><span class="swchip" aria-hidden="true">Aa</span><span class="swname">閱讀模式</span><span class="swdesc">面板右上角的「Aa」按鈕：把面板文字放大、提高對比並改用圓體字，再按一次即可恢復。</span></li></ul>'+
+    '<div class="swlegend"><span><i></i>小燈亮金色＝開啟</span><span><i class="off"></i>灰色並加斜線＝關閉</span></div>'+
+    '<details class="fold"><summary>開關的細節</summary><ul>'+
+    '<li>動畫、音樂、音效三個按鈕都在畫面下方的選單，可以分別開關。</li>'+
+    '<li>動態效果包含雲、蠟燭、光帶、瀑布、自動旋轉等；預設跟隨裝置的「減少動態效果」設定。</li>'+
+    '<li>只有開關面板、切換案例與時間線等重要操作才有短音效；摸到島上的角色時，他們也會發出一點聲音。</li></ul></details></div>'));
   body.appendChild(s1);
   var s2=sec("a-data",2,"資料來源與版本對照");
   s2.appendChild(el('<div class="card"><ul>'+
@@ -1038,6 +1120,7 @@ function fill(id){
   // 下一站：把三館串成 歷程 → 診斷 → 策略
   var NEXT={history:["diagnosis","下一站：② 題目品質診斷館 →"],diagnosis:["strategy","下一站：③ 命題修訂策略館 →"]};
   if(NEXT[id]) pBody.appendChild(el('<div class="nextstop"><button type="button" data-goto="'+NEXT[id][0]+'">'+NEXT[id][1]+'</button></div>'));
+  else if(id==="about") pBody.appendChild(el('<div class="nextstop"><button type="button" data-goto="history">開始探索：① AI 命題歷程館 →</button></div>'));
   else if(id==="strategy"){ var ns=el('<div class="nextstop"><button type="button">⟲ 返回島嶼全景</button><small>三棟建築的建議路線到這裡結束。</small></div>'); ns.querySelector("button").addEventListener("click",home); pBody.appendChild(ns); }
   pBody.scrollTop=0; pProg.style.transform="scaleX(0)";
   setNavOn(pNav.firstElementChild&&pNav.firstElementChild.dataset.sec);
