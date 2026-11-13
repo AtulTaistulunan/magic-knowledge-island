@@ -82,6 +82,12 @@ button{font-family:inherit;color:inherit}
   opacity:0;transition:opacity .2s;will-change:transform}
 #charBubble::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border:7px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
 #charBubble.show{opacity:1}
+/* 星座名稱：滑鼠移到星座附近（手機點一下）才出現 */
+#skyLabel{position:fixed;left:0;top:0;z-index:11;pointer-events:none;white-space:nowrap;padding:.22rem .7rem;border-radius:999px;
+  background:rgba(16,20,48,.78);border:1px solid rgba(226,200,150,.5);color:#f3e0a8;font-family:var(--serif);font-size:.8rem;font-weight:700;letter-spacing:.06em;
+  text-shadow:0 0 10px rgba(243,224,168,.4);opacity:0;transition:opacity .3s}
+#skyLabel.show{opacity:1}
+body.talk-open #skyLabel{opacity:0}
 /* 第一次進站的導覽小卡（只出現一次，位置貼著下方選單上緣） */
 #guide{position:fixed;left:50%;bottom:90px;transform:translate(-50%,8px);z-index:21;width:min(360px,calc(100vw - 24px));
   padding:14px 14px 14px 18px;border-radius:16px;color:var(--parch);border:1px solid var(--gold);
@@ -521,6 +527,52 @@ i.who.h{background:#e3a33a}i.who.ai{background:#4a7cc0}
 .who-legend{display:flex;gap:1rem;margin:0 0 8px;font-size:.9rem;color:var(--muted);font-weight:700}
 .who-legend span{display:inline-flex;align-items:center;gap:.4rem}
 @media (max-width:760px){ .p-body .tl button{font-size:.8rem} }
+/* ===== 角色對話框（2026-11-14）：深藍玻璃＋金框，沿用導覽小卡的風格 ===== */
+#talk{position:fixed;left:50%;bottom:18px;z-index:24;width:min(680px,calc(100vw - 24px));max-height:min(64vh,620px);
+  display:flex;flex-direction:column;transform:translate(-50%,14px);opacity:0;transition:opacity .28s ease,transform .32s cubic-bezier(.22,1,.36,1);
+  background:var(--glass);border:1px solid var(--glass-line);border-radius:18px;color:#efe6d2;
+  box-shadow:0 18px 44px rgba(8,10,28,.55),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#talk.show{opacity:1;transform:translate(-50%,0)}
+#talk[hidden]{display:none}
+#talk::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;border-top:2px solid var(--tc,var(--gold))}
+.t-head{display:flex;align-items:center;gap:12px;padding:12px 14px 8px}
+.t-face{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.18),rgba(255,255,255,.03));border:2px solid var(--tc,var(--gold))}
+.t-who{flex:1;min-width:0}
+.t-sub{font-size:.78rem;color:#cdbf9f;font-weight:700;letter-spacing:.08em}
+#tName{margin:0;font-family:var(--serif);font-size:1.12rem;color:var(--gold-l);letter-spacing:.04em}
+.t-x{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid rgba(216,178,106,.4);background:rgba(255,255,255,.05);color:#e9dcc0;font-size:1rem;cursor:pointer}
+.t-x:hover{background:rgba(216,178,106,.2);color:var(--gold-l)}
+.t-x:focus-visible,.t-choices button:focus-visible{outline:2px solid var(--gold-l);outline-offset:2px}
+.t-log{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 10px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;overscroll-behavior:contain}
+.t-msg{max-width:92%;padding:9px 13px;border-radius:14px;line-height:1.75;font-size:.98rem;animation:tIn .3s ease both;text-wrap:pretty}
+.t-msg.c{align-self:flex-start;background:#fbf4e3;color:var(--ink);border-top-left-radius:4px}
+.t-msg.u{align-self:flex-end;background:rgba(216,178,106,.2);border:1px solid rgba(216,178,106,.45);color:#f3e7cc;border-top-right-radius:4px;font-size:.92rem}
+.t-msg.wide{max-width:100%;width:100%}
+.t-msg ul,.t-msg ol{margin:.3rem 0 .1rem;padding-left:1.3rem}
+.t-msg b{color:inherit}
+.t-msg .examhead .tag,.t-msg .vtag,.t-msg .badge{font-size:.8rem}
+.t-msg .q{margin-top:6px}
+.t-msg .t-note{display:block;margin-top:6px;font-size:.9rem;color:var(--muted)}
+.t-msg.ok{border-left:4px solid #3f9658}.t-msg.no{border-left:4px solid #d9782b}
+@keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.t-choices{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 14px;border-top:1px solid rgba(216,178,106,.25)}
+.t-choices button{border:1px solid rgba(216,178,106,.55);background:rgba(255,255,255,.06);color:#f3e7cc;border-radius:999px;
+  padding:.5rem .95rem;font-size:.92rem;font-weight:700;cursor:pointer;line-height:1.45;text-align:left;font-family:inherit}
+.t-choices button:hover{background:rgba(216,178,106,.22);box-shadow:var(--mglow)}
+.t-choices button.pri{background:linear-gradient(180deg,var(--gold-l),var(--gold));color:#1b1408;border-color:transparent}
+.t-choices button.opt{border-radius:12px;flex:1 1 100%}
+.t-choices button.opt .k{display:inline-block;min-width:1.6em;margin-right:.5em;color:var(--gold)}
+body.talk-open #dock,body.talk-open #labels,body.talk-open #guide,body.talk-open #charBubble{opacity:0;pointer-events:none}
+body.talk-open #dock,body.talk-open #labels{transition:opacity .25s}
+body.read-mode #talk .t-msg{font-family:"Huninn",var(--font);font-size:1.06rem}
+@media (max-width:760px){
+  #talk{bottom:8px;width:calc(100vw - 16px);max-height:62vh;border-radius:16px}
+  body.talk-open #topbar{opacity:0;pointer-events:none;transition:opacity .25s}   /* 手機畫面小：對話時讓出上方空間給角色 */
+  .t-face{width:40px;height:40px;font-size:1.25rem}
+  .t-msg{font-size:.95rem}
+  .t-choices button{font-size:.88rem;padding:.45rem .8rem}
+}
 /* 動畫關閉時（跟隨系統「減少動態效果」，或訪客按下方選單的「動畫」關閉），介面轉場也一起關掉 */
 html.reduce-motion *{transition:none!important;animation:none!important}
 </style>
@@ -566,6 +618,17 @@ html.reduce-motion *{transition:none!important;animation:none!important}
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+
+<!-- 角色對話：點三館前的角色，鏡頭飛近並開啟這個對話框（選項式對話，內容只取自網站既有資料） -->
+<section id="talk" role="dialog" aria-modal="false" aria-labelledby="tName" hidden>
+  <div class="t-head">
+    <div class="t-face" id="tFace" aria-hidden="true"></div>
+    <div class="t-who"><div class="t-sub" id="tSub"></div><h2 id="tName"></h2></div>
+    <button type="button" class="t-x" id="tClose" aria-label="結束對話（Esc）" title="結束對話（Esc）">✕</button>
+  </div>
+  <div class="t-log" id="tLog" aria-live="polite"></div>
+  <div class="t-choices" id="tChoices" role="group" aria-label="回覆選項"></div>
+</section>
 
 <aside id="panel" role="dialog" aria-modal="false" aria-labelledby="pTitle">
   <div class="p-head">
@@ -1063,6 +1126,7 @@ builders.about=function(body){
       '<dt>'+k(1)+' '+k(2)+' '+k(3)+'</dt><dd>開啟三棟建築</dd><dt>'+k("H")+'</dt><dd>返回島嶼全景</dd><dt>'+k("Esc")+'</dt><dd>關閉面板</dd><dt>'+k("Tab")+'</dt><dd>移到下方建築選單</dd></dl></div>'+
     '</div>'));
   s1.appendChild(el('<p class="howtip"><span class="hi" aria-hidden="true">✦</span><span>不方便操作 3D 時，直接使用畫面下方的建築選單即可閱讀全部內容。</span></p>'));
+  s1.appendChild(el('<p class="howtip"><span class="hi" aria-hidden="true">✦</span><span>星空：天上藏著三個星座，分別對應三棟建築；滑鼠移到比較亮的星星附近（手機點一下）就會連成圖案，轉動島嶼可以找到全部。偶爾還會有流星劃過。</span></p>'));
   s1.appendChild(el('<p class="howtip"><span class="hi" aria-hidden="true">✦</span><span>島上的小角色：滑鼠移到角色身上（手機點一下），他們會打招呼並說一句操作提示。</span></p>'));
   // 開關對照列：圖示與畫面下方選單的按鈕相同
   s1.appendChild(el('<div class="card"><ul class="swlist">'+
@@ -1170,6 +1234,7 @@ pBody.addEventListener("scroll",function(){
 function open(id, opts){
   opts=opts||{};
   if(!BUILDINGS[id])return;
+  if(talkIsOpen()) talkClose(false);   // 從角色對話跳到建築：鏡頭直接由面板飛過去，不先飛回原位
   if(typeof dismissGuide==="function") dismissGuide();
   if(!panel.classList.contains("open")) lastFocus=document.activeElement;
   if(current!==id) fill(id);
@@ -1200,7 +1265,7 @@ function close(){
   if(window.Island3D) window.Island3D.panelChanged(false);
   if(lastFocus && lastFocus.focus && document.body.contains(lastFocus)) lastFocus.focus({preventScroll:true});
 }
-function home(){close();if(window.Island3D)window.Island3D.home();}
+function home(){talkClose(false);close();if(window.Island3D)window.Island3D.home();}
 
 /* 面板內連結：跨館案例、跳轉段落 */
 pBody.addEventListener("click",function(e){
@@ -1231,10 +1296,11 @@ document.getElementById("pHome").addEventListener("click",home);
 document.getElementById("homeBtn").addEventListener("click",home);
 document.querySelectorAll("#dock [data-open]").forEach(function(b){b.addEventListener("click",function(){open(b.dataset.open);});});
 document.addEventListener("keydown",function(e){
-  if(e.key==="Escape"){ if(panel.classList.contains("open")){close();e.preventDefault();} return; }
+  if(e.key==="Escape"){ if(talkIsOpen()){talkClose(true);e.preventDefault();} else if(panel.classList.contains("open")){close();e.preventDefault();} return; }
   var tag=(e.target.tagName||"").toLowerCase();
   if(tag==="input"||tag==="textarea"||e.ctrlKey||e.metaKey||e.altKey)return;
   if(panel.classList.contains("open") && panel.contains(e.target))return;
+  if(talkEl.contains(e.target))return;
   if(e.key==="1")open("history"); else if(e.key==="2")open("diagnosis"); else if(e.key==="3")open("strategy");
   else if(e.key==="h"||e.key==="H")home();
   else if(e.key==="m"||e.key==="M")toggleMusic();
@@ -1520,7 +1586,211 @@ setTimeout(function(){ if(!window.__islandReady && !window.__islandBuilt && !win
   showError("3D 場景載入逾時：可能是網路無法連線至 Three.js 的 CDN（cdn.jsdelivr.net），或瀏覽器封鎖了外部程式。請確認網路後重新整理頁面。");
 }},20000);
 
+/* ---------------- 角色對話（選項式，不連網、不用 AI） ----------------
+   點三館前的角色：鏡頭飛近角色，下方出現對話框。
+   角色說的話只能是網站既有內容的轉述或操作提示；題目一律用 CASES 的原文（renderQuestion），不產生新題目。
+   兩個小挑戰：
+   - 找出問題（觀星學徒）：看案例原題，從三段「品質問題」敘述中選出屬於這題的那一段。
+   - 修訂配方（煉金師）：看案例原題，從三項命題原則中選出 PRINCIPLES.cases 對應到這題的那一項，再揭曉第三版。 */
+var TALKERS={
+  scholar:{ b:"history", name:"小學者", face:"📖", tc:"#6d9be0", sub:"古卷圖書館前｜AI 命題歷程館",
+    hello:"你好！我在整理這座島的命題紀錄。想問什麼，點下面的選項就可以。" },
+  apprentice:{ b:"diagnosis", name:"觀星學徒", face:"🔍", tc:"#e9944a", sub:"觀星塔前｜題目品質診斷館",
+    hello:"嗨！我正在用放大鏡檢查題目。要不要一起找找看，題目哪裡有問題？" },
+  alchemist:{ b:"strategy", name:"煉金師", face:"⚗️", tc:"#5fb878", sub:"煉金工坊前｜命題修訂策略館",
+    hello:"歡迎來到煉金工坊。修訂題目就像調配魔藥：先診斷問題，再選對配方。" }
+};
+var MOTTO="人工診斷與提出修訂要求 → AI 協助改寫 → 人工檢查與選用";
+function roundList(){return '<ol>'+ROUNDS.map(function(r){return '<li>第 '+r.n+' 輪：'+esc(r.short)+'</li>';}).join("")+'</ol>';}
+function round1Problems(){var h=ROUNDS[0].html,i=h.indexOf("<ul>"),j=h.indexOf("</ul>");return i>=0?h.slice(i,j+5):"";}
+var TOPICS={
+  scholar:[
+    {q:"這座圖書館在記錄什麼？", a:function(){return '這裡是<b>'+BUILDINGS.history.name+'</b>。'+esc(BUILDINGS.history.intro);}},
+    {q:"四輪命題各做了什麼？", a:function(){return '命題一共經過四輪：'+roundList()+'<span class="t-note">進入歷程館，點時間線可以看每一輪的細節。</span>';}},
+    {q:"AI 的第一份試卷有什麼問題？", a:function(){return '後續檢查發現的問題包含：'+round1Problems();}},
+    {q:"給我看一題原始題目", act:"case1"},
+    {q:"學生和 AI 怎麼分工？", a:function(){return '<b>'+MOTTO+'</b><span class="t-note">網站中各版本的題目文字由 AI 依學生的命題與修訂要求產生，學生負責檢查品質、指出問題、提出修訂要求，並檢查與選用修訂結果；題目文字並非學生完全獨立手寫。</span>';}},
+    {q:"有沒有缺漏的資料？", a:function(){return '<b>第 2 輪實際修訂文本缺漏</b>：原始 PDF 只保留 AI 回覆的開場句，沒有完整修訂題目內容，本網站不自行補寫。';}}
+  ],
+  apprentice:[
+    {q:"🔍 挑戰：找出題目的問題", act:"find", pri:true},
+    {q:"答案正確就是好題目嗎？", a:function(){return '不一定。初版 25 題的「答案正確」全數通過，但「誘答性」有 22 題未通過——<b>答案正確不等於題目品質良好</b>。';}},
+    {q:"四項品質指標的結果？", a:function(){return '初版 25 題的檢核結果：<ul>'+STATS.map(function(s){return '<li>'+esc(s.name)+'：通過 '+s.pass+' 題｜未通過 '+s.fail+' 題</li>';}).join("")+'</ul><span class="t-note">數字是命題者對初版題目的品質檢核結果，不是學生作答錯誤題數。</span>';}}
+  ],
+  alchemist:[
+    {q:"⚗️ 挑戰：修訂配方", act:"fix", pri:true},
+    {q:"有哪些命題原則？", a:function(){return '工坊整理了六項命題原則：<ol>'+PRINCIPLES.map(function(p){return '<li>'+esc(p.title)+'</li>';}).join("")+'</ol>';}},
+    {q:"修訂時，人和 AI 怎麼分工？", a:function(){return '<b>'+MOTTO+'</b>';}},
+    {q:"修訂後就沒問題了嗎？", a:function(){return 'AI 依要求修訂後仍可能出現新問題：第二版第 20 題出現兩個合理答案。<span class="t-note">目前沒有實際學生施測的作答數據，因此不能宣稱修訂後的誘答性、鑑別度或學習成效已被實證提升。</span>';}}
+  ]
+};
+var FIND_CASES=["case-1","case-2","case-4","case-5","case-6"], FIX_CASES=["case-2","case-3","case-4","case-5","case-6"];
+var talkEl=document.getElementById("talk"), tLog=document.getElementById("tLog"), tChoices=document.getElementById("tChoices");
+var talkId=null, talkStep={find:0,fix:0}, talkFocusBack=null;
+function talkIsOpen(){return !!talkId;}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+var talkMark=null;
+function tSay(html,cls){var m=el('<div class="t-msg c'+(cls?' '+cls:'')+'"></div>');m.innerHTML=html;tLog.appendChild(m);if(!talkMark)talkMark=m;return m;}
+function tUser(text){var m=el('<div class="t-msg u"></div>');m.textContent=text;tLog.appendChild(m);if(!talkMark)talkMark=m;}
+/* 一個回合結束：捲到這回合的第一則訊息（題目很長時，不會直接跳到底部看不到題幹） */
+function tFlush(){ if(talkMark){ var top=talkMark.offsetTop-tLog.offsetTop-6; tLog.scrollTo({top:Math.max(0,top),behavior:motionReduced()?"auto":"smooth"}); } talkMark=null; }
+function tChoicesSet(list){
+  tChoices.innerHTML="";
+  list.forEach(function(c){
+    var b=el('<button type="button"'+(c.cls?' class="'+c.cls+'"':'')+'></button>');
+    b.innerHTML=c.html||esc(c.label);
+    b.addEventListener("click",function(){ playSfx("tap"); c.fn(b); });
+    tChoices.appendChild(b);
+  });
+  tFlush();
+}
+function tMenu(){
+  var t=TALKERS[talkId], list=TOPICS[talkId].map(function(tp){
+    return {label:tp.q, cls:tp.pri?"pri":"", fn:function(){
+      tUser(tp.q);
+      if(tp.act==="find") return findStart();
+      if(tp.act==="fix") return fixStart();
+      if(tp.act==="case1") return showCase1();
+      tSay(tp.a()); tMenu();
+    }};
+  });
+  list.push({label:"進入"+BUILDINGS[t.b].name+" →", fn:function(){ open(t.b); }});
+  list.push({label:"結束對話", fn:function(){ talkClose(true); }});
+  tChoicesSet(list);
+}
+function qBlock(v){return '<div class="t-q">'+renderQuestion(v)+'</div>';}
+function showCase1(){
+  var c=CASE_BY_ID["case-1"];
+  tSay('這是 AI 第一份試卷裡的題目（'+esc(c.original.num)+'），注意題目上方的大標題：','wide');
+  tSay(qBlock(c.original),'wide');
+  tSay('品質問題：'+esc(c.problem)+'<span class="t-note">修訂方向：'+esc(c.reason)+'</span>');
+  tMenu();
+}
+/* 挑戰一：找出問題 */
+function findStart(){
+  var c=CASE_BY_ID[FIND_CASES[talkStep.find%FIND_CASES.length]];
+  var others=shuffle(CASES.filter(function(x){return x.id!==c.id;})).slice(0,2);
+  var opts=shuffle([c].concat(others));
+  tSay('請看這一題（案例 '+c.no+'，'+esc(c.original.num)+'）。你覺得它最主要的問題是哪一個？','wide');
+  tSay(qBlock(c.original),'wide');
+  var tried={};
+  function ask(){
+    tChoicesSet(opts.filter(function(o){return !tried[o.id];}).map(function(o){
+      var k="ABC".charAt(opts.indexOf(o));
+      return {cls:"opt", html:'<span class="k">'+k+'</span>'+esc(o.problem), fn:function(){
+        tUser("我選 "+k);
+        if(o.id===c.id){
+          tSay('<b>答對了！</b>這就是這題的診斷：'+esc(c.problem)+'<span class="t-note">對應的命題原則：'+esc(c.principle)+'</span>','ok');
+          findAfter(c);
+        } else {
+          tried[o.id]=1;
+          tSay('再看看題目。提示：這個案例叫做「'+esc(c.title)+'」。','no');
+          ask();
+        }
+      }};
+    }));
+  }
+  ask();
+}
+function findAfter(c){
+  tChoicesSet([
+    {label:"看修訂後的題目", fn:function(){
+      tUser("看修訂後的題目");
+      tSay('修訂原因：'+esc(c.reason),'wide');
+      tSay(qBlock(c.revised),'wide');
+      if(c.v2) tSay('這個案例在初版與第三版之間，還有一個出現<b>雙重答案</b>的第二版，可以到診斷館的案例卡查看。');
+      if(c.pending) tSay('⚠ '+esc(c.pending));
+      findAfter2(c);
+    }},
+    {label:"下一題", cls:"pri", fn:function(){ tUser("下一題"); talkStep.find++; findStart(); }},
+    {label:"到診斷館看完整案例 →", fn:function(){ open("diagnosis",{caseId:c.id}); }},
+    {label:"回到聊天選單", fn:function(){ tUser("回到聊天選單"); tSay("好，還想問什麼？"); tMenu(); }}
+  ]);
+}
+function findAfter2(c){
+  tChoicesSet([
+    {label:"下一題", cls:"pri", fn:function(){ tUser("下一題"); talkStep.find++; findStart(); }},
+    {label:"到診斷館看完整案例 →", fn:function(){ open("diagnosis",{caseId:c.id}); }},
+    {label:"回到聊天選單", fn:function(){ tUser("回到聊天選單"); tSay("好，還想問什麼？"); tMenu(); }}
+  ]);
+}
+/* 挑戰二：修訂配方 */
+function fixStart(){
+  var c=CASE_BY_ID[FIX_CASES[talkStep.fix%FIX_CASES.length]];
+  var good=PRINCIPLES.filter(function(p){return p.cases.indexOf(c.id)>=0;});
+  var bad=shuffle(PRINCIPLES.filter(function(p){return p.cases.length&&p.cases.indexOf(c.id)<0;})).slice(0,2);
+  var opts=shuffle([good[0]].concat(bad));
+  tSay('這一題（案例 '+c.no+'，'+esc(c.original.num)+'）需要修訂。你會選哪一種配方？','wide');
+  tSay(qBlock(c.original),'wide');
+  var tried={};
+  function ask(){
+    tChoicesSet(opts.filter(function(p){return !tried[p.n];}).map(function(p){
+      return {cls:"opt", html:'<span class="k">原則 '+p.n+'</span>'+esc(p.title), fn:function(){
+        tUser("選原則 "+p.n+"："+p.title);
+        if(good.indexOf(p)>=0){
+          tSay('<b>配方正確！</b>原則 '+p.n+'：'+esc(p.desc)+'<span class="t-note">這題實際的修訂原因：'+esc(c.reason)+'</span>','ok');
+          fixAfter(c);
+        } else {
+          tried[p.n]=1;
+          tSay('這個配方比較適合別的題目。提示：這題的問題是——'+esc(c.problem),'no');
+          ask();
+        }
+      }};
+    }));
+  }
+  ask();
+}
+function fixAfter(c){
+  tChoicesSet([
+    {label:"揭曉修訂後的題目", cls:"pri", fn:function(){
+      tUser("揭曉修訂後的題目");
+      tSay('修訂後（'+esc(c.revised.num)+'）：','wide');
+      tSay(qBlock(c.revised),'wide');
+      if(c.v2) tSay('這個案例在初版與第三版之間，還有一個出現<b>雙重答案</b>的第二版，可以到策略館點「⚠ 第二版問題」查看。');
+      if(c.pending) tSay('⚠ '+esc(c.pending));
+      fixAfter2(c);
+    }},
+    {label:"下一題", fn:function(){ tUser("下一題"); talkStep.fix++; fixStart(); }},
+    {label:"回到聊天選單", fn:function(){ tUser("回到聊天選單"); tSay("好，還想問什麼？"); tMenu(); }}
+  ]);
+}
+function fixAfter2(c){
+  tChoicesSet([
+    {label:"下一題", cls:"pri", fn:function(){ tUser("下一題"); talkStep.fix++; fixStart(); }},
+    {label:"到策略館看修訂前後對照 →", fn:function(){ open("strategy",{caseId:c.id}); }},
+    {label:"回到聊天選單", fn:function(){ tUser("回到聊天選單"); tSay("好，還想問什麼？"); tMenu(); }}
+  ]);
+}
+function talkOpen(id){
+  var t=TALKERS[id]; if(!t) return false;
+  if(panel.classList.contains("open")) close();
+  if(typeof dismissGuide==="function" && !guide.hidden) dismissGuide();
+  if(!talkId) talkFocusBack=document.activeElement;
+  talkId=id;
+  talkEl.style.setProperty("--tc",t.tc);
+  document.getElementById("tFace").textContent=t.face;
+  document.getElementById("tName").textContent=t.name;
+  document.getElementById("tSub").textContent=t.sub;
+  tLog.innerHTML=""; talkMark=null;
+  tSay(esc(t.hello)); tMenu();
+  talkEl.hidden=false; document.body.classList.add("talk-open");
+  requestAnimationFrame(function(){ talkEl.classList.add("show"); var f=tChoices.querySelector("button"); if(f) f.focus({preventScroll:true}); });
+  if(window.Island3D && window.Island3D.talkFocus) window.Island3D.talkFocus(id);
+  return true;
+}
+/* back=true：鏡頭飛回對話前的位置；開啟建築面板時傳 false（由面板自己飛過去） */
+function talkClose(back){
+  if(!talkId) return;
+  talkId=null;
+  talkEl.classList.remove("show"); document.body.classList.remove("talk-open");
+  setTimeout(function(){ if(!talkId) talkEl.hidden=true; },300);
+  if(window.Island3D && window.Island3D.talkEnd) window.Island3D.talkEnd(back);
+  if(back && talkFocusBack && talkFocusBack.focus && document.body.contains(talkFocusBack)) talkFocusBack.focus({preventScroll:true});
+}
+document.getElementById("tClose").addEventListener("click",function(){ talkClose(true); });
+
 window.KI={open:open,close:close,home:home,isOpen:function(){return panel.classList.contains("open");},current:function(){return current;},
+  talk:talkOpen,talkClose:talkClose,talkOpen:talkIsOpen,talkable:function(id){return !!TALKERS[id];},talkEl:talkEl,
   hideLoading:hideLoading,showError:function(m){window.__islandFailed=true;showError(m);},isMobile:isMobile,motionReduced:motionReduced,
   names:{history:BUILDINGS.history.name,diagnosis:BUILDINGS.diagnosis.name,strategy:BUILDINGS.strategy.name},
   // 主題副標（取自各館 kicker，例如「古卷圖書館」），名牌在滑鼠移入時顯示
@@ -1991,7 +2261,30 @@ async function loadModel(cfg){
     }
   }
 }
-(async ()=>{ for (const id in MODELS) await loadModel(MODELS[id]); window.__modelsDone = true; })();
+const lateLoaders = [];   // 建築載完後才載的小模型（角色），一樣一次一個
+(async ()=>{ for (const id in MODELS) await loadModel(MODELS[id]); for (const f of lateLoaders) await f(); window.__modelsDone = true; })();
+/* 角色模型：把 Tripo 模型放進角色節點，取代程式繪製的造型；失敗時保留原本的造型。回傳模型的外層群組（做動作用）或 null */
+async function loadCharModel(url, node, height, rotY = 0, maxW = 0){
+  for (let attempt = 0; attempt < 3; attempt++){
+    try {
+      const gltf = await gltfLoader.parseAsync(await fetchBuffer(url), "models/");
+      const model = gltf.scene, bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), ctr = bb.getCenter(new THREE.Vector3());
+      let sc = height / size.y; if (maxW) sc = Math.min(sc, maxW / Math.max(size.x, size.z));
+      model.scale.setScalar(sc); model.position.set(-ctr.x*sc, -bb.min.y*sc, -ctr.z*sc);
+      model.traverse(o=>{ if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = false;
+        const m = o.material; m.envMapIntensity = 0.5; if (m.map){ m.emissiveMap = m.map; m.emissive.setRGB(0.14,0.14,0.14); } });
+      const holder = new THREE.Group(); holder.userData.keep = true; holder.rotation.y = rotY; holder.add(model);
+      holder.userData.hidden = node.children.filter(c => !c.userData.charId);   // 只留下點擊範圍；原本的小人（person 有 keep 標記）也要藏起來，不然會和模型疊在一起
+      for (const c of holder.userData.hidden) c.visible = false;
+      node.add(holder);
+      return holder;
+    } catch (err){
+      if (attempt === 2 || err.permanent){ console.warn("角色模型載入失敗，保留程式繪製的角色：" + url, err); return null; }
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+    }
+  }
+  return null;
+}
 
 /* signpost at plaza */
 (function signpost(){
@@ -2185,13 +2478,21 @@ const SPOTS = [[1.75,3.15],[-1.75,3.15],[2.4,2.6],[-2.4,2.6],[1.1,3.3],[-1.1,3.3
   const cover = mesh(new THREE.BoxGeometry(0.44,0.02,0.28), mat(C.red)); cover.position.y = -0.03; book.add(cover);
   const flipPivot = new THREE.Group(); const flip = mesh(new THREE.BoxGeometry(0.19,0.012,0.25), mat(0xfff7e2), false, false); flip.position.x = 0.095; flipPivot.add(flip); flipPivot.position.y = 0.02; book.add(flipPivot);
   p.add(book); g.add(p);
-  addActor({ id:"scholar", node:p, h:1.55, cy:0.7,
-    line:"這裡記錄了四輪 AI 命題的歷程，點我身後的歷程館看看！",
+  const scholar = addActor({ id:"scholar", node:p, h:1.55, cy:0.7,
+    line:"這裡記錄了四輪 AI 命題的歷程。點我，可以聊聊這段歷程！",
     update(t){ const k = (t*0.22) % 1;                      // 每 4.5 秒翻一頁
       flipPivot.rotation.z = k < 0.25 ? (k/0.25)*Math.PI*0.92 + 0.1 : 0.1; flipPivot.visible = k < 0.25;
       p.userData.head.rotation.x = 0.22 + Math.sin(t*0.5)*0.05;
       p.userData.armL.rotation.set(-1.1, 0, 0); },
     react(k, t){ p.userData.armL.rotation.set(-1.1*(1-k), 0, waveZ(-1, k, t)); p.userData.head.rotation.x -= 0.45*k; } });
+  // 2026-11-14：換成 Tripo 生成的小學者（models/scholar.glb，約 5700 個三角形）。模型沒有骨架，動作改成整體的輕微搖晃；打招呼時小跳並左右轉身
+  lateLoaders.push(async ()=>{
+    const h = await loadCharModel("models/scholar.glb", p, 1.3);
+    if (!h) return;
+    scholar.h = 1.6;
+    scholar.update = t=>{ h.position.y = 0; h.rotation.y = 0; h.rotation.z = REDUCED ? 0 : Math.sin(t*0.9)*0.035; h.rotation.x = REDUCED ? 0 : 0.04 + Math.sin(t*0.5)*0.03; };
+    scholar.react = (k, t)=>{ h.position.y = hop(k, t); h.rotation.y = REDUCED ? 0 : Math.sin(t*5)*0.3*k; h.rotation.x *= (1-k); };
+  });
 }
 // 2. 診斷館：拿放大鏡檢查卷軸的天文學徒（橘袍），偶爾抬頭看望遠鏡
 {
@@ -2204,7 +2505,7 @@ const SPOTS = [[1.75,3.15],[-1.75,3.15],[2.4,2.6],[-2.4,2.6],[1.1,3.3],[-1.1,3.3
   const hd = mesh(new THREE.CylinderGeometry(0.015,0.015,0.1,5), mat(C.woodD)); hd.position.y = -0.03; lens.add(hd);
   p.userData.armR.add(lens); g.add(p);
   addActor({ id:"apprentice", node:p, h:1.45,
-    line:"答案正確不等於好題目，每個選項都要逐一檢查喔！",
+    line:"答案正確不等於好題目！點我，一起來找題目的問題。",
     update(t){ const look = Math.max(0, Math.sin(t*0.35 - 1)) ** 6;              // 偶爾抬頭
       p.userData.armR.rotation.set(-1.15, 0, -0.25 + Math.sin(t*1.1)*0.22 * (1-look));
       p.userData.head.rotation.x = 0.25 - look*0.75; p.userData.hatG.rotation.x = -look*0.5; },
@@ -2222,7 +2523,7 @@ const SPOTS = [[1.75,3.15],[-1.75,3.15],[2.4,2.6],[-2.4,2.6],[1.1,3.3],[-1.1,3.3
   const bubbles = []; for (let i=0;i<3;i++){ const b = mesh(new THREE.IcosahedronGeometry(0.035,0), glow(0xa8ffc4,1.1), false, false); grp.add(b); bubbles.push(b); }
   g.add(grp);
   addActor({ id:"alchemist", node:grp, h:1.5,
-    line:"修訂就像調配魔藥：先診斷問題，再提出具體的改寫要求。",
+    line:"修訂就像調配魔藥。點我，來挑一帖修訂配方！",
     update(t){ p.userData.armR.rotation.set(-1.0 + Math.sin(t*1.6)*0.14, 0, -0.1 + Math.cos(t*1.6)*0.2);
       p.userData.armL.rotation.set(-0.3, 0, 0); p.userData.head.rotation.x = 0.2;
       bubbles.forEach((b,i)=>{ const k = (t*0.3 + i/3) % 1; b.position.set(Math.sin(i*2.4)*0.1, 0.4 + k*0.5, 0.48 + Math.cos(i*2.4)*0.1); b.scale.setScalar(1 - k*0.7); b.visible = !REDUCED; }); },
@@ -2289,6 +2590,62 @@ function walkPose(p, t, speed){ const s = Math.sin(t*speed);
     react(k, t){ head.position.y = 0.14 + 0.09*k; head.rotation.z = 0.35*k; body.scale.y = 0.75 + 0.12*k;   // 抬頭醒來
       tailP.rotation.y = tailP.rotation.y*(1-k) + (REDUCED ? 0.6 : Math.sin(t*4.5)*0.8)*k; } });
 }
+/* 2026-11-14：其餘六個角色也換成 Tripo 模型（models/*.glb）。原本的 update/react 繼續負責位置、走路路線與小跳，
+   模型本身沒有骨架，只加上整體的搖晃（sway）；打招呼時左右轉身。載入失敗就保留程式繪製的造型。 */
+/* 沒有骨架的模型也能拍翅膀：把模型左右兩側（離身體中線超過一定距離）的頂點，繞著肩膀的位置上下轉動。
+   回傳 apply(角度)；角度 0 就是模型原本的姿勢。 */
+function makeFlapper(holder){
+  const parts = [];
+  holder.traverse(m=>{
+    if (!m.isMesh) return;
+    const pos = m.geometry.attributes.position; if (!pos || pos.isInterleavedBufferAttribute) return; m.geometry.computeBoundingBox();
+    const bb = m.geometry.boundingBox, sx = bb.max.x - bb.min.x, sz = bb.max.z - bb.min.z;
+    const ax = sx >= sz ? 0 : 2;                                  // 翅膀展開的方向（模型本身的左右軸）
+    const W = Math.max(sx, sz), mid = ax === 0 ? (bb.min.x + bb.max.x)/2 : (bb.min.z + bb.max.z)/2;
+    parts.push({ pos, orig:pos.array.slice(), ax, mid, hinge:W*0.17, ramp:W*0.1, yh:bb.min.y + (bb.max.y - bb.min.y)*0.62 });
+    m.frustumCulled = false;
+  });
+  let last = null;
+  return ang=>{
+    if (ang === last) return; last = ang;
+    for (const p of parts){
+      const a = p.pos.array, o = p.orig;
+      for (let i = 0; i < a.length; i += 3){
+        const d = o[i + p.ax] - p.mid, ad = Math.abs(d) - p.hinge;
+        if (ad <= 0){ a[i + p.ax] = o[i + p.ax]; a[i+1] = o[i+1]; continue; }
+        const w = Math.min(1, ad / p.ramp), th = ang * w * w * (3 - 2*w), c = Math.cos(th), sn = Math.sin(th), dy = o[i+1] - p.yh;
+        a[i + p.ax] = p.mid + Math.sign(d) * (p.hinge + ad*c - dy*sn);
+        a[i+1] = p.yh + ad*sn + dy*c;
+      }
+      p.pos.needsUpdate = true;
+    }
+  };
+}
+function useCharModel(id, url, o){
+  const a = actors.find(x => x.id === id); if (!a) return;
+  lateLoaders.push(async ()=>{
+    const h = await loadCharModel(url, a.node, o.height, o.rotY || 0, o.maxW || 0);
+    if (!h) return;
+    const u0 = a.update, r0 = a.react, hid = h.userData.hidden, y0 = o.y || 0, ry = o.rotY || 0;
+    if (o.h) a.h = o.h;
+    const flap = o.flap ? makeFlapper(h) : null;
+    a.update = t=>{ u0(t); for (const c of hid) c.visible = false;
+      h.position.y = y0; h.rotation.y = ry; h.rotation.x = 0;
+      h.rotation.z = REDUCED ? 0 : Math.sin(t*(o.swaySpeed || 0.9))*(o.sway ?? 0.035);
+      if (flap) flap(REDUCED ? 0 : Math.sin(t*5.5)*0.5); };
+    a.react = (k, t)=>{ if (r0) r0(k, t); for (const c of hid) c.visible = false;
+      if (o.hop) h.position.y = y0 + hop(k, t)*o.hop;
+      h.rotation.y = ry + (REDUCED ? 0 : Math.sin(t*5)*(o.turn ?? 0.3)*k);
+      if (flap && !REDUCED) flap(Math.sin(a.lt*5.5)*0.5*(1-k) + Math.sin(t*11)*0.7*k); };   // 打招呼時拍得更快
+    a.update(a.lt || 0);
+  });
+}
+useCharModel("apprentice",  "models/apprentice.glb", { height:1.3, h:1.6 });
+useCharModel("alchemist",   "models/alchemist.glb",  { height:1.3, maxW:1.5, h:1.6, hop:1 });
+useCharModel("walkerPlaza", "models/student-red.glb",    { height:1.3, h:1.6, sway:0.07, swaySpeed:3.2 });   // 走路時左右搖擺
+useCharModel("walkerPath",  "models/student-purple.glb", { height:1.3, h:1.6, sway:0.07, swaySpeed:3.0 });
+useCharModel("owl",         "models/owl.glb",        { height:0.7, maxW:1.2, y:-0.3, sway:0.03, swaySpeed:1.2, turn:0.2, flap:true });   // 模型沒有骨架，用 makeFlapper() 讓兩側翅膀上下拍動
+useCharModel("cat",         "models/cat.glb",        { height:0.42, maxW:0.62, y:-0.11, rotY:Math.PI/2, sway:0.02, swaySpeed:1.1, hop:0.6, turn:0.15 });
 for (const a of actors) a.update(0);   // 先擺好初始姿勢（動畫關閉時就停在這個姿勢）
 
 /* clouds */
@@ -2423,6 +2780,129 @@ controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
 const HOME_TARGET = at(0, -3.6).setY(2.6);   // 稍微往後、往上，讓後方的城堡也完整進入全景
 const POLAR = 0.98;   // 稍微再俯視一點：後方城堡的大門與階梯會高過中央塔樓
 const HOME_DIR = new THREE.Vector3(Math.sin(Math.PI/4)*Math.sin(POLAR), Math.cos(POLAR), Math.cos(Math.PI/4)*Math.sin(POLAR)).normalize();
+
+/* ---------- 星空的三樣點綴（2026-11-14）：遠方浮島、星座、流星 ----------
+   位置用「從全景鏡頭看出去的方向」來定：az 是相對全景視線的左右角度（度，負值在左），el 是仰角（負值代表視線往下，
+   全景鏡頭本身俯視約 34 度，所以畫面上緣大約是 -17 度），dist 是離鏡頭的距離。都固定在世界座標，轉動島嶼時會跟著移動。 */
+const SKY_CAM = HOME_TARGET.clone().addScaledVector(HOME_DIR, 60);
+function skyPoint(az, el, dist){
+  const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(el);
+  const h = V.clone().negate().applyAxisAngle(new THREE.Vector3(0,1,0), -a);
+  return SKY_CAM.clone().addScaledVector(h, Math.cos(e)*dist).add(new THREE.Vector3(0, Math.sin(e)*dist, 0));
+}
+// 1. 遠方浮島：很淡的剪影，其中兩座有一點暖色窗光
+const farIsles = [];
+{
+  const rockM = new THREE.MeshBasicMaterial({ color:0x343b68, fog:false, transparent:true, opacity:0.72 });
+  const topM  = new THREE.MeshBasicMaterial({ color:0x46557c, fog:false, transparent:true, opacity:0.72 });
+  const defs = [ { az:-27, el:-29, d:200, r:8,  light:true,  tower:true },
+                 { az: 25, el:-24, d:230, r:7,  light:false, tower:false },
+                 { az: 84, el:-24, d:205, r:10, light:true,  tower:true },
+                 { az:-110, el:-23, d:215, r:8, light:false, tower:false },
+                 { az:168, el:-24, d:210, r:8,  light:true,  tower:false } ];
+  for (const d of defs){
+    const g = new THREE.Group(); g.position.copy(skyPoint(d.az, d.el, d.d));
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(d.r, d.r*0.78, d.r*0.22, 7), topM); g.add(top);
+    const rock = new THREE.Mesh(new THREE.ConeGeometry(d.r*0.8, d.r*1.25, 6), rockM); rock.rotation.x = Math.PI; rock.position.y = -d.r*0.73; g.add(rock);
+    if (d.tower){
+      const tw = new THREE.Mesh(new THREE.CylinderGeometry(d.r*0.11, d.r*0.14, d.r*0.6, 6), rockM); tw.position.set(d.r*0.2, d.r*0.4, 0); g.add(tw);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(d.r*0.19, d.r*0.34, 6), rockM); roof.position.set(d.r*0.2, d.r*0.86, 0); g.add(roof);
+    }
+    for (let i=0;i<2;i++){ const tr = new THREE.Mesh(new THREE.ConeGeometry(d.r*0.13, d.r*0.38, 5), rockM); tr.position.set(-d.r*(0.25+i*0.3), d.r*0.3, d.r*(i ? 0.2 : -0.3)); g.add(tr); }
+    if (d.light){
+      const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.BufferAttribute(new Float32Array([d.r*0.2, d.r*0.45, 0]), 3));
+      const lm = pointsMat(0xffcf8a, d.r*0.5, 0.9); g.add(new THREE.Points(lg, lm)); g.userData.light = lm;
+    }
+    g.rotation.y = d.az; g.userData.y0 = g.position.y; g.userData.ph = d.az;
+    scene.add(g); farIsles.push(g);
+  }
+}
+// 2. 星座：三組，對應三棟知識館。平常只有比較亮的星點，移到附近才連線並顯示名稱
+const skyLabel = document.createElement("div"); skyLabel.id = "skyLabel"; skyLabel.setAttribute("aria-hidden", "true"); document.body.appendChild(skyLabel);
+const constellations = [];
+{
+  const defs = [
+    { id:"history", name:"書卷座", az:-15.5, el:-31, pts:[[-1,0.7],[0,0.45],[1,0.7],[-1,-0.45],[0,-0.7],[1,-0.45]], lines:[[0,1],[1,2],[3,4],[4,5],[0,3],[2,5],[1,4]] },
+    { id:"diagnosis", name:"望遠鏡座", az:15.5, el:-31, pts:[[-0.95,-0.3],[-0.1,0.1],[0.75,0.5],[-0.5,-1],[0.3,-1],[1.15,1.0]], lines:[[0,1],[1,2],[1,3],[1,4]] },
+    { id:"strategy", name:"燒瓶座", az:128, el:-26, pts:[[-0.25,1],[0.25,1],[-0.25,0.3],[0.25,0.3],[-0.9,-0.9],[0.9,-0.9],[0.15,1.5]], lines:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5]] } ];
+  const S = 6.5;
+  for (const d of defs){
+    const c = skyPoint(d.az, d.el, 165), fwd = SKY_CAM.clone().sub(c).normalize();
+    const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), fwd).normalize(), up = new THREE.Vector3().crossVectors(fwd, right);
+    const w = d.pts.map(([x,y]) => c.clone().addScaledVector(right, x*S).addScaledVector(up, y*S));
+    const pg = new THREE.BufferGeometry().setFromPoints(w);
+    const pm = new THREE.PointsMaterial({ color:0xfff1c9, size:coarse ? 9 : 8, sizeAttenuation:false, map:GLOW_TEX, transparent:true, opacity:0.85, depthWrite:false, fog:false });
+    scene.add(new THREE.Points(pg, pm));
+    const lg = new THREE.BufferGeometry().setFromPoints(d.lines.flatMap(([a,b]) => [w[a], w[b]]));
+    const lm = new THREE.LineBasicMaterial({ color:0xf3e0a8, transparent:true, opacity:0, depthWrite:false, fog:false });
+    const ln = new THREE.LineSegments(lg, lm); ln.visible = false; scene.add(ln);
+    constellations.push({ id:d.id, name:d.name, center:c, top:c.clone().addScaledVector(up, S*1.3), pm, lm, ln, k:0, sx:-999, sy:-999, on:false, ph:d.az });
+  }
+}
+let skyHover = -1, skyTimer = 0;
+function setSkyHover(i){ skyHover = i; }
+/* 離游標最近、而且在 85 像素內的星座；沒有就回傳 -1 */
+function skyPick(cx, cy){
+  let best = -1, bd = 85;
+  constellations.forEach((c, i)=>{ if (!c.on) return; const d = Math.hypot(cx - c.sx, cy - c.sy); if (d < bd){ bd = d; best = i; } });
+  return best;
+}
+// 3. 流星：偶爾一顆，從畫面上方斜斜劃過（跟著鏡頭畫在遠處，所以不論島嶼轉到哪裡都看得到）
+const meteor = (()=>{
+  const cv = document.createElement("canvas"); cv.width = 128; cv.height = 16; const g = cv.getContext("2d");
+  const gr = g.createLinearGradient(0,0,128,0); gr.addColorStop(0,"rgba(255,255,255,0)"); gr.addColorStop(0.75,"rgba(255,236,200,.55)"); gr.addColorStop(1,"rgba(255,255,255,1)");
+  g.fillStyle = gr; g.beginPath(); g.moveTo(0,8); g.lineTo(128,4); g.lineTo(128,12); g.closePath(); g.fill();
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({ map:tex, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false, fog:false }));
+  m.visible = false; m.renderOrder = -1; scene.add(m);
+  return { mesh:m, next:6 + R()*4, t:-1, x:0, y:0, ang:0 };
+})();
+const _sv = new THREE.Vector3(), _sr = new THREE.Vector3(), _su = new THREE.Vector3(), _sf = new THREE.Vector3();
+function updateSky(t, dt){
+  // 遠方浮島：很慢的上下浮動、窗光微微明暗
+  if (!REDUCED) for (const g of farIsles){ g.position.y = g.userData.y0 + Math.sin(t*0.22 + g.userData.ph)*0.7; if (g.userData.light) g.userData.light.opacity = 0.75 + Math.sin(t*1.3 + g.userData.ph)*0.15; }
+  // 星座：算出螢幕位置（給游標判定用），連線淡入淡出
+  const w = innerWidth, h = innerHeight; let labelFor = null;
+  constellations.forEach((c, i)=>{
+    _sv.copy(c.center).project(camera);
+    c.on = _sv.z < 1 && Math.abs(_sv.x) < 1.05 && Math.abs(_sv.y) < 1.05;
+    c.sx = (_sv.x*0.5 + 0.5)*w; c.sy = (-_sv.y*0.5 + 0.5)*h;
+    const want = (skyHover === i && c.on) ? 1 : 0;
+    c.k = REDUCED ? want : c.k + (want - c.k)*damp(want ? 5 : 3, dt);
+    c.lm.opacity = 0.8*c.k; c.ln.visible = c.k > 0.01;
+    c.pm.opacity = 0.7 + 0.3*c.k + (REDUCED ? 0 : Math.sin(t*1.7 + c.ph)*0.12);
+    if (want) labelFor = c;
+  });
+  if (labelFor && !panelOpen && !talkingId){
+    const txt = "✦ " + labelFor.name + "｜" + KI.names[labelFor.id];
+    if (skyLabel.textContent !== txt) skyLabel.textContent = txt;
+    _sv.copy(labelFor.top).project(camera);
+    const lw = skyLabel.offsetWidth, x = Math.min(Math.max((_sv.x*0.5 + 0.5)*w, lw/2 + 8), w - lw/2 - 8), y = Math.max((-_sv.y*0.5 + 0.5)*h, 34);
+    skyLabel.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -100%)`;
+    skyLabel.classList.add("show");
+  } else skyLabel.classList.remove("show");
+  // 流星
+  const m = meteor;
+  if (m.t < 0){
+    if (REDUCED || document.hidden) return;
+    m.next -= dt;
+    if (m.next <= 0){
+      const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*150, halfW = halfH*camera.aspect, dir = R() < 0.5 ? -1 : 1;
+      m.x = (R()*1.3 - 0.65)*halfW; m.y = (0.5 + R()*0.42)*halfH; m.ang = dir > 0 ? -(0.35 + R()*0.35) : Math.PI + 0.35 + R()*0.35;
+      m.t = 0; m.len = 13 + R()*8; m.mesh.visible = true;
+    }
+    return;
+  }
+  m.t += dt; const life = 0.85, k = m.t / life;
+  if (k >= 1 || REDUCED){ m.t = -1; m.next = 20 + R()*20; m.mesh.visible = false; m.mesh.material.opacity = 0; return; }
+  const dist = 52*m.t, dx = Math.cos(m.ang), dy = Math.sin(m.ang);
+  camera.getWorldDirection(_sf); _sr.setFromMatrixColumn(camera.matrixWorld, 0); _su.setFromMatrixColumn(camera.matrixWorld, 1);
+  m.mesh.position.copy(camera.position).addScaledVector(_sf, 150).addScaledVector(_sr, m.x + dx*dist).addScaledVector(_su, m.y + dy*dist);
+  m.mesh.quaternion.copy(camera.quaternion); m.mesh.rotateZ(m.ang);
+  m.mesh.translateX(-m.len/2);                                   // 亮的那一頭在行進方向的前端
+  m.mesh.scale.set(m.len, 0.55, 1);
+  m.mesh.material.opacity = Math.sin(Math.PI*k)*0.95;
+}
 function homeDistance(){
   const aspect = viewAspect();
   const vHalf = THREE.MathUtils.degToRad(camera.fov/2);
@@ -2558,7 +3038,7 @@ const bubbleEl = document.getElementById("charBubble"); let bubbleFor = null;
 const _bv = new THREE.Vector3();
 function updateBubble(){
   const a = charHovered && actors.find(x => x.id === charHovered);
-  if (!a || panelOpen){ bubbleEl.classList.remove("show"); return; }
+  if (!a || panelOpen || talkingId){ bubbleEl.classList.remove("show"); return; }
   if (bubbleFor !== a.id){ bubbleEl.textContent = a.line; bubbleFor = a.id; }
   _bv.set(0, a.h, 0); a.node.localToWorld(_bv); _bv.project(camera);
   if (_bv.z > 1){ bubbleEl.classList.remove("show"); return; }
@@ -2577,6 +3057,8 @@ function updateLabels(){
   for (const id in labels) sizes[id] = [labels[id].offsetWidth, labels[id].offsetHeight];
   // 手機或直式螢幕（例如直放的平板）：把場景下移到標題卡與底部選單之間
   viewShiftYTarget = (tb && dk && tb.width > 0 && dk.width > 0 && (KI.isMobile() || w < h) && !panelOpen) ? Math.max(0, (tb.bottom - (h - dk.top)) / 2) : 0;
+  // 角色對話：對話框蓋住畫面下方，把場景往上移，角色落在對話框上方的空間正中間
+  if (talkingId){ const th = KI.talkEl.offsetHeight || 0; viewShiftYTarget = -Math.min(th / 2 + 8, h * 0.34); }
   for (const id in labels){
     const [obj, ay0] = anchors[id];
     const ay = obj.userData.modelTop ? obj.userData.modelTop + 1.0 : ay0;   // 換成模型後，名牌放在模型頂端上方
@@ -2622,9 +3104,11 @@ function setHover(id){
 let down = null;
 canvas.addEventListener("pointerdown", e=>{ cancelTween(); zoomGoal = null; down = { x:e.clientX, y:e.clientY, t:performance.now() }; if (e.pointerType === "mouse") canvas.style.cursor = "grabbing"; });
 canvas.addEventListener("pointermove", e=>{ if (e.pointerType !== "mouse" || (down && e.buttons)) return;
-  const h = pickAny(e.clientX, e.clientY); setHover(h && !h.char ? h.id : null); setCharHover(h && h.char ? h.id : null); });
+  const h = pickAny(e.clientX, e.clientY); setHover(h && !h.char ? h.id : null); setCharHover(h && h.char ? h.id : null);
+  clearTimeout(skyTimer); setSkyHover(h ? -1 : skyPick(e.clientX, e.clientY));
+  if (h && h.char && KI.talkable(h.id)) canvas.style.cursor = "pointer"; });
 // 只處理滑鼠：手機／平板放開手指後，瀏覽器也會送出 pointerleave，若照樣清除，點角色的打招呼會立刻被取消
-canvas.addEventListener("pointerleave", e=>{ if (e.pointerType !== "mouse") return; setHover(null); setCharHover(null); });
+canvas.addEventListener("pointerleave", e=>{ if (e.pointerType !== "mouse") return; setHover(null); setCharHover(null); setSkyHover(-1); });
 window.addEventListener("pointerup", e=>{
   if (!down) return;
   const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t;
@@ -2632,16 +3116,22 @@ window.addEventListener("pointerup", e=>{
   if (e.pointerType === "mouse") setHover(wasOnCanvas ? pick(e.clientX, e.clientY) : null);
   if (wasOnCanvas && moved < (e.pointerType === "mouse" ? 6 : 12) && dt < 700){
     const h = pickAny(e.clientX, e.clientY);
-    if (h && h.char){   // 點到角色：打招呼 3.5 秒（手機沒有滑鼠移入，用點一下代替）
+    if (h && h.char && KI.talkable(h.id)){   // 三館前的角色：鏡頭飛近並開啟對話
+      setCharHover(h.id); const id = h.id;
+      charTapTimer = setTimeout(()=>{ if (charHovered === id) charHovered = null; }, 1600);
+      KI.talk(id);
+    } else if (h && h.char){   // 其他角色：打招呼 3.5 秒（手機沒有滑鼠移入，用點一下代替）
       setCharHover(h.id); const id = h.id;
       charTapTimer = setTimeout(()=>{ if (charHovered === id) charHovered = null; }, 3500);
     } else if (h) KI.open(h.id);
+    else { const si = skyPick(e.clientX, e.clientY);   // 點天空中的星座：連線 4 秒（手機沒有滑鼠移入，用點一下代替）
+      if (si >= 0){ setSkyHover(si); clearTimeout(skyTimer); skyTimer = setTimeout(()=> setSkyHover(-1), 4000); } }
   }
 });
 canvas.style.cursor = "grab";
 
 /* ---------- public API used by the panel ---------- */
-let focusedId = null, panelOpen = false;
+let focusedId = null, panelOpen = false, talkingId = null, talkBack = null;
 window.Island3D = {
   focus(id){
     const b = buildings[id]; if (!b) return;
@@ -2654,6 +3144,43 @@ window.Island3D = {
     viewShiftTarget = panelShift(true);
   },
   panelChanged(open){ panelOpen = open; viewShiftTarget = panelShift(open); },
+  /* 角色對話：鏡頭飛到角色正前方近處（從廣場方向看過去，建築在背景），結束時飛回原位 */
+  talkFocus(id){
+    const a = actors.find(x => x.id === id); if (!a) return;
+    if (!talkingId) talkBack = { pos: camera.position.clone(), target: controls.target.clone() };
+    talkingId = id; focusedId = null; bumpIdle();
+    const c = new THREE.Vector3(); a.node.getWorldPosition(c);
+    const target = c.clone(); target.y += (a.h || 1.4) * 0.5;
+    const front = plaza.clone().sub(c).setY(0);
+    if (front.lengthSq() < 0.01) front.copy(camera.position).sub(c).setY(0);
+    front.normalize();
+    const dist = KI.isMobile() ? 6.6 : 5.8;
+    // 視線不要被廣場路標、樹、路燈或別棟建築擋住：從正前方開始，左右逐步偏轉，挑第一個沒被擋的方向
+    let own = null, ownD = 1e9;
+    for (const b of blockers){ if (b.r !== 2.9) continue; const d = Math.hypot(b.p.x - c.x, b.p.z - c.z); if (d < ownD){ ownD = d; own = b; } }
+    const obs = blockers.filter(b => b !== own && b.r !== 2.6 && b.r !== 1.9).concat([{ p: plaza, r: 0.7 }]);   // 廣場本身不算，中央路標算
+    const up = new THREE.Vector3(0,1,0), cand = new THREE.Vector3();
+    let best = front.clone(), bestHits = 1e9;
+    for (const ang of [0, 0.45, -0.45, 0.9, -0.9, 1.3, -1.3]){
+      cand.copy(front).applyAxisAngle(up, ang);
+      let hits = 0;
+      for (let s = 0.7; s <= dist * 0.86; s += 0.35){
+        const x = c.x + cand.x * s, z = c.z + cand.z * s;
+        for (const b of obs) if (Math.hypot(x - b.p.x, z - b.p.z) < b.r * 0.85){ hits++; break; }
+      }
+      if (hits < bestHits){ bestHits = hits; best.copy(cand); if (!hits) break; }
+    }
+    const dir = best.multiplyScalar(0.86).add(new THREE.Vector3(0, 0.5, 0)).normalize();
+    controls.minDistance = 3;
+    flyTo(target.clone().addScaledVector(dir, dist), target);
+    viewShiftTarget = 0;
+  },
+  talkEnd(back){
+    if (!talkingId) return;
+    talkingId = null; hd = updateLimits(); bumpIdle();
+    if (back && talkBack) flyTo(talkBack.pos, talkBack.target);
+    talkBack = null;
+  },
   home(){
     focusedId = null; panelOpen = false; viewShiftTarget = 0; bumpIdle();
     hd = updateLimits();
@@ -2710,7 +3237,7 @@ function frame(now){
   if (!first) adaptQuality(dt, now);
 
   // idle auto-rotate, eased so it never starts or stops abruptly
-  const idle = !panelOpen && !tween && !REDUCED && (now - lastInteract > 7000);
+  const idle = !panelOpen && !talkingId && !tween && !REDUCED && (now - lastInteract > 7000);
   autoSpeed += ((idle ? 0.35 : 0) - autoSpeed) * damp(idle ? 0.8 : 6, dt);
   controls.autoRotate = autoSpeed > 0.002; controls.autoRotateSpeed = autoSpeed;
 
@@ -2747,6 +3274,7 @@ function frame(now){
     if (a.k > 0.005 && a.react) a.react(a.k, t);
   }
   updateSparkles(t, dt, hovered);
+  updateSky(t, dt);
   // hover / focus highlight
   for (const id in buildings){
     const b = buildings[id];
