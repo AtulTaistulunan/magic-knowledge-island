@@ -1,0 +1,7 @@
+# 內部檔案：不放進公開儲存庫
+CLAUDE.md
+spec.md
+.claude/
+# Google Drive / Windows 自動產生的檔案
+desktop.ini
+Thumbs.db

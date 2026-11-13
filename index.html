@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>AI 題目知識島｜從 AI 出題、品質診斷到命題修訂的探索旅程</title>
+<meta name="description" content="國小四年級自然科「水的流動」單元的 AI 輔助命題歷程：三棟知識建築與六個真實修訂案例。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2e2418; --ink2:#54463a; --muted:#7a6a58;
+  --cream:#fbf4e3; --cream2:#f5ead2; --line:#e3d2ad;
+  --blue:#3d6fc0; --blue-d:#264f93; --blue-l:#e6eefb;
+  --orange:#d9782b; --orange-d:#9c4f12; --orange-l:#fdeedd;
+  --green:#3f9658; --green-d:#24693a; --green-l:#e3f3e6;
+  /* 魔法學院夜晚主題 */
+  --night:#0e1430; --night2:#1b2350; --wine:#6b2433; --wine-d:#3a1520;
+  --gold:#d8b26a; --gold-l:#f3e0a8; --gold-d:#a8823c; --parch:#efe2c4;
+  --glass:linear-gradient(180deg,rgba(26,30,66,.88),rgba(14,17,40,.9)); --glass-line:rgba(216,178,106,.5);
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --wood:#a87b4f; --pass:#1f9a7a; --fail:#d9682a;
+  --warn-bg:#fff4d6; --warn-line:#e7b93e; --warn-ink:#6b4a00;
+  --danger-bg:#fde8e4; --danger-line:#d9634f; --danger-ink:#8a2414;
+  --radius:16px;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font-family:var(--font);color:var(--ink);-webkit-text-size-adjust:100%}
+/* 魔法學院傍晚：以低飽和藍紫為主，只在地平線留一道柔和的粉橘晚霞 */
+body{background:radial-gradient(ellipse 80% 30% at 22% 96%,rgba(240,176,140,.38),transparent 70%),linear-gradient(180deg,#2a3160 0%,#414878 30%,#686a96 56%,#a891ab 80%,#dcb5a3 100%);background-color:#414878}
+button{font-family:inherit;color:inherit}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none;z-index:1}
+/* 月亮固定在畫面右上方的背景（位於 3D 畫布後面） */
+#moon{position:fixed;z-index:0;top:7vh;right:20vw;width:min(15vw,130px);aspect-ratio:1;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 62% 40%,rgba(160,150,120,.35) 0 8%,transparent 9%),radial-gradient(circle at 38% 64%,rgba(160,150,120,.3) 0 6%,transparent 7%),radial-gradient(circle at 30% 30%,rgba(160,150,120,.22) 0 5%,transparent 6%),radial-gradient(circle at 40% 36%,#fffbea,#ece4c6 58%,#cfc5a4);
+  opacity:.82;box-shadow:0 0 40px 10px rgba(255,236,214,.3),0 0 120px 50px rgba(255,200,190,.14)}
+@media (max-width:760px){#moon{top:auto;bottom:16vh;right:7vw;width:62px}}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Top bar ---------- */
+#topbar{position:fixed;top:14px;left:14px;max-width:min(430px,calc(100vw - 28px));z-index:20;color:var(--parch);
+  background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--glass-line);border-radius:var(--radius);box-shadow:0 12px 32px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.04);padding:14px 18px 12px}
+#topbar .orn{display:flex;align-items:center;gap:.5rem;font-family:var(--serif);font-size:.72rem;letter-spacing:.32em;color:var(--gold);font-weight:700;margin-bottom:.15rem}
+#topbar .orn::before,#topbar .orn::after{content:"";flex:1;max-width:2.2rem;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+#topbar .orn::after{background:linear-gradient(90deg,var(--gold),transparent)}
+#topbar h1{margin:0;font-family:var(--serif);font-size:1.6rem;font-weight:900;letter-spacing:.06em;line-height:1.25;display:flex;align-items:center;gap:.45rem;color:var(--gold-l);text-shadow:0 0 18px rgba(243,224,168,.35),0 2px 0 rgba(0,0,0,.4)}
+#topbar h1 .logo{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8a3446,var(--wine-d));border:1.5px solid var(--gold);color:var(--gold-l);font-size:.95rem;text-shadow:none;box-shadow:0 0 12px rgba(216,178,106,.45)}
+#topbar .sub{margin:.3rem 0 0;font-family:var(--serif);font-size:.95rem;color:#eadfc4;font-weight:600;font-style:italic}
+#topbar details{margin-top:.55rem}
+#topbar summary{cursor:pointer;font-size:.85rem;color:var(--gold);font-weight:700;list-style:none;display:inline-flex;align-items:center;gap:.3rem}
+#topbar summary::-webkit-details-marker{display:none}
+#topbar summary::before{content:"▸";transition:transform .2s}
+#topbar details[open] summary::before{transform:rotate(90deg)}
+#topbar summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+#topbar .intro{margin:.4rem 0 0;font-size:.9rem;line-height:1.75;color:#d9cfb8}
+.hint{margin-top:.6rem;display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#e7dcc4;background:rgba(255,255,255,.05);border:1px dashed rgba(216,178,106,.45);border-radius:999px;padding:.25rem .7rem}
+.hint .touch{display:none}
+@media (hover:none) and (pointer:coarse){.hint .mouse{display:none}.hint .touch{display:inline}}
+
+/* ---------- 3D labels ---------- */
+#labels{position:fixed;inset:0;pointer-events:none;z-index:10;overflow:hidden}
+.blabel{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;border:0;
+  display:flex;align-items:center;gap:.35rem;white-space:nowrap;padding:.26rem .65rem .26rem .3rem;border-radius:999px;
+  background:rgba(20,25,56,.86);border:1px solid rgba(216,190,140,.55);color:#f1e3bd;
+  box-shadow:0 3px 10px rgba(10,12,30,.35);font-family:var(--serif);font-size:.82rem;font-weight:700;letter-spacing:.02em;
+  transform:translate(-50%,-100%);transform-origin:50% 100%;transition:background .2s,border-color .2s,scale .2s;will-change:transform}
+.blabel .num{display:inline-grid;place-items:center;width:1.25rem;height:1.25rem;border-radius:50%;color:#fff;font-size:.72rem;font-weight:900;flex:none;font-family:var(--font)}
+.blabel .go{font-size:.72rem;font-weight:600;color:#cdbb92;max-width:0;overflow:hidden;transition:max-width .3s cubic-bezier(.22,1,.36,1)}
+.blabel::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);border:6px solid transparent;border-bottom:0;border-top-color:rgba(216,190,140,.75)}
+/* 滑鼠移入：略微放大、顯示主題副標，不發光 */
+.blabel.hot,.blabel:hover,.blabel:focus-visible{background:rgba(28,34,74,.95);border-color:rgba(232,210,160,.9);scale:1.06}
+.blabel.hot .go,.blabel:hover .go,.blabel:focus-visible .go{max-width:9em}
+.blabel:focus-visible{outline:2px solid var(--gold-l);outline-offset:3px}
+.b-history .num{background:var(--blue)} .b-diagnosis .num{background:var(--orange)} .b-strategy .num{background:var(--green)} .b-about .num{background:var(--wine)}
+/* 角色的對話泡泡：羊皮紙底、深色字，位置跟著角色移動 */
+#charBubble{position:fixed;left:0;top:0;z-index:12;pointer-events:none;max-width:min(240px,70vw);
+  padding:.45rem .7rem;border-radius:12px;background:#fbf4e3;color:var(--ink);border:1px solid rgba(168,130,60,.55);
+  box-shadow:0 6px 16px rgba(10,12,30,.3);font-size:.84rem;line-height:1.55;font-weight:500;
+  opacity:0;transition:opacity .2s;will-change:transform}
+#charBubble::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);border:7px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
+#charBubble.show{opacity:1}
+/* 學院城堡不是知識館：用較小、較淡的次要名牌 */
+.blabel.b-about{font-size:.74rem;padding:.2rem .55rem .2rem .25rem;background:rgba(20,25,56,.7)}
+.blabel.b-about .num{width:1.05rem;height:1.05rem;font-size:.62rem}
+
+/* ---------- Dock ---------- */
+#dock{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;
+  display:flex;gap:6px;padding:6px;border-radius:999px;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 12px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.04);border:1px solid var(--glass-line);max-width:calc(100vw - 20px)}
+#dock button{border:0;background:transparent;color:#f1e6cc;border-radius:999px;padding:.55rem .95rem;font-family:var(--serif);font-size:.95rem;font-weight:700;letter-spacing:.03em;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;transition:background .15s,transform .1s,color .15s}
+#dock button:hover{background:rgba(216,178,106,.16);color:var(--gold-l)}
+#dock button:active{transform:scale(.96)}
+#dock button:focus-visible{outline:2px solid var(--gold-l);outline-offset:1px}
+#dock .dot{width:.72rem;height:.72rem;border-radius:50%;flex:none;box-shadow:0 0 0 1.5px rgba(243,224,168,.7),0 0 8px currentColor}
+#dock .sep{width:1px;background:rgba(216,178,106,.4);margin:4px 2px}
+#dock .short{display:none}
+#musicBtn[hidden]{display:none}
+#musicBtn[aria-pressed="true"]{background:rgba(216,178,106,.24);color:var(--gold-l)}
+#musicBtn[aria-pressed="true"] .note{animation:notebob 1.2s ease-in-out infinite}
+@keyframes notebob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+html.reduce-motion #musicBtn .note{animation:none!important}   /* 跟著下方選單的動畫開關（預設跟隨系統的減少動態效果） */
+/* 動畫開關：和「音樂」按鈕同一種樣式，開啟時底色變金色 */
+#motionBtn[aria-pressed="true"]{background:rgba(216,178,106,.24);color:var(--gold-l)}
+#motionBtn .ico{display:inline-block;width:1em;text-align:center}
+/* 點擊音效開關：和「音樂」「動畫」按鈕同一種樣式 */
+#sfxBtn[aria-pressed="true"]{background:rgba(216,178,106,.24);color:var(--gold-l)}
+#sfxBtn .ico{display:inline-block;width:1em;text-align:center}
+#dock{transition:left .55s cubic-bezier(.22,1,.36,1)}
+@media (min-width:761px){body.panel-open #dock{left:calc((100vw - min(620px,100vw)) / 2)} body.panel-open #topbar details, body.panel-open #topbar .hint{display:none}}
+/* 桌面寬度但面板打開時，下方選單只能用面板左邊的空間：改成短名稱、音樂與動畫只留圖示，避免超出畫面或被面板蓋住 */
+@media (min-width:761px){
+  body.panel-open #dock{max-width:calc(100vw - min(620px,100vw) - 24px)}
+  body.panel-open #dock .long{display:none} body.panel-open #dock .short{display:inline}
+  body.panel-open #dock button{padding:.5rem .6rem;font-size:.86rem;letter-spacing:0}
+}
+@media (min-width:761px) and (max-width:1180px){
+  body.panel-open #homeBtn .short, body.panel-open #dock [data-open="about"] .short{display:none}
+}
+/* 加了「音效」按鈕後，面板旁邊最窄的情況（約 1081–1120）按鈕間距再收一點，避免選單超出 */
+@media (min-width:761px) and (max-width:1120px){
+  body.panel-open #dock button{padding:.5rem .48rem}
+}
+/* 中等寬度（例如平板橫放）面板關閉時：建築用短名稱，音樂與動畫只留圖示 */
+@media (min-width:761px) and (max-width:1000px){
+  #dock .long{display:none} #dock .short{display:inline}
+}
+/* 面板打開時，面板左邊少於約 450 像素就放不下選單：先收起下方選單；面板上方有「返回島嶼全景」與關閉按鈕，也可用快捷鍵 1、2、3 */
+@media (min-width:761px) and (max-width:1080px){
+  body.panel-open #dock{visibility:hidden}
+}
+.iconbtn .stxt{display:none}
+@media (max-width:760px){
+  #dock{gap:0;padding:4px}
+  #dock button{padding:.55rem .45rem;font-size:.8rem;gap:.28rem;letter-spacing:0}
+  #dock .dot{width:.6rem;height:.6rem}
+  #dock .long{display:none}#dock .short{display:inline}
+  #topbar{top:10px;left:10px;padding:10px 12px}
+  #topbar h1{font-size:1.2rem}
+  #topbar .sub{font-size:.8rem}
+  .blabel{font-size:.74rem;padding:.22rem .5rem .22rem .26rem}
+  .blabel .num{width:1.1rem;height:1.1rem;font-size:.66rem}
+}
+/* 加了音樂按鈕後，窄手機的「全景」「說明」只留圖示 */
+@media (max-width:430px){
+  #homeBtn .short,#dock [data-open="about"] .short{display:none}
+}
+/* 小螢幕手機（寬度 360 以下）：選單和標題卡再縮一點，避免「說明」被切掉 */
+@media (max-width:360px){
+  #dock button{padding:.5rem .3rem;font-size:.74rem;gap:.2rem}
+  #dock .dot{width:.5rem;height:.5rem}
+  #dock .sep{margin:4px 0}
+  .hint{font-size:.7rem;padding:.2rem .5rem}
+  #topbar .sub{font-size:.74rem}
+}
+
+/* ---------- Overlays ---------- */
+#loading,#error{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none}
+#loading .box{background:var(--glass);border:1px solid var(--glass-line);color:var(--gold-l);font-family:var(--serif);border-radius:var(--radius);padding:18px 24px;box-shadow:0 12px 30px rgba(0,0,0,.5);text-align:center;font-weight:700;letter-spacing:.06em}
+#error .box{background:var(--cream);border-radius:var(--radius);padding:18px 22px;box-shadow:0 12px 30px rgba(0,0,0,.5);text-align:center;font-weight:700}
+#loading .spin{width:34px;height:34px;margin:0 auto 10px;border-radius:50%;border:3px solid rgba(216,178,106,.25);border-top-color:var(--gold-l);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading.hide{opacity:0;transition:opacity .5s;visibility:hidden}
+#error{display:none;pointer-events:auto;padding:20px}
+#error .box{max-width:460px;text-align:left;font-weight:400;line-height:1.7;border:2px solid var(--danger-line)}
+#error h2{margin:0 0 .4rem;font-size:1.1rem;color:var(--danger-ink)}
+
+/* ---------- Panel ---------- */
+#panel{position:fixed;top:0;right:0;height:100%;width:min(620px,100%);z-index:30;background:var(--cream);border-left:2px solid var(--gold);
+  box-shadow:-12px 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column;transform:translateX(105%);
+  transition:transform .55s cubic-bezier(.22,1,.36,1),visibility 0s linear .55s;visibility:hidden;will-change:transform}
+#panel.open{transition:transform .55s cubic-bezier(.22,1,.36,1),visibility 0s}
+#panel.open{transform:none;visibility:visible}
+@media (max-width:760px){
+  #panel{width:100%;transform:translateY(105%)}
+  #panel.open{transform:none}
+}
+.p-head{flex:none;padding:18px 18px 10px;border-bottom:2px solid var(--gold);position:relative;color:var(--parch);
+  background:radial-gradient(ellipse 80% 120% at 100% 0%,rgba(92,112,200,.28),transparent 60%),linear-gradient(180deg,#1b2148,#11152f)}
+.p-head::before{content:"";position:absolute;left:0;top:0;right:0;height:5px;background:linear-gradient(90deg,var(--accent,#999),var(--gold) 55%,var(--accent,#999))}
+.p-top{display:flex;align-items:flex-start;gap:10px}
+.p-icon{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.35rem;background:radial-gradient(circle at 35% 30%,var(--accent,#777),#0d1028 95%);border:1.5px solid var(--gold);box-shadow:0 0 14px rgba(216,178,106,.35)}
+.p-title{flex:1;min-width:0}
+.p-title h2{margin:2px 0 0;font-family:var(--serif);font-size:1.4rem;font-weight:900;letter-spacing:.05em;color:var(--gold-l);text-shadow:0 0 14px rgba(243,224,168,.25)}
+.p-title .kicker{font-size:.78rem;color:#cdbf9f;font-weight:700;letter-spacing:.1em}
+.p-actions{display:flex;gap:6px;flex:none}
+.iconbtn{border:1px solid var(--glass-line);background:rgba(255,255,255,.06);color:#f1e6cc;border-radius:10px;min-width:40px;height:40px;padding:0 10px;cursor:pointer;font-size:.88rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.iconbtn:hover{background:rgba(216,178,106,.18);color:var(--gold-l)}
+.iconbtn:focus-visible{outline:2px solid var(--gold-l);outline-offset:1px}
+.iconbtn.close{font-size:1.25rem}
+.p-intro{margin:.6rem 0 .2rem;font-size:.93rem;line-height:1.75;color:#ddd1b6}
+.p-nav{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:thin;scrollbar-color:var(--gold-d) transparent}
+.p-nav button{flex:none;border:1px solid rgba(216,178,106,.4);background:rgba(255,255,255,.05);border-radius:999px;padding:.35rem .75rem;font-size:.82rem;font-weight:700;cursor:pointer;color:#e9dcc0}
+.p-nav button:hover,.p-nav button.on{background:var(--accent);border-color:var(--gold-l);color:#fff}
+.p-nav button:focus-visible{outline:2px solid var(--gold-l);outline-offset:1px}
+.p-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 18px calc(40px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 120px),var(--cream)}
+.sec{scroll-margin-top:12px;margin-bottom:22px}
+.sec>h3{font-family:var(--serif);font-size:1.12rem;margin:0 0 .6rem;display:flex;align-items:center;gap:.45rem;font-weight:900;color:#3a2614;padding-bottom:.3rem;border-bottom:1px solid rgba(168,130,60,.35)}
+.sec>h3 .n{display:inline-grid;place-items:center;min-width:1.6rem;height:1.6rem;border-radius:8px;background:var(--accent-l);color:var(--accent-d);font-size:.82rem;padding:0 .3rem}
+.card{background:#fffdf7;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 0 rgba(168,130,60,.12)}
+.card p{margin:.3rem 0;line-height:1.75}
+.card ul,.card ol{margin:.3rem 0;padding-left:1.35rem;line-height:1.75}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.35rem .9rem;font-size:.93rem;line-height:1.6}
+.kv dt{color:var(--muted);font-weight:700}
+.kv dd{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:.25rem;font-size:.8rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;background:var(--cream2);border:1px solid var(--line);color:var(--ink2)}
+.chip.b-history{background:var(--blue-l);border-color:#b9d2ee;color:var(--blue-d)}
+.chip.b-diagnosis{background:var(--orange-l);border-color:#f3c9a3;color:var(--orange-d)}
+.chip.b-strategy{background:var(--green-l);border-color:#bfdcb8;color:var(--green-d)}
+blockquote.prompt{margin:0;padding:12px 14px;background:#f7f3ea;border-left:5px solid var(--accent);border-radius:8px;line-height:1.85;font-size:.95rem}
+.note{font-size:.84rem;color:var(--muted);line-height:1.7}
+.callout{border-radius:12px;padding:11px 14px;margin:8px 0;line-height:1.75;font-size:.92rem;border:1px solid}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);color:var(--danger-ink)}
+.callout.info{background:var(--blue-l);border-color:#b9d2ee;color:#1f4c7c}
+.callout b{font-weight:900}
+.linkbtn{border:0;background:none;padding:0;color:var(--blue-d);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.linkbtn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;margin:4px 0 10px}
+.tl::before{content:"";position:absolute;left:12%;right:12%;top:22px;height:4px;background:#dfe9dc;border-radius:4px}
+.tl button{position:relative;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 2px;font-size:.8rem;font-weight:700;color:var(--ink2);line-height:1.35}
+.tl .dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:3px solid #cfdcc9;font-size:1rem;font-weight:900;color:var(--ink2);transition:all .2s}
+.tl button.on .dot{background:var(--blue);border-color:var(--blue-d);color:#fff;transform:scale(1.08)}
+.tl button.on{color:var(--ink)}
+.tl button:focus-visible .dot{outline:3px solid var(--blue);outline-offset:2px}
+.tl-detail h4{margin:0 0 .3rem;font-size:1.02rem}
+.tl-detail h5{margin:.7rem 0 .2rem;font-size:.9rem;color:var(--muted)}
+.relcase{margin-top:.6rem;display:flex;flex-wrap:wrap;gap:6px}
+
+/* flow */
+.flow{display:flex;flex-direction:column;gap:6px;counter-reset:step}
+.flow .step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:.93rem}
+.flow .who{flex:none;font-size:.75rem;font-weight:900;padding:.15rem .5rem;border-radius:6px}
+.who.h{background:#fff0d6;color:#7a4a00}.who.ai{background:#e3ecfb;color:#1f4c7c}
+.flow .step::before{counter-increment:step;content:counter(step);flex:none;width:1.5rem;height:1.5rem;border-radius:50%;display:grid;place-items:center;background:var(--cream2);font-size:.8rem;font-weight:900}
+.motto{margin:10px 0 0;text-align:center;font-weight:900;font-size:1rem;padding:10px;border-radius:12px;background:var(--accent-l);color:var(--accent-d)}
+
+/* stats chart */
+.legend{display:flex;gap:14px;font-size:.84rem;color:var(--ink2);margin-bottom:8px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.bars{display:flex;flex-direction:column;gap:12px}
+.barrow .lab{display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;margin-bottom:4px;gap:8px}
+.barrow .lab small{font-weight:500;color:var(--muted)}
+.track{display:flex;gap:2px;height:26px;border-radius:6px;position:relative}
+.seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:#fff;min-width:0;position:relative;cursor:default;outline:none}
+.seg.pass{background:var(--pass);border-radius:6px 0 0 6px}
+.seg.fail{background:var(--fail);border-radius:0 6px 6px 0}
+.seg.only{border-radius:6px}
+.seg .tt{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#283629;color:#fff;font-weight:500;font-size:.78rem;padding:.3rem .55rem;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:2}
+.seg:hover .tt,.seg:focus .tt{opacity:1}
+/* 提示文字靠齊所在區段的同一側，避免超出面板造成手機上可以左右滑動 */
+.seg.pass .tt{left:0;transform:none}
+.seg.fail .tt{left:auto;right:0;transform:none}
+.barrow.key .lab{color:var(--orange-d)}
+.statbig{display:flex;align-items:center;gap:14px}
+.statbig .num{white-space:nowrap;flex:none;font-size:2.4rem;font-weight:900;color:var(--orange-d);line-height:1}
+.statbig .num small{font-size:1rem;color:var(--muted);font-weight:700}
+table.data{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:8px}
+table.data th,table.data td{border-bottom:1px solid var(--line);padding:.4rem .5rem;text-align:left}
+table.data td.r,table.data th.r{text-align:right}
+.toggle-table{margin-top:8px}
+
+/* indicator cards */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.ind{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.ind h4{margin:0 0 .2rem;font-size:.98rem}
+.ind p{margin:0;font-size:.86rem;line-height:1.65;color:var(--ink2)}
+
+/* case selector + card */
+.casepick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.casepick button{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:.45rem .7rem;font-size:.84rem;font-weight:700;cursor:pointer;text-align:left;line-height:1.35;color:var(--ink2)}
+.casepick button b{display:block;font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+.casepick button.on{border-color:var(--accent);background:var(--accent-l);color:var(--ink)}
+.casepick button:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+.casecard{background:#fff;border:1.5px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.cc-head{padding:12px 14px 10px;background:linear-gradient(180deg,#fffdf7,#fff);border-bottom:1px solid var(--line)}
+.cc-head h4{margin:0;font-size:1.06rem;font-weight:900}
+.cc-head .id{font-size:.72rem;color:var(--muted);font-weight:700;letter-spacing:.08em}
+.numchain{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px;font-size:.8rem}
+.numchain .nc{padding:.15rem .5rem;border-radius:6px;background:var(--cream2);border:1px solid var(--line);font-weight:700}
+.numchain .arr{color:var(--muted)}
+.cc-tabs{display:flex;gap:4px;overflow-x:auto;padding:8px 10px 0;border-bottom:1px solid var(--line);background:#fffdf8;scrollbar-width:thin}
+.cc-tabs button{flex:none;border:0;background:none;padding:.5rem .7rem;font-size:.85rem;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);border-radius:8px 8px 0 0}
+.cc-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);background:#fff}
+.cc-tabs button.v2{color:var(--danger-ink)}
+.cc-tabs button.v2[aria-selected="true"]{border-bottom-color:var(--danger-line)}
+.cc-tabs button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.cc-body{padding:12px 14px 14px}
+.cc-src{padding:8px 14px 12px;font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);line-height:1.65}
+.q{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fffefb}
+.q-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.vtag{font-size:.75rem;font-weight:900;padding:.15rem .5rem;border-radius:6px;background:#eef1ec;color:#3c4a3e}
+.vtag.v1{background:#eceff3;color:#3d4a5c}.vtag.v2{background:var(--danger-bg);color:var(--danger-ink)}.vtag.v3{background:var(--green-l);color:var(--green-d)}
+.qnum{font-size:.78rem;color:var(--muted);font-weight:700}
+.examhead{margin:4px 0 8px;padding:6px 10px;border:2px dashed var(--fail);border-radius:8px;background:#fff7f0;font-size:.9rem}
+.examhead .tag{display:block;font-size:.72rem;color:var(--orange-d);font-weight:900;margin-bottom:2px}
+.stem{margin:.2rem 0 .5rem;line-height:1.85;font-size:.98rem}
+.opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.opts li{display:flex;gap:.5rem;align-items:flex-start;padding:.45rem .6rem;border-radius:9px;border:1px solid #eee6d6;background:#fff;line-height:1.65;font-size:.94rem;flex-wrap:wrap}
+.opts .L{flex:none;font-weight:900;color:var(--ink2);min-width:2.1em}
+.opts .T{flex:1;min-width:10em}
+.opts li.correct{border-color:#7cc3a9;background:#eef8f3}
+.opts li.correct .L{color:#16735a}
+.opts li.aiset{border-color:#9db8dd;background:#f0f5fc}
+.opts li.dual{border-color:var(--danger-line);background:#fff3f0}
+.badge{flex:none;font-size:.72rem;font-weight:900;padding:.12rem .45rem;border-radius:6px;margin-left:auto;align-self:center}
+.badge.ok{background:#d5efe4;color:#0f5c47}
+.badge.ai{background:#dce7f6;color:#1f4c7c}
+.badge.dual{background:#fbd9d1;color:var(--danger-ink)}
+.ansline{margin:.6rem 0 0;font-size:.9rem;font-weight:700}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.dg{display:flex;flex-direction:column;gap:8px}
+.dg .item{border-radius:12px;padding:10px 12px;border:1px solid var(--line);background:#fffefb}
+.dg .item h5{margin:0 0 .2rem;font-size:.84rem;letter-spacing:.04em}
+.dg .item p{margin:0;line-height:1.75;font-size:.93rem}
+.dg .item.prob{border-left:5px solid var(--fail)}
+.dg .item.fix{border-left:5px solid var(--pass)}
+.dg .item.pr{border-left:5px solid var(--blue)}
+.princ{display:flex;flex-direction:column;gap:8px}
+.pr-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.pr-card h4{margin:0 0 .25rem;font-size:.98rem;display:flex;gap:.4rem;align-items:baseline}
+.pr-card h4 .pn{flex:none;font-size:.75rem;font-weight:900;color:#fff;background:var(--green);border-radius:6px;padding:.1rem .45rem}
+.pr-card p{margin:0 0 .35rem;font-size:.9rem;line-height:1.7;color:var(--ink2)}
+.check{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.check label{display:flex;gap:.6rem;align-items:flex-start;padding:.55rem .7rem;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;line-height:1.6;font-size:.92rem}
+.check input{width:1.15rem;height:1.15rem;margin-top:.2rem;accent-color:var(--green);flex:none}
+.check input:checked+span{color:var(--muted);text-decoration:line-through}
+.pending{counter-reset:pd;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.pending li{display:flex;gap:.6rem;padding:.6rem .75rem;border-radius:10px;background:var(--warn-bg);border:1px solid #f0d78e;line-height:1.7;font-size:.9rem;color:#4f3a06}
+.pending li::before{counter-increment:pd;content:counter(pd);flex:none;width:1.5rem;height:1.5rem;border-radius:50%;background:#e7b93e;color:#fff;display:grid;place-items:center;font-weight:900;font-size:.8rem;margin-top:.1rem}
+.foot{margin-top:24px;padding:12px 14px;border-radius:12px;background:#f3eee2;font-size:.84rem;line-height:1.75;color:var(--ink2)}
+.kbd{display:inline-block;border:1px solid #cfc4ab;border-bottom-width:2px;border-radius:5px;padding:0 .35rem;font-size:.8rem;background:#fff;font-family:inherit}
+@media (max-width:760px){
+  .p-head{padding:12px 14px 8px}
+  .p-title h2{font-size:1.15rem}
+  .p-icon{width:38px;height:38px;font-size:1.15rem}
+  .p-intro{font-size:.86rem}
+  .p-body{padding:12px 12px calc(40px + env(safe-area-inset-bottom))}
+  .iconbtn .txt{display:none}.iconbtn .stxt{display:inline}
+  .tl .dot{width:40px;height:40px}.tl::before{top:19px}
+  .tl button{font-size:.72rem}
+}
+/* 動畫關閉時（跟隨系統「減少動態效果」，或訪客按下方選單的「動畫」關閉），介面轉場也一起關掉 */
+html.reduce-motion *{transition:none!important;animation:none!important}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="可旋轉縮放的 3D 知識島場景，島上有三棟知識建築。也可以使用下方的建築選單閱讀內容。" tabindex="-1"></canvas>
+
+<header id="topbar">
+  <div class="orn" aria-hidden="true">魔法學院</div>
+  <h1><span class="logo" aria-hidden="true">✦</span>AI 題目知識島</h1>
+  <p class="sub">從 AI 出題、品質診斷到命題修訂的探索旅程</p>
+  <details id="introBox">
+    <summary>關於這座島</summary>
+    <p class="intro">歡迎登上 AI 題目知識島！這裡記錄了一次國小四年級自然科「水的流動」單元的 AI 輔助命題歷程。透過三棟知識建築與六個真實修訂案例，探索如何檢查 AI 產生的題目、發現問題並提出具體修訂策略。</p>
+  </details>
+  <div class="hint" role="note"><span class="mouse">拖曳旋轉島嶼｜滾輪縮放｜點選建築探索知識</span><span class="touch">單指拖曳旋轉｜雙指縮放｜點選建築探索知識</span></div>
+</header>
+
+
+<div id="labels" aria-hidden="false"></div>
+<div id="charBubble" aria-hidden="true"></div>
+
+<div id="moon" aria-hidden="true"></div>
+<div id="loading" role="status" aria-live="polite"><div class="box"><div class="spin"></div>知識島點燈中…</div></div>
+<div id="error" role="alert"><div class="box"><h2>3D 場景無法顯示</h2><p id="errorMsg"></p><p class="note">您仍然可以使用畫面下方的建築選單，閱讀三棟建築的全部內容。</p></div></div>
+
+<nav id="dock" aria-label="建築選單">
+  <button type="button" data-open="history" title="開啟 AI 命題歷程館（快捷鍵 1）"><span class="dot" style="background:var(--blue)"></span><span class="long">AI 命題歷程館</span><span class="short">歷程館</span></button>
+  <button type="button" data-open="diagnosis" title="開啟題目品質診斷館（快捷鍵 2）"><span class="dot" style="background:var(--orange)"></span><span class="long">題目品質診斷館</span><span class="short">診斷館</span></button>
+  <button type="button" data-open="strategy" title="開啟命題修訂策略館（快捷鍵 3）"><span class="dot" style="background:var(--green)"></span><span class="long">命題修訂策略館</span><span class="short">策略館</span></button>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" id="homeBtn" aria-label="返回島嶼全景" title="返回島嶼全景（快捷鍵 H）"><span aria-hidden="true">⟲</span><span class="long">返回島嶼全景</span><span class="short">全景</span></button>
+  <button type="button" data-open="about" aria-label="說明" title="網站說明與資料聲明"><span aria-hidden="true">ⓘ</span><span class="long">說明</span><span class="short">說明</span></button>
+  <button type="button" id="musicBtn" hidden aria-pressed="false" aria-label="背景音樂" title="播放背景音樂（快捷鍵 M）"><span class="note" aria-hidden="true">♪</span><span class="long">音樂</span></button>
+  <button type="button" id="motionBtn" aria-pressed="true" aria-label="動畫效果" title="關閉動畫效果（快捷鍵 A）"><span class="ico" aria-hidden="true">✦</span><span class="long">動畫</span></button>
+  <button type="button" id="sfxBtn" aria-pressed="true" aria-label="點擊音效" title="關閉點擊音效（快捷鍵 S）"><span class="ico" aria-hidden="true">♬</span><span class="long">音效</span></button>
+</nav>
+
+<aside id="panel" role="dialog" aria-modal="false" aria-labelledby="pTitle">
+  <div class="p-head">
+    <div class="p-top">
+      <div class="p-icon" id="pIcon" aria-hidden="true"></div>
+      <div class="p-title"><div class="kicker" id="pKicker"></div><h2 id="pTitle"></h2></div>
+      <div class="p-actions">
+        <button type="button" class="iconbtn" id="pHome" title="返回島嶼全景"><span aria-hidden="true">⟲</span><span class="txt">返回島嶼全景</span><span class="stxt">全景</span></button>
+        <button type="button" class="iconbtn close" id="pClose" title="關閉面板（Esc）" aria-label="關閉面板">×</button>
+      </div>
+    </div>
+    <p class="p-intro" id="pIntro"></p>
+    <div class="p-nav" id="pNav" aria-label="面板內導覽"></div>
+  </div>
+  <div class="p-body" id="pBody" tabindex="-1"></div>
+</aside>
+
+<!-- ================= 內容資料與介面（不依賴 3D，3D 失敗時仍可閱讀） ================= -->
+<script>
+(function(){
+"use strict";
+
+/* ---------------- 六個案例：唯一資料來源（三棟建築共用） ---------------- */
+var CASES = [
+{
+  id:"case-1", no:1, title:"標題洩題與名詞定義",
+  chain:[["分析表","第 1 題"],["第三版","第 1 題"]],
+  buildings:["history","diagnosis"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 1 題",
+    examHeader:"一、毛細現象（第 1～9 題）",
+    stem:"小明將一張衛生紙的一角放入裝有紅色水的杯子中，過了一會兒，發現紅色水沿著衛生紙慢慢向上移動。這是哪一種現象？",
+    options:[["A","虹吸現象"],["B","毛細現象"],["C","連通管原理"],["D","蒸發現象"]], answer:"B" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 1 題",
+    stem:"小明在水中加入少量紅色食用色素，讓水變成紅色，這種水以下簡稱為「色水」。他把衛生紙的一角放入色水中，過了一會兒，發現色水沿著衛生紙慢慢向上移動。這是哪一種現象？",
+    options:[["A","連通管原理"],["B","虹吸現象"],["C","水往低處流的現象"],["D","毛細現象"]], answer:"D" },
+  problem:"原試卷的「毛細現象」大標題直接提示答案，D 選項「蒸發現象」也較容易排除。",
+  reason:"取消主題標題，調整選項，並在首次出現時定義「色水」。",
+  principle:"消除非學科線索，清楚定義重要用語。",
+  sources:["《題目分析表》第 1 題。","《AI 出題對話紀錄》初版與第三版。"]
+},
+{
+  id:"case-2", no:2, title:"誘答選項品質",
+  chain:[["分析表","第 6 題"],["第三版","第 9 題"]],
+  buildings:["diagnosis","strategy"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 6 題",
+    stem:"媽媽把一條乾毛巾放在不小心打翻的水旁，毛巾接觸到水的地方逐漸變濕，其他部分也慢慢濕了。最主要的原因是什麼？",
+    options:[["A","毛巾會自己製造水"],["B","水受到磁力吸引"],["C","水沿著毛巾纖維間的細小空隙移動"],["D","毛巾讓空氣變成水"]], answer:"C" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 9 題",
+    stem:"媽媽把乾毛巾的一角碰到桌上的水，毛巾其他部分則搭在較高的盒子上。過了一會兒，發現高處沒有直接碰到水的毛巾也變濕了。這主要是什麼原因？",
+    options:[["A","水先變成水蒸氣，再附著在毛巾上"],["B","水沿毛巾表面，從低處往高處流動"],["C","水沿著毛巾內的細小空隙慢慢向上移動"],["D","毛巾從周圍空氣中吸收水分而變濕"]], answer:"C" },
+  problem:"原始錯誤選項包含「自己製造水」「磁力」「空氣變成水」等容易以常識排除的敘述，缺乏概念診斷價值。",
+  reason:"加入毛巾搭在高處的情境，讓學生需要判斷水如何移動，並以其他可能的解釋設計誘答選項。",
+  principle:"使用具有迷思診斷價值的錯誤選項，避免過度荒謬的誘答選項。",
+  sources:["《題目分析表》第 6 題。","《AI 出題對話紀錄》初版與第三版。"]
+},
+{
+  id:"case-3", no:3, title:"實驗控制變因",
+  chain:[["分析表","第 7 題"],["第三版","第 11 題"]],
+  buildings:["strategy"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 7 題",
+    stem:"小美想比較兩種紙巾的吸水情形。為了讓實驗結果比較公平，下列哪一種做法最適當？",
+    options:[["A","使用相同大小的紙巾，將一端浸入相同深度的水中，觀察相同時間"],["B","一種紙巾使用熱水，另一種使用冷水"],["C","一張紙巾浸入水中 1 分鐘，另一張浸入 5 分鐘"],["D","一種紙巾先弄濕，另一種保持乾燥"]], answer:"A" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 11 題",
+    stem:"小琳想比較甲、乙兩種紙巾的吸水情形。她準備了相同大小的兩張紙巾，卻將甲紙巾浸入色水中 1 公分，乙紙巾浸入色水中 3 公分，並且都觀察 2 分鐘。如果要讓實驗比較公平，她最應該修改哪一項？",
+    options:[["A","將甲、乙改成相同種類的紙巾"],["B","讓兩張紙巾浸入水中的深度相同"],["C","將甲、乙改成不同大小的紙巾"],["D","讓其中一張紙巾多觀察一分鐘"]], answer:"B" },
+  problem:"初版題目偏向直接辨認正確實驗做法，正確答案也明顯比其他選項長。",
+  reason:"改成有瑕疵的實驗設計，要求學生找出應保持一致的條件，並加入「將被比較的紙巾改成相同種類」作為可能的迷思選項。",
+  principle:"使用具體實驗情境，評量學生辨識與控制變因的能力。",
+  sources:["《題目分析表》第 7 題。","《AI 出題對話紀錄》初版與第三版。"]
+},
+{
+  id:"case-4", no:4, title:"跨題互相提示",
+  chain:[["分析表","第 17 題"],["第三版","第 24 題"]],
+  buildings:["diagnosis","strategy"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 17 題",
+    stem:"小安利用虹吸現象將水桶中的水排出，水管入口一直放在桶內較低的位置，出口則位於更低處。如果桶內水量持續減少，直到水面低於水管入口，最可能發生什麼事？",
+    options:[["A","水會繼續不斷流出"],["B","空氣進入水管，虹吸作用停止"],["C","水會從水管出口倒流回水桶"],["D","水桶中的水會自動增加"]], answer:"B" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 24 題",
+    stem:"小華利用裝滿水的軟管，將桌上水桶中的水引到地上的水盆，水已經持續流出。接著，他把出水的一端移到旁邊另一個同樣低的水盆，移動時出口始終低於原來水桶內的水面，管內也沒有進入空氣。最可能出現什麼結果？",
+    options:[["A","新水盆要先裝水，水才會繼續流出"],["B","換了接水盆後，水就會停止流動"],["C","水會繼續沿著軟管流入新的水盆"],["D","水會沿軟管流回原本桌上的水桶"]], answer:"C" },
+  problem:"學生在第二版的全卷檢查中發現，第 10 題與第 24 題都在考「空氣進入水管造成虹吸停止」，容易重複並互相提示。",
+  reason:"將其中一題改成更換接水盆後的排水結果判斷。",
+  principle:"整份試卷完成後，需要進行跨題互查，不能只逐題檢查。",
+  sources:["《題目分析表》第 17 題。","《AI 出題對話紀錄》第三輪、第四輪及第三版。"]
+},
+{
+  id:"case-5", no:5, title:"雙重答案問題",
+  chain:[["分析表","第 19 題"],["第二版","第 20 題"],["第三版","第 20 題"]],
+  buildings:["diagnosis","strategy"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 19 題",
+    stem:"關於連通管原理，下列哪一個敘述正確？",
+    options:[["A","當連通容器中的水靜止，且水面都接觸相同的大氣壓力時，各處水面會在相同的水平高度"],["B","連通管的兩端一定要一樣粗"],["C","水一定會全部流向較寬的一端"],["D","連通管必須使用馬達才能運作"]], answer:"A" },
+  v2:{ tag:"第二版", cls:"v2", num:"第二版第 20 題",
+    stem:"學校有一個不透明的儲水桶，旁邊裝了一根透明水管，水管下端和桶底相通，上端開口朝上，高於桶內水面，粗細約和一般吸管相同。等水靜止後，可以利用這根透明管來做什麼？",
+    options:[["A","觀察比水桶內水面更高的水位"],["B","判斷儲水桶裡的水面高度"],["C","判斷儲水桶是否已經裝滿水"],["D","觀察水管粗細如何使水面升高"]],
+    aiAnswer:"B", dual:"C",
+    issue:"學生指出 C「判斷儲水桶是否已經裝滿水」也可能達成，所以存在兩個合理答案。" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 20 題",
+    stem:"家裡的電熱水瓶側面有一條透明的水位窗，裡面的水和熱水瓶內的水相通。當家人倒出一杯熱水後，等水面靜止，透明水位窗中的水面會如何變化？",
+    options:[["A","保持原來高度，因為它在瓶子外側"],["B","逐漸升高，因為瓶內的水量減少"],["C","先降低，再慢慢回到原來的高度"],["D","跟著降低，因為它和瓶內的水相通"]], answer:"D" },
+  problem:"初版有專業用語太難、答案過長等問題。第二版雖然更生活化，卻產生兩個合理答案。",
+  reason:"學生發現雙重答案後，要求重新設計題目，改用家庭電熱水瓶透明水位窗的情境。",
+  principle:"不能只檢查設定的正確答案是否合理，必須逐一確認其他選項不會同時成立。",
+  sources:["《題目分析表》第 19 題。","《AI 出題對話紀錄》初版、第二版第 20 題、第三版第 20 題。"]
+},
+{
+  id:"case-6", no:6, title:"水量與水面高度迷思",
+  chain:[["分析表","第 25 題"],["第三版","第 12 題"]],
+  buildings:["diagnosis","strategy"],
+  original:{ tag:"初版", cls:"v1", num:"分析表第 25 題",
+    stem:"甲、乙兩個水槽底部以水管相通，兩個水槽的水面都接觸空氣。剛開始甲水槽的水面較高，乙水槽的水面較低。當連接水管暢通時，會發生什麼情形？",
+    options:[["A","水會從乙水槽流向甲水槽，讓高低差更大"],["B","水會從甲水槽流向乙水槽，直到兩邊水面同高"],["C","水完全不會流動"],["D","兩個水槽的水都會消失"]], answer:"B" },
+  revised:{ tag:"修訂第三版", cls:"v3", num:"第三版第 12 題",
+    stem:"甲、乙兩個水槽底部有水管相通，但水管原本被夾緊。甲水槽比較寬，裡面的水量較多，水面卻比較低；乙水槽比較窄，裡面的水量較少，水面卻比較高。當水管鬆開後，水一開始會如何流動？",
+    options:[["A","從乙流向甲，因為乙的水面比較高"],["B","從甲流向乙，因為甲的水量比較多"],["C","從甲流向乙，因為甲的水槽比較寬"],["D","從乙流向甲，因為乙的水槽比較窄"]], answer:"A" },
+  problem:"原題有太容易排除的選項，且與其他題目重複測驗水面高度概念。",
+  reason:"改成「水量較多但水面較低」與「水量較少但水面較高」的衝突情境，要求學生根據水面高度判斷流動方向。",
+  principle:"使用容易混淆的概念設計推理情境，避免只測驗單純記憶。",
+  sources:["《題目分析表》第 25 題。","《AI 出題對話紀錄》初版與第三版。"],
+  pending:"待人工確認：第三版第 12 題（分析表第 25 題）刪除了原題「兩個水槽水面都接觸空氣」的條件，尚待人工確認是否需要補回。"
+}
+];
+var CASE_BY_ID = {}; CASES.forEach(function(c){CASE_BY_ID[c.id]=c;});
+
+/* ---------------- 六項命題設計原則 ---------------- */
+var PRINCIPLES = [
+  {n:1, title:"設計具有迷思診斷價值的誘答選項", desc:"避免「需要電力」「水會消失」「毛巾會自己製造水」等過度荒謬的選項。", cases:["case-2","case-6"]},
+  {n:2, title:"避免非學科線索與題間洩題", desc:"檢查標題、答案排列、選項長度、絕對字眼及不同題目之間的互相提示。", cases:["case-1","case-4"]},
+  {n:3, title:"使用符合教學對象的語言與情境", desc:"避免過度艱深的專業術語，以學生熟悉的生活情境呈現科學概念。", cases:["case-1","case-5"]},
+  {n:4, title:"確認答案唯一性與科學條件", desc:"不只檢查正確選項，也要逐一檢查錯誤選項是否可能成立。", cases:["case-5"]},
+  {n:5, title:"從記憶辨認轉向實驗與推理", desc:"透過控制變因、生活情境和概念衝突設計試題。", cases:["case-3","case-6"]},
+  {n:6, title:"以多輪修訂搭配結構化檢核", desc:"採取「AI 產生初稿 → 人工診斷 → 提出具體修訂要求 → AI 改寫 → 人工再檢查」的流程。", cases:[], other:"對應內容：完整四輪命題歷程、四項品質指標與六個案例。"}
+];
+
+/* ---------------- 品質統計（初版 25 題） ---------------- */
+var STATS = [
+  {name:"題目語法", pass:17, fail:8},
+  {name:"誘答性", pass:3, fail:22, key:true},
+  {name:"答案正確", pass:25, fail:0},
+  {name:"切合學習目標", pass:15, fail:10}
+];
+
+/* ---------------- 四輪命題歷程 ---------------- */
+var ROUNDS = [
+  { n:1, short:"AI 初始命題", title:"第 1 輪：AI 初始命題",
+    html:'<p>學生指定四年級自然科、水的流動單元、25 題四選一題目。</p><p>AI 產出初版試卷。</p>'+
+      '<h5>後續檢查發現的問題包含</h5><ul><li>分類標題提示答案。</li><li>正確答案排列出現規律。</li><li>錯誤選項不夠合理。</li><li>部分正確選項明顯較長。</li><li>某些科學用語對四年級學生太難。</li><li>多道題目重複測驗相同概念。</li></ul>',
+    rel:[["case-1","相關問題：分類標題提示答案"]] },
+  { n:2, short:"局部試題調整", title:"第 2 輪：局部試題調整",
+    html:'<h5>學生指出</h5><ul><li>第 4 題「色水」的意思不清楚。</li><li>第 6 題的錯誤選項缺乏挑戰性。</li></ul><p>AI 回覆表示要修改第 4、6 題。</p>'+
+      '<div class="callout danger"><b>⚠ 第 2 輪實際修訂文本缺漏</b><br>原始 PDF 只保留這輪 AI 回覆的開場句，沒有完整修訂題目內容。本網站不補寫該輪產出。</div>',
+    rel:[] },
+  { n:3, short:"全卷品質修訂", title:"第 3 輪：全卷品質修訂",
+    html:'<h5>學生提出七項全卷修改方向</h5><ol><li>打散固定答案規律。</li><li>移除會透露答案的主題大標題，混合排列題目。</li><li>使用較合理的錯誤選項，取代荒謬選項。</li><li>避免「一定」「永遠」「完全」只出現在錯誤選項。</li><li>平衡四個選項的文字長度。</li><li>避免四年級尚難理解的專業術語。</li><li>減少重複考點，增加生活應用與推理題。</li></ol>'+
+      '<p>同時針對初版第 3、4、6、7、8、10、13、14、15、16、19、20、22、25 題提出修改要求。</p><p>AI 產生第二版完整試卷及分析表。</p>',
+    rel:[["case-1","相關方向：移除會透露答案的主題大標題"]] },
+  { n:4, short:"去提示化與細節精修", title:"第 4 輪：去提示化與細節精修",
+    html:'<h5>學生再次發現問題並要求修改</h5><ol><li>第二版第 20 題有兩個合理答案。<span class="xref" data-case="case-5" data-b="diagnosis"></span></li><li>不同題目之間會互相提示答案。<span class="xref" data-case="case-4" data-b="diagnosis"></span></li><li>第二版第 19 題流速快慢未在課堂中特別教授。</li><li>第二版第 5 題只考水管夾住，題目太簡單。</li><li>第二版第 2、18、23 題有重複考點。</li><li>紅色水、色水、紅色色素水的用語不一致。</li><li>第二版第 25 題的 C 選項太容易排除。</li><li>要求移除開頭說明、亂碼及多餘網站連結。</li></ol>'+
+      '<p>AI 依照學生要求產生「修訂第三版」。</p><p>學生檢查與選用修訂結果，並將修訂後內容與原因整理到題目分析表。</p>',
+    rel:[["case-1","相關問題：紅色水、色水、紅色色素水的用語不一致"]] }
+];
+
+var COLLAB_STEPS = [
+  ["h","學生提出初始命題要求。"],["ai","AI 產生題目初稿。"],["h","學生檢查題目品質。"],
+  ["h","學生指出具體問題並提出修訂要求。"],["ai","AI 依學生要求改寫。"],["h","學生檢查、選用修訂結果。"]
+];
+
+var PENDING = [
+  "第 2 輪 AI 回應缺少實際修訂題目全文，不能自行補造。",
+  "第三版第 3 題（分析表第 10 題）的虹吸情境沒有明確寫出軟管開始流動前如何充滿水，尚待人工確認是否需要補充。",
+  "第三版第 12 題（分析表第 25 題）刪除了原題「兩個水槽水面都接觸空氣」的條件，尚待人工確認是否需要補回。",
+  "第三版第 14 題的康乃馨花莖輸水涉及多種植物生理作用，不應將植物向上輸水完全等同於毛細現象。",
+  "第三版第 18 題中，一般吸管粗細的連通管水面高度差涉及可能被教學簡化的毛細效應，尚待進一步審題。",
+  "目前沒有實際學生施測的作答數據，因此不能宣稱修訂後的誘答性、鑑別度或學習成效已被實證提升。",
+  "各案例的原始題號與第三版題號不同，必須保留版本對照。",
+  "原分析表第 18 題的修訂原因提到「水比較多」的選項，但第三版該題已改為「管子比較粗」的選項，這是紀錄文字未完全對齊的情況。"
+];
+
+var DISCLAIMER = "本網站整理 AI 輔助命題與修訂的學習歷程。部分題目條件與科學細節仍需人工審查，並非所有修訂成果都經過實際施測驗證。";
+
+var BUILDINGS = {
+  history:{ name:"AI 命題歷程館", num:"①", icon:"📚", kicker:"建築一｜古卷圖書館",
+    accent:"#3d6fc0", accentL:"#e6eefb", accentD:"#264f93",
+    intro:"從 AI 的第一份試卷開始，探索命題者如何發現問題、提出修訂要求，並透過多輪人機合作改善題目。" },
+  diagnosis:{ name:"題目品質診斷館", num:"②", icon:"🔭", kicker:"建築二｜觀星塔",
+    accent:"#d9782b", accentL:"#fdeedd", accentD:"#9c4f12",
+    intro:"題目品質不只看答案是否正確。本館透過四項檢核指標與具體案例，帶領參觀者發現容易忽略的命題問題。" },
+  strategy:{ name:"命題修訂策略館", num:"③", icon:"⚗️", kicker:"建築三｜煉金工坊",
+    accent:"#3f9658", accentL:"#e3f3e6", accentD:"#24693a",
+    intro:"透過真實題目的修訂前後比較，了解如何從問題診斷出發，提出具體改寫要求，並整理可應用於未來的命題原則。" },
+  about:{ name:"網站說明與資料聲明", num:"ⓘ", icon:"🏰", kicker:"學院城堡｜關於 AI 題目知識島",
+    accent:"#7a2a3a", accentL:"#f6e6e8", accentD:"#55182a",
+    intro:"操作方式、資料來源、版本對照方式與使用限制。" }
+};
+
+/* ---------------- 工具 ---------------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function el(html){var t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild;}
+function bChips(ids){return ids.map(function(b){return '<span class="chip b-'+b+'">'+esc(BUILDINGS[b].name)+'</span>';}).join("");}
+
+/* ---------------- 題目渲染 ---------------- */
+function renderQuestion(v, mode){
+  var h='<div class="q"><div class="q-meta"><span class="vtag '+v.cls+'">'+esc(v.tag)+'</span><span class="qnum">'+esc(v.num)+'</span></div>';
+  if(v.examHeader){h+='<div class="examhead"><span class="tag">原始試卷上方的大標題（會提示答案）</span>'+esc(v.examHeader)+'</div>';}
+  h+='<p class="stem">'+esc(v.stem)+'</p><ol class="opts">';
+  v.options.forEach(function(o){
+    var cls="",badge="";
+    if(v.answer && o[0]===v.answer){cls="correct";badge='<span class="badge ok">✓ 正確答案</span>';}
+    if(v.aiAnswer && o[0]===v.aiAnswer){cls="aiset";badge='<span class="badge ai">AI 設定的答案</span>';}
+    if(v.dual && o[0]===v.dual){cls="dual";badge='<span class="badge dual">⚠ 學生指出也可能成立</span>';}
+    h+='<li class="'+cls+'"><span class="L">('+o[0]+')</span><span class="T">'+esc(o[1])+'</span>'+badge+'</li>';
+  });
+  h+='</ol>';
+  if(v.answer){h+='<p class="ansline">正確答案：'+v.answer+'</p>';}
+  if(v.aiAnswer){
+    h+='<p class="ansline">AI 原本設定的正確答案：'+v.aiAnswer+'</p>';
+    h+='<div class="callout danger"><b>第二版發現雙重答案</b><br>'+esc(v.issue)+'<br>因此此版本的 C 不應視為確定錯誤的選項；學生發現後，要求重新設計本題（見第三版）。</div>';
+  }
+  return h+'</div>';
+}
+
+function relatedPrinciples(caseId){return PRINCIPLES.filter(function(p){return p.cases.indexOf(caseId)>=0;});}
+
+function renderCaseCard(c, building){
+  var tabs=[];
+  if(building==="strategy") tabs.push(["compare","修訂前後對照"]);
+  tabs.push(["original","原始題目"]);
+  if(c.v2) tabs.push(["v2","第二版問題"]);
+  tabs.push(["revised","修訂後題目"],["diag","品質診斷"],["princ","命題原則"]);
+  var uid=c.id+"-"+building;
+  var chain=c.chain.map(function(x){return '<span class="nc">'+esc(x[0])+esc(x[1])+'</span>';}).join('<span class="arr" aria-hidden="true">→</span>');
+  var card=el('<article class="casecard" id="card-'+uid+'">'+
+    '<div class="cc-head"><div class="id">案例 '+c.no+'｜'+c.id+'</div><h4>案例 '+c.no+'：'+esc(c.title)+'</h4>'+
+    '<div class="numchain" aria-label="題號對照">'+chain+'</div>'+
+    '<div class="chips" style="margin-top:6px">'+bChips(c.buildings)+'</div></div>'+
+    '<div class="cc-tabs" role="tablist" aria-label="案例 '+c.no+' 內容切換">'+
+      tabs.map(function(t,i){return '<button type="button" role="tab" id="tab-'+uid+'-'+t[0]+'" aria-controls="tp-'+uid+'" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'" data-t="'+t[0]+'"'+(t[0]==="v2"?' class="v2"':'')+'>'+(t[0]==="v2"?"⚠ ":"")+t[1]+'</button>';}).join("")+
+    '</div><div class="cc-body" role="tabpanel" id="tp-'+uid+'"></div>'+
+    '<div class="cc-src"><b>資料來源：</b>'+c.sources.map(esc).join(" ")+(c.v2?'<br><b>版本說明：</b>本案例呈現初版、第二版（雙重答案）與第三版三個版本。':'')+'</div>'+
+  '</article>');
+  var body=card.querySelector(".cc-body");
+  function show(t){
+    card.querySelectorAll('[role="tab"]').forEach(function(b){var on=b.dataset.t===t;b.setAttribute("aria-selected",on);b.tabIndex=on?0:-1;});
+    body.setAttribute("aria-labelledby","tab-"+uid+"-"+t);
+    var h="";
+    if(t==="original") h=renderQuestion(c.original);
+    else if(t==="v2") h=renderQuestion(c.v2);
+    else if(t==="revised") h=renderQuestion(c.revised);
+    else if(t==="compare"){
+      h='<div class="compare"><div>'+renderQuestion(c.original)+'</div><div>'+renderQuestion(c.revised)+'</div></div>';
+      if(c.v2) h+='<div class="callout warn" style="margin-top:10px">本案例在初版與第三版之間，還有一個出現<b>雙重答案</b>的第二版（第二版第 20 題），請點選「⚠ 第二版問題」查看。</div>';
+      h+='<div class="dg" style="margin-top:10px"><div class="item fix"><h5>修訂原因</h5><p>'+esc(c.reason)+'</p></div></div>';
+    }
+    else if(t==="diag"){
+      h='<div class="dg"><div class="item prob"><h5>品質問題</h5><p>'+esc(c.problem)+'</p></div><div class="item fix"><h5>修訂原因</h5><p>'+esc(c.reason)+'</p></div></div>';
+      if(c.pending) h+='<div class="callout warn">'+esc(c.pending)+'</div>';
+    }
+    else if(t==="princ"){
+      var rp=relatedPrinciples(c.id);
+      h='<div class="dg"><div class="item pr"><h5>本案例的命題原則</h5><p>'+esc(c.principle)+'</p></div></div>';
+      if(rp.length){h+='<p class="note" style="margin:10px 0 6px">對應「命題修訂策略館」的六項命題設計原則：</p><div class="princ">'+rp.map(function(p){return '<div class="pr-card"><h4><span class="pn">原則 '+p.n+'</span>'+esc(p.title)+'</h4><p>'+esc(p.desc)+'</p></div>';}).join("")+'</div>';}
+    }
+    if(t!=="diag" && c.pending && (t==="revised"||t==="compare")) h+='<div class="callout warn" style="margin-top:10px">'+esc(c.pending)+'</div>';
+    body.innerHTML=h;
+  }
+  card.querySelector(".cc-tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-t]");if(b)show(b.dataset.t);});
+  card.querySelector(".cc-tabs").addEventListener("keydown",function(e){
+    if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+    var bs=[].slice.call(card.querySelectorAll('[role="tab"]'));var i=bs.indexOf(document.activeElement);if(i<0)return;
+    i=(i+(e.key==="ArrowRight"?1:-1)+bs.length)%bs.length;bs[i].focus();show(bs[i].dataset.t);e.preventDefault();
+  });
+  card._show=show;
+  show(tabs[0][0]);
+  return card;
+}
+
+function renderCasePicker(ids, building, container){
+  var wrap=el('<div></div>');
+  var pick=el('<div class="casepick" role="group" aria-label="選擇案例"></div>');
+  var slot=el('<div></div>');
+  ids.forEach(function(id){var c=CASE_BY_ID[id];
+    pick.appendChild(el('<button type="button" data-case="'+id+'" aria-pressed="false"><b>案例 '+c.no+'</b>'+esc(c.title)+'</button>'));});
+  wrap.appendChild(pick);wrap.appendChild(slot);
+  function select(id, tab){
+    pick.querySelectorAll("button").forEach(function(b){var on=b.dataset.case===id;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);});
+    slot.innerHTML="";var card=renderCaseCard(CASE_BY_ID[id],building);slot.appendChild(card);
+    if(tab) card._show(tab);
+    return card;
+  }
+  pick.addEventListener("click",function(e){var b=e.target.closest("button[data-case]");if(b)select(b.dataset.case);});
+  wrap._select=select;
+  select(ids[0]);
+  container.appendChild(wrap);
+  return wrap;
+}
+
+/* ---------------- 各館內容 ---------------- */
+function sec(id,n,title){return el('<section class="sec" id="'+id+'" data-nav="'+esc(title)+'"><h3><span class="n">'+n+'</span>'+esc(title)+'</h3></section>');}
+function caseLinkBtn(id,label,b){var c=CASE_BY_ID[id];return '<button type="button" class="chip linkcase" data-case="'+id+'" data-b="'+(b||"")+'" style="cursor:pointer">📌 案例 '+c.no+'：'+esc(c.title)+(label?'｜'+esc(label):'')+'</button>';}
+
+function collabBlock(){
+  return '<div class="card"><div class="flow">'+COLLAB_STEPS.map(function(s){return '<div class="step"><span class="who '+s[0]+'">'+(s[0]==="h"?"學生":"AI")+'</span><span>'+esc(s[1])+'</span></div>';}).join("")+
+  '</div><p class="motto">人工診斷與提出修訂要求 → AI 協助改寫 → 人工檢查與選用</p>'+
+  '<p class="note" style="margin-top:8px">說明：網站中各版本的題目文字由 AI 依學生的命題與修訂要求產生，學生負責檢查品質、指出問題、提出修訂要求，並檢查與選用修訂結果；題目文字並非學生完全獨立手寫。</p></div>';
+}
+
+var builders = {};
+builders.history=function(body){
+  var s1=sec("h-basic",1,"命題任務基本資料");
+  s1.appendChild(el('<div class="card"><dl class="kv"><dt>命題學科</dt><dd>國小自然科</dd><dt>適用年級</dt><dd>國小四年級下學期</dd><dt>單元名稱</dt><dd>水的流動</dd><dt>三大概念</dt><dd><div class="chips"><span class="chip">毛細現象</span><span class="chip">虹吸現象</span><span class="chip">連通管原理</span></div></dd><dt>原始命題目標</dt><dd>產生 25 題四選一選擇題。</dd></dl></div>'));
+  s1.appendChild(el('<div class="card"><p style="font-weight:700;margin-top:0">AI 最初產出</p><ul><li>25 題選擇題。</li><li>每題四個選項。</li><li>每題 4 分，滿分 100 分。</li><li>第 1～9 題為毛細現象。</li><li>第 10～17 題為虹吸現象。</li><li>第 18～25 題為連通管原理。</li><li>附答案表與教學重點。</li></ul><p class="note">原始試卷具有題目分類標題及答案排列規律等問題。</p></div>'));
+  body.appendChild(s1);
+
+  var s2=sec("h-prompt",2,"學生原始提示詞");
+  s2.appendChild(el('<div class="card"><p class="note" style="margin-top:0">第一輪提示詞原文：</p><blockquote class="prompt">「你是一位國小自然科老師，我需要你幫忙出25題關於四下水的流動的選擇題題目，內容範圍是關於毛細現象、虹吸現象、連通管原理。」</blockquote></div>'));
+  body.appendChild(s2);
+
+  var s3=sec("h-timeline",3,"四輪 AI 命題時間線");
+  var tl=el('<div class="card"><div class="tl" role="tablist" aria-label="四輪命題歷程">'+ROUNDS.map(function(r,i){return '<button type="button" role="tab" aria-selected="'+(i===0)+'" data-r="'+i+'"><span class="dot">'+r.n+'</span><span>第 '+r.n+' 輪<br>'+esc(r.short)+'</span></button>';}).join("")+'</div><div class="tl-detail" role="tabpanel" aria-live="polite"></div></div>');
+  var det=tl.querySelector(".tl-detail");
+  function showRound(i){
+    tl.querySelectorAll(".tl button").forEach(function(b){var on=+b.dataset.r===i;b.classList.toggle("on",on);b.setAttribute("aria-selected",on);});
+    var r=ROUNDS[i];
+    det.innerHTML='<h4>'+esc(r.title)+'</h4>'+r.html+(r.rel.length?'<div class="relcase">'+r.rel.map(function(x){return caseLinkBtn(x[0],x[1],"history");}).join("")+'</div>':'');
+    det.querySelectorAll(".xref").forEach(function(x){var c=CASE_BY_ID[x.dataset.case];
+      x.outerHTML=' <button type="button" class="linkbtn linkcase" data-case="'+c.id+'" data-b="'+x.dataset.b+'">→ 見案例 '+c.no+'（'+esc(BUILDINGS[x.dataset.b].name)+'）</button>';});
+  }
+  tl.querySelector(".tl").addEventListener("click",function(e){var b=e.target.closest("button[data-r]");if(b)showRound(+b.dataset.r);});
+  showRound(0);
+  s3.appendChild(tl);
+  body.appendChild(s3);
+
+  var s4=sec("h-collab",4,"學生與 AI 的協作分工");
+  s4.appendChild(el(collabBlock()));
+  body.appendChild(s4);
+
+  var s5=sec("h-case1",5,"案例 1：標題洩題與名詞定義");
+  s5.appendChild(el('<p class="note" style="margin:0 0 8px">與本案例相關的輪次：第 1 輪（分類標題提示答案）、第 3 輪（移除主題大標題）、第 4 輪（色水用語不一致）。點選上方時間線可查看各輪內容。</p>'));
+  s5.appendChild(renderCaseCard(CASE_BY_ID["case-1"],"history"));
+  body.appendChild(s5);
+
+  var s6=sec("h-findings",6,"命題歷程中的重要發現");
+  s6.appendChild(el('<div class="card"><ul>'+
+    '<li>初版 25 題的「答案正確」全數通過，但「誘答性」有 22 題未通過——答案正確不等於題目品質良好。<button type="button" class="linkbtn" data-goto="diagnosis" data-sec="d-stats">（看統計）</button></li>'+
+    '<li>AI 依要求修訂後仍可能出現新問題：第二版第 20 題出現兩個合理答案。'+'<button type="button" class="linkbtn linkcase" data-case="case-5" data-b="diagnosis">（見案例 5）</button></li>'+
+    '<li>逐題檢查不夠：第二版第 10 題與第 24 題考同一概念而互相提示，需要整卷跨題互查。<button type="button" class="linkbtn linkcase" data-case="case-4" data-b="diagnosis">（見案例 4）</button></li>'+
+    '<li>第 3、4 輪都是由學生指出具體題號與問題，再請 AI 依要求改寫，最後由學生檢查與選用。</li></ul>'+
+    '<p class="note">以上為依本次命題紀錄、題目分析表與案例整理的重點，不是學生撰寫的學習心得。</p></div>'));
+  body.appendChild(s6);
+
+  var s7=sec("h-limits",7,"原始資料缺漏與限制");
+  s7.appendChild(el('<div class="card"><div class="callout danger" style="margin-top:0"><b>第 2 輪實際修訂文本缺漏</b>：原始 PDF 只保留 AI 回覆的開場句，沒有完整修訂題目內容，本網站不自行補寫。</div><ul>'+
+    '<li>目前沒有實際國小學生的施測作答資料，因此無法宣稱題目的鑑別度、信度或學習成效。</li>'+
+    '<li>四項品質指標的正式操作型定義在原始資料中未記載。</li>'+
+    '<li>分析表題號（初版 1～25 題）與第三版混排後的題號不同，閱讀案例時請留意版本對照。</li></ul>'+
+    '<p style="margin-bottom:0"><button type="button" class="linkbtn" data-goto="strategy" data-sec="s-pending">查看全部「待確認的科學與命題問題」→</button></p></div>'));
+  body.appendChild(s7);
+};
+
+builders.diagnosis=function(body){
+  var s1=sec("d-ind",1,"四項品質指標");
+  s1.appendChild(el('<div><div class="grid2">'+
+    '<div class="ind"><h4>① 題目語法</h4><p>題幹與選項敘述是否清楚、用語前後一致，並適合四年級學生閱讀（例如「色水」需要先定義）。</p></div>'+
+    '<div class="ind"><h4>② 誘答性</h4><p>錯誤選項是否合理、能反映學生可能的迷思，而不是一看就能以常識排除。</p></div>'+
+    '<div class="ind"><h4>③ 答案正確</h4><p>設定的正確答案是否科學上正確，且其他選項不會同時成立（答案唯一）。</p></div>'+
+    '<div class="ind"><h4>④ 切合學習目標</h4><p>是否對應毛細、虹吸、連通管三大概念與四年級教學範圍，避免考到課堂未教的內容或重複考點。</p></div>'+
+    '</div><div class="callout info"><b>說明：</b>四項指標名稱來自學生原始分析表；上方各指標的「檢查方向」是依本網站案例整理的解釋，並非學生原本逐字寫下的評分規準。原始資料中未記載正式操作型定義。</div></div>'));
+  body.appendChild(s1);
+
+  var s2=sec("d-stats",2,"初版 25 題的品質統計");
+  var rows=STATS.map(function(s){
+    var pw=s.pass/25*100, fw=s.fail/25*100;
+    return '<div class="barrow'+(s.key?' key':'')+'"><div class="lab"><span>'+esc(s.name)+(s.key?' ★':'')+'</span><small>通過 '+s.pass+' 題｜未通過 '+s.fail+' 題</small></div>'+
+      '<div class="track" role="img" aria-label="'+esc(s.name)+'：通過 '+s.pass+' 題，未通過 '+s.fail+' 題，共 25 題">'+
+      (s.pass?'<div class="seg pass'+(s.fail?'':' only')+'" style="width:'+pw+'%" tabindex="0"><span>'+(pw>=10?s.pass:'')+'</span><span class="tt">'+esc(s.name)+'｜通過 '+s.pass+' 題（'+Math.round(pw)+'%）</span></div>':'')+
+      (s.fail?'<div class="seg fail'+(s.pass?'':' only')+'" style="width:'+fw+'%" tabindex="0"><span>'+(fw>=10?s.fail:'')+'</span><span class="tt">'+esc(s.name)+'｜未通過 '+s.fail+' 題（'+Math.round(fw)+'%）</span></div>':'')+
+      '</div></div>';}).join("");
+  var tbl='<table class="data"><caption class="sr-only">初版 25 題品質檢核統計</caption><thead><tr><th>品質指標</th><th class="r">通過題數</th><th class="r">未通過題數</th></tr></thead><tbody>'+
+    STATS.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td class="r">'+s.pass+'</td><td class="r">'+s.fail+'</td></tr>';}).join("")+'</tbody></table>';
+  var chart=el('<div class="card"><div class="legend"><span><i style="background:var(--pass)"></i>通過題數</span><span><i style="background:var(--fail)"></i>未通過題數</span><span style="color:var(--muted)">每列合計 25 題</span></div><div class="bars">'+rows+'</div>'+
+    '<button type="button" class="linkbtn toggle-table" aria-expanded="false">以表格檢視</button><div class="tblwrap" hidden>'+tbl+'</div>'+
+    '<p class="note" style="margin-bottom:0">數字為學生在原始分析表中，依四項指標對<b>初版 25 題</b>逐題檢核的結果（題數），<b>不是學生作答錯誤題數</b>。</p></div>');
+  chart.querySelector(".toggle-table").addEventListener("click",function(){var w=chart.querySelector(".tblwrap");w.hidden=!w.hidden;this.setAttribute("aria-expanded",!w.hidden);this.textContent=w.hidden?"以表格檢視":"隱藏表格";});
+  s2.appendChild(chart);
+  s2.appendChild(el('<div class="callout warn"><b>關於「答案正確 25／0」：</b>原始分析表中，25 題的「答案正確」均被勾選為通過，但這不代表每個後續修訂版本完全沒有問題——第二版第 20 題即曾出現雙重答案。<button type="button" class="linkbtn linkcase" data-case="case-5" data-b="diagnosis">（見案例 5）</button></div>'));
+  body.appendChild(s2);
+
+  var s3=sec("d-lure",3,"誘答性問題的重點說明");
+  s3.appendChild(el('<div class="card"><div class="statbig"><div class="num">22<small> / 25 題</small></div><div><b>初版 25 題中，有 22 題的「誘答性」未通過</b>，是這份初版試卷最普遍的品質問題。</div></div>'+
+    '<p>常見情形包括：錯誤選項過於荒謬（例如「毛巾會自己製造水」「水受到磁力吸引」）、正確選項明顯較長、絕對字眼只出現在錯誤選項等，學生不需要理解科學概念也能排除。</p>'+
+    '<p class="note" style="margin-bottom:0">注意：這是命題者對題目的品質檢核結果，並非實際學生作答結果；目前沒有國小學生施測資料，因此也未測出鑑別度或信度。</p>'+
+    '<div class="relcase">'+caseLinkBtn("case-2","","diagnosis")+caseLinkBtn("case-6","","diagnosis")+'</div></div>'));
+  body.appendChild(s3);
+
+  var s4=sec("d-cases",4,"五張案例診斷卡");
+  s4.appendChild(el('<p class="note" style="margin:0 0 8px">點選案例，再用卡片上方的切換按鈕查看原始題目、修訂後題目、品質診斷與命題原則。</p>'));
+  body.appendChild(s4);
+  body._picker=renderCasePicker(["case-1","case-2","case-4","case-5","case-6"],"diagnosis",s4);
+  body._pickerDefaultTab="diag";
+
+  var s5=sec("d-remind",5,"命題品質檢查提醒");
+  s5.appendChild(el('<div class="card"><ul>'+
+    '<li><b>答案正確不等於好題目：</b>答案正確全數通過的初版，誘答性仍有 22 題未通過。</li>'+
+    '<li><b>逐一檢查每個選項：</b>不只確認設定答案正確，也要確認其他選項不會同時成立（案例 5）。</li>'+
+    '<li><b>整卷跨題互查：</b>不同題目之間可能互相提示或重複考點（案例 4）。</li>'+
+    '<li><b>留意非學科線索：</b>分類標題、答案排列規律、選項長度與絕對字眼都可能洩題（案例 1）。</li>'+
+    '<li><b>AI 修訂後仍需人工再檢查：</b>修訂版也可能產生新的問題。</li>'+
+    '<li><b>不過度宣稱：</b>沒有施測資料前，不宣稱誘答性、鑑別度或學習成效已被實證提升。</li></ul></div>'));
+  body.appendChild(s5);
+};
+
+builders.strategy=function(body){
+  var s1=sec("s-collab",1,"人工診斷與 AI 改寫的分工");
+  s1.appendChild(el(collabBlock()));
+  body.appendChild(s1);
+
+  var s2=sec("s-cases",2,"五張案例修訂卡");
+  s2.appendChild(el('<p class="note" style="margin:0 0 8px">預設顯示「修訂前後對照」。案例 5 另有「⚠ 第二版問題」可查看雙重答案版本。</p>'));
+  body.appendChild(s2);
+  body._picker=renderCasePicker(["case-2","case-3","case-4","case-5","case-6"],"strategy",s2);
+  body._pickerDefaultTab="compare";
+
+  var s3=sec("s-principles",3,"六項命題設計原則");
+  s3.appendChild(el('<div class="callout info" style="margin-top:0">這六項原則是依照學生的修訂要求、原始紀錄與 AI 協助整理的分析結果所歸納，並已獲學生確認；原始作業中並未逐字寫出所有原則名稱。</div>'));
+  s3.appendChild(el('<div class="princ">'+PRINCIPLES.map(function(p){
+    return '<div class="pr-card"><h4><span class="pn">原則 '+p.n+'</span>'+esc(p.title)+'</h4><p>'+esc(p.desc)+'</p><div class="chips">'+
+      (p.cases.length?p.cases.map(function(id){return caseLinkBtn(id,"","strategy");}).join(""):'<span class="chip">'+esc(p.other)+'</span>')+'</div></div>';}).join("")+'</div>'));
+  body.appendChild(s3);
+
+  var s4=sec("s-check",4,"下一次使用 AI 出題時的檢查清單");
+  var items=["移除會透露答案的主題標題，題目混合排列。","檢查正確答案的位置沒有固定規律。","錯誤選項合理、具有迷思診斷價值，不使用荒謬選項。","「一定」「永遠」「完全」等絕對字眼不只出現在錯誤選項。","四個選項的文字長度大致平衡，正確選項不特別長。","用語符合四年級程度，同一名詞前後一致（例如先定義「色水」）。","逐一確認每個錯誤選項都不會同時成立，答案唯一。","整份試卷跨題互查，避免互相提示與重複考點。","題目情境與條件在課堂教過的範圍內，科學條件寫清楚。","移除 AI 回覆中的開頭說明、亂碼及多餘網站連結。","AI 修訂後由人工再檢查，並記錄修訂原因與版本題號。"];
+  s4.appendChild(el('<div class="card"><ul class="check">'+items.map(function(t,i){return '<li><label><input type="checkbox" id="ck'+i+'"><span>'+esc(t)+'</span></label></li>';}).join("")+'</ul><p class="note" style="margin-bottom:0">清單依本次第 3、4 輪修訂要求與六項原則整理；勾選狀態只在此頁暫時保留，不會儲存或上傳。</p></div>'));
+  body.appendChild(s4);
+
+  var s5=sec("s-pending",5,"待確認的科學與命題問題");
+  s5.appendChild(el('<div class="card"><p style="margin-top:0">以下內容只作為<b>資料檢核提醒</b>，尚未經過人工確認修正；六張案例卡的原始題目、修訂題目與答案均維持原紀錄，未自動改寫。</p><ol class="pending">'+PENDING.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ol></div>'));
+  body.appendChild(s5);
+};
+
+builders.about=function(body){
+  var s1=sec("a-howto",1,"操作方式");
+  s1.appendChild(el('<div class="card"><ul>'+
+    '<li>滑鼠：左鍵拖曳旋轉島嶼、滾輪縮放、點選建築或建築名牌開啟知識面板。</li>'+
+    '<li>手機／平板：單指拖曳旋轉、雙指縮放、點選建築或名牌。</li>'+
+    '<li>鍵盤：<span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> 開啟三棟建築、<span class="kbd">H</span> 返回島嶼全景、<span class="kbd">Esc</span> 關閉面板；也可用 <span class="kbd">Tab</span> 移到畫面下方的建築選單。</li>'+
+    '<li>不方便操作 3D 時，直接使用畫面下方的建築選單即可閱讀全部內容。</li>'+
+    '<li>動畫開關：畫面下方選單的「動畫」按鈕（或 <span class="kbd">A</span>）可以開啟或關閉島上的動態效果（雲、蠟燭、光帶、瀑布、自動旋轉等）。預設跟隨裝置的「減少動態效果」設定。</li>'+
+    '<li>島上的小角色：滑鼠移到角色身上（手機點一下），他們會打招呼並說一句操作提示。</li></ul></div>'));
+  body.appendChild(s1);
+  var s2=sec("a-data",2,"資料來源與版本對照");
+  s2.appendChild(el('<div class="card"><ul>'+
+    '<li>內容來自《AI 出題對話紀錄》、《題目分析表》與學生對人機分工方式的確認。</li>'+
+    '<li><b>分析表題號</b>：依初版 1～25 題排列；<b>第三版題號</b>：經混排後的新題號。每張案例卡都同時標示兩種題號（案例 5 另標示第二版題號）。</li>'+
+    '<li>三棟建築引用同一份案例資料，不同館只是從不同角度呈現。</li>'+
+    '<li>各版本題目文字由 AI 依學生要求產生，經學生檢查與選用；網站未改寫題幹、選項與答案。</li></ul></div>'));
+  body.appendChild(s2);
+  var s3=sec("a-limit",3,"使用限制");
+  s3.appendChild(el('<div class="card"><div class="callout warn" style="margin-top:0">'+esc(DISCLAIMER)+'</div><ul>'+
+    '<li>網站沒有實際學生施測資料，不宣稱鑑別度、信度或學習成效。</li>'+
+    '<li>第 2 輪 AI 實際修訂文本缺漏，網站不補寫。</li></ul>'+
+    '<p style="margin-bottom:0"><button type="button" class="linkbtn" data-goto="strategy" data-sec="s-pending">查看「待確認的科學與命題問題」→</button></p></div>'));
+  body.appendChild(s3);
+  var s4=sec("a-tech",4,"技術與隱私");
+  s4.appendChild(el('<div class="card"><ul><li>以 Three.js（WebGL）即時繪製 3D 場景，從 jsDelivr CDN 載入；建築模型以 Tripo 生成後放在網站資料夾中。</li><li>不需要登入、API Key 或後端；不收集任何使用者資料，也沒有追蹤或分析程式。</li><li>動畫開關的選擇只存在你自己的瀏覽器裡，不會上傳。</li></ul></div>'));
+  body.appendChild(s4);
+};
+
+/* ---------------- 面板控制 ---------------- */
+var panel=document.getElementById("panel"), pBody=document.getElementById("pBody"), pNav=document.getElementById("pNav");
+var current=null, lastFocus=null, navObserver=null;
+
+function isMobile(){return window.matchMedia("(max-width:760px)").matches;}
+
+function fill(id){
+  var b=BUILDINGS[id];
+  panel.style.setProperty("--accent",b.accent);panel.style.setProperty("--accent-l",b.accentL);panel.style.setProperty("--accent-d",b.accentD);
+  document.getElementById("pIcon").textContent=b.icon;
+  document.getElementById("pKicker").textContent=b.kicker;
+  document.getElementById("pTitle").textContent=b.name;
+  document.getElementById("pIntro").textContent=b.intro;
+  pBody.innerHTML="";pBody._picker=null;
+  builders[id](pBody);
+  // 資料聲明（spec 第八部分）統一放在「網站說明」面板的「使用限制」，各知識館面板底部不再重複
+  // nav
+  pNav.innerHTML="";
+  pBody.querySelectorAll("section.sec").forEach(function(s,i){
+    var bt=el('<button type="button" data-sec="'+s.id+'">'+esc(s.dataset.nav)+'</button>');
+    bt.addEventListener("click",function(){scrollToSec(s.id);});
+    pNav.appendChild(bt);
+  });
+  pBody.scrollTop=0;
+  setNavOn(pNav.firstElementChild&&pNav.firstElementChild.dataset.sec);
+}
+function setNavOn(sid){pNav.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.sec===sid);});}
+function scrollToSec(sid){var s=document.getElementById(sid);if(!s)return;pBody.scrollTo({top:s.offsetTop-pBody.offsetTop-6,behavior:"smooth"});setNavOn(sid);}
+pBody.addEventListener("scroll",function(){
+  var secs=pBody.querySelectorAll("section.sec"),top=pBody.scrollTop+pBody.offsetTop+40,cur=null;
+  secs.forEach(function(s){if(s.offsetTop<=top)cur=s.id;});
+  if(cur){setNavOn(cur);var b=pNav.querySelector('[data-sec="'+cur+'"]');if(b&&b.scrollIntoView){var r=b.getBoundingClientRect(),nr=pNav.getBoundingClientRect();if(r.left<nr.left||r.right>nr.right)pNav.scrollLeft+=r.left-nr.left-20;}}
+},{passive:true});
+
+function open(id, opts){
+  opts=opts||{};
+  if(!BUILDINGS[id])return;
+  if(!panel.classList.contains("open")) lastFocus=document.activeElement;
+  if(current!==id) fill(id);
+  current=id;
+  panel.classList.add("open"); document.body.classList.add("panel-open");
+  document.getElementById("introBox").open=false;
+  panel.setAttribute("aria-label",BUILDINGS[id].name);
+  try{history.replaceState(null,"","#"+id);}catch(e){}
+  if(window.Island3D && id!=="about") window.Island3D.focus(id);
+  else if(window.Island3D) window.Island3D.panelChanged(true);
+  if(opts.caseId && pBody._picker){
+    var tab=opts.tab||pBody._pickerDefaultTab;
+    var card=pBody._picker._select(opts.caseId,tab);
+    setTimeout(function(){pBody.scrollTo({top:card.parentNode.parentNode.offsetTop-pBody.offsetTop-6,behavior:"smooth"});},60);
+  } else if(opts.caseId && id==="history"){
+    setTimeout(function(){scrollToSec("h-case1");},60);
+  } else if(opts.sec){
+    setTimeout(function(){scrollToSec(opts.sec);},60);
+  }
+  if(!opts.keepFocus) setTimeout(function(){document.getElementById("pClose").focus({preventScroll:true});},50);
+  if(window.KISfx) window.KISfx.play("open");
+}
+function close(){
+  if(!panel.classList.contains("open"))return;
+  if(window.KISfx) window.KISfx.play("close");
+  panel.classList.remove("open"); document.body.classList.remove("panel-open");
+  try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}
+  if(window.Island3D) window.Island3D.panelChanged(false);
+  if(lastFocus && lastFocus.focus && document.body.contains(lastFocus)) lastFocus.focus({preventScroll:true});
+}
+function home(){close();if(window.Island3D)window.Island3D.home();}
+
+/* 面板內連結：跨館案例、跳轉段落 */
+pBody.addEventListener("click",function(e){
+  var lc=e.target.closest(".linkcase");
+  if(lc){
+    var cid=lc.dataset.case, c=CASE_BY_ID[cid], b=lc.dataset.b;
+    if(!b||c.buildings.indexOf(b)<0) b=(c.buildings.indexOf(current)>=0)?current:c.buildings[0];
+    if(b===current && pBody._picker){var card=pBody._picker._select(cid,pBody._pickerDefaultTab);pBody.scrollTo({top:card.parentNode.parentNode.offsetTop-pBody.offsetTop-6,behavior:"smooth"});}
+    else if(b===current && b==="history"){scrollToSec("h-case1");}
+    else open(b,{caseId:cid,keepFocus:true});
+    return;
+  }
+  var g=e.target.closest("[data-goto]");
+  if(g){ if(g.dataset.goto===current) scrollToSec(g.dataset.sec); else open(g.dataset.goto,{sec:g.dataset.sec,keepFocus:true}); }
+});
+
+document.getElementById("pClose").addEventListener("click",close);
+document.getElementById("pHome").addEventListener("click",home);
+document.getElementById("homeBtn").addEventListener("click",home);
+document.querySelectorAll("#dock [data-open]").forEach(function(b){b.addEventListener("click",function(){open(b.dataset.open);});});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"){ if(panel.classList.contains("open")){close();e.preventDefault();} return; }
+  var tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea"||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(panel.classList.contains("open") && panel.contains(e.target))return;
+  if(e.key==="1")open("history"); else if(e.key==="2")open("diagnosis"); else if(e.key==="3")open("strategy");
+  else if(e.key==="h"||e.key==="H")home();
+  else if(e.key==="m"||e.key==="M")toggleMusic();
+  else if(e.key==="a"||e.key==="A")toggleMotion();
+  else if(e.key==="s"||e.key==="S")toggleSfx();
+});
+
+/* 背景音樂：資料夾內有 bgm.mp3 才顯示按鈕。
+   預設開啟：載入後先嘗試自動播放；瀏覽器擋下有聲自動播放時，等訪客第一次點擊、觸控或按鍵就開始播。
+   訪客按「音樂」（或快捷鍵 M）關掉後，選擇會存在這台電腦的瀏覽器（localStorage），下次來就不會自動播放。 */
+var BGM_SRC="bgm.mp3",BGM_VOLUME=0.35;
+var musicBtn=document.getElementById("musicBtn"),bgm=null,bgmWanted=true;
+try{ if(localStorage.getItem("ki-music")==="off") bgmWanted=false; }catch(e){}
+function syncMusicBtn(){
+  var on=!!bgm&&!bgm.paused;
+  musicBtn.setAttribute("aria-pressed",on);
+  musicBtn.title=(on?"暫停背景音樂":"播放背景音樂")+"（快捷鍵 M）";
+}
+function saveMusicPref(){ try{ localStorage.setItem("ki-music",bgmWanted?"on":"off"); }catch(e){} }
+function toggleMusic(){
+  if(!bgm||musicBtn.hidden)return;
+  if(bgm.paused){bgmWanted=true;saveMusicPref();var p=bgm.play();if(p&&p.catch)p.catch(function(){syncMusicBtn();});}
+  else{bgmWanted=false;saveMusicPref();bgm.pause();}
+}
+function autoStartMusic(){
+  if(!bgm||!bgmWanted||!bgm.paused||document.hidden||musicBtn.hidden)return;
+  var p=bgm.play();if(p&&p.catch)p.catch(function(){});
+}
+// 第一次互動就開始播放；如果第一下就是按「音樂」按鈕或 M 鍵，交給按鈕自己處理，避免一開就被關掉
+var GESTURES=["pointerdown","keydown","touchend"];
+function onFirstGesture(e){
+  if(e.type==="keydown"&&(e.key==="m"||e.key==="M"||e.key==="Escape"))return;
+  if(e.target&&e.target.closest&&e.target.closest("#musicBtn"))return;
+  autoStartMusic();
+}
+function stopWaitingGesture(){ GESTURES.forEach(function(t){document.removeEventListener(t,onFirstGesture,true);}); }
+try{
+  bgm=new Audio();bgm.loop=true;bgm.volume=BGM_VOLUME;bgm.preload="auto";
+  bgm.addEventListener("loadedmetadata",function(){musicBtn.hidden=false;autoStartMusic();});
+  bgm.addEventListener("error",function(){musicBtn.hidden=true;stopWaitingGesture();});
+  bgm.addEventListener("play",function(){syncMusicBtn();stopWaitingGesture();});
+  bgm.addEventListener("pause",syncMusicBtn);
+  GESTURES.forEach(function(t){document.addEventListener(t,onFirstGesture,true);});
+  bgm.src=BGM_SRC;
+  musicBtn.addEventListener("click",toggleMusic);
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){if(!bgm.paused)bgm.pause();}
+    else if(bgmWanted){var p=bgm.play();if(p&&p.catch)p.catch(function(){});}
+  });
+}catch(e){bgm=null;}
+
+/* ---------------- 動畫開關 ----------------
+   預設跟隨系統的「減少動態效果」設定；訪客按下方選單的「動畫」（或快捷鍵 A）後，改用訪客的選擇。
+   選擇只存在這台電腦的瀏覽器（localStorage），不會上傳；瀏覽器不允許儲存時就只在這次瀏覽有效。 */
+var motionBtn=document.getElementById("motionBtn");
+var sysReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
+var motionPref=null;
+try{ motionPref=localStorage.getItem("ki-motion"); }catch(e){}
+if(motionPref!=="on" && motionPref!=="off") motionPref=null;
+function motionReduced(){ return motionPref ? motionPref==="off" : sysReduce.matches; }
+function applyMotion(){
+  var reduced=motionReduced();
+  document.documentElement.classList.toggle("reduce-motion",reduced);
+  motionBtn.setAttribute("aria-pressed",String(!reduced));
+  motionBtn.querySelector(".ico").textContent=reduced?"◇":"✦";
+  motionBtn.title=(reduced?"開啟動畫效果":"關閉動畫效果")+"（快捷鍵 A）";   // 開關狀態由 aria-pressed 告訴讀屏軟體，和「音樂」按鈕一致
+  window.dispatchEvent(new CustomEvent("ki-motion",{detail:{reduced:reduced}}));
+}
+function toggleMotion(){
+  motionPref=motionReduced()?"on":"off";
+  try{ localStorage.setItem("ki-motion",motionPref); }catch(e){}
+  applyMotion();
+}
+motionBtn.addEventListener("click",toggleMotion);
+var onSysChange=function(){ if(!motionPref) applyMotion(); };
+if(sysReduce.addEventListener) sysReduce.addEventListener("change",onSysChange); else if(sysReduce.addListener) sysReduce.addListener(onSysChange);
+applyMotion();
+
+/* ---------------- 點擊音效 ----------------
+   用瀏覽器內建的 Web Audio 即時合成「魔法鈴聲」，不需要額外音檔。
+   預設開啟；訪客按下方選單的「音效」（或快捷鍵 S）可關閉，選擇只存在這台電腦的瀏覽器（localStorage）。
+   一般按鈕：輕亮的叮聲；開啟建築：上行的閃爍琶音；關閉面板：下行的柔和兩音。 */
+var sfxBtn=document.getElementById("sfxBtn");
+var sfxOn=true;
+try{ if(localStorage.getItem("ki-sfx")==="off") sfxOn=false; }catch(e){}
+var sfxCtx=null,sfxBus=null,sfxLast=0;
+function sfxReady(){
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return null;
+  // 還沒有任何使用者操作時（例如網址直接帶 #history 開啟）不出聲
+  if(navigator.userActivation && !navigator.userActivation.hasBeenActive)return null;
+  if(!sfxCtx){
+    sfxCtx=new AC();
+    sfxBus=sfxCtx.createGain(); sfxBus.gain.value=0.22;
+    var lp=sfxCtx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=7000;
+    sfxBus.connect(lp); lp.connect(sfxCtx.destination);
+  }
+  if(sfxCtx.state==="suspended") sfxCtx.resume();
+  return sfxCtx;
+}
+function sfxNote(ctx,freq,start,dur,vol,type){
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type||"sine"; o.frequency.setValueAtTime(freq,start);
+  g.gain.setValueAtTime(0.0001,start);
+  g.gain.exponentialRampToValueAtTime(vol,start+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g); g.connect(sfxBus);
+  o.start(start); o.stop(start+dur+0.02);
+  // 高八度的泛音，讓聲音更像鈴鐺
+  var o2=ctx.createOscillator(),g2=ctx.createGain();
+  o2.type="sine"; o2.frequency.setValueAtTime(freq*2.01,start);
+  g2.gain.setValueAtTime(0.0001,start);
+  g2.gain.exponentialRampToValueAtTime(vol*0.35,start+0.006);
+  g2.gain.exponentialRampToValueAtTime(0.0001,start+dur*0.6);
+  o2.connect(g2); g2.connect(sfxBus);
+  o2.start(start); o2.stop(start+dur+0.02);
+}
+var SFX={
+  tap:function(ctx,t){ sfxNote(ctx,1568,t,0.22,0.35,"triangle"); sfxNote(ctx,2349,t+0.045,0.28,0.22); },
+  open:function(ctx,t){ [1047,1319,1568,2093].forEach(function(f,i){ sfxNote(ctx,f,t+i*0.06,0.5,0.28-i*0.03); }); sfxNote(ctx,3136,t+0.26,0.6,0.08); },
+  close:function(ctx,t){ sfxNote(ctx,1568,t,0.25,0.22,"triangle"); sfxNote(ctx,1047,t+0.08,0.35,0.2,"triangle"); }
+};
+function playSfx(kind,force){
+  if(!sfxOn && !force)return;
+  var now=performance.now();
+  if(kind==="tap" && now-sfxLast<120)return;   // 同一次點擊已經播過開啟／關閉音，不再疊加叮聲
+  var ctx; try{ ctx=sfxReady(); }catch(e){ return; }
+  if(!ctx||!SFX[kind])return;
+  sfxLast=now;
+  try{ SFX[kind](ctx,ctx.currentTime+0.01); }catch(e){}
+}
+function syncSfxBtn(){
+  sfxBtn.setAttribute("aria-pressed",String(sfxOn));
+  sfxBtn.querySelector(".ico").textContent=sfxOn?"♬":"♩";
+  sfxBtn.title=(sfxOn?"關閉點擊音效":"開啟點擊音效")+"（快捷鍵 S）";
+}
+function toggleSfx(){
+  sfxOn=!sfxOn;
+  try{ localStorage.setItem("ki-sfx",sfxOn?"on":"off"); }catch(e){}
+  syncSfxBtn();
+  if(sfxOn) playSfx("tap",true);
+  sfxLast=performance.now();
+}
+sfxBtn.addEventListener("click",toggleSfx);
+syncSfxBtn();
+// 一般可點擊的東西（按鈕、分頁、展開框）都給一聲叮；放在 document 冒泡階段，晚於各按鈕自己的處理，
+// 所以開啟建築或關閉面板時只會聽到對應的開啟／關閉音
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest("button, summary, a[href], [role=tab]");
+  if(!t||t===sfxBtn||t.disabled)return;
+  playSfx("tap");
+});
+window.KISfx={play:playSfx};
+
+/* 簡介框：桌面預設展開 */
+/* 簡介預設收合，讓 3D 知識島成為首頁主角；點「關於這座島」即可展開 */
+
+/* 載入與錯誤 */
+function hideLoading(){var l=document.getElementById("loading");l.classList.add("hide");}
+function showError(msg){
+  hideLoading();
+  document.getElementById("errorMsg").textContent=msg;
+  document.getElementById("error").style.display="grid";
+}
+(function webglCheck(){
+  try{var c=document.createElement("canvas");var gl=c.getContext("webgl2")||c.getContext("webgl");if(!gl)throw 0;}
+  catch(e){showError("您的瀏覽器或裝置目前不支援 WebGL，無法繪製 3D 知識島。請改用新版 Chrome、Edge、Safari 或 Firefox，或開啟瀏覽器的硬體加速。");window.__noWebGL=true;}
+})();
+/* 只有在 3D 程式真的沒載入時才報逾時。分頁在背景時瀏覽器不會畫第一幀（__islandReady 不會成立），
+   但場景其實已經建好（__islandBuilt），這種情況不能誤報錯誤。 */
+setTimeout(function(){ if(!window.__islandReady && !window.__islandBuilt && !window.__noWebGL && !window.__islandFailed){
+  showError("3D 場景載入逾時：可能是網路無法連線至 Three.js 的 CDN（cdn.jsdelivr.net），或瀏覽器封鎖了外部程式。請確認網路後重新整理頁面。");
+}},20000);
+
+window.KI={open:open,close:close,home:home,isOpen:function(){return panel.classList.contains("open");},current:function(){return current;},
+  hideLoading:hideLoading,showError:function(m){window.__islandFailed=true;showError(m);},isMobile:isMobile,motionReduced:motionReduced,
+  names:{history:BUILDINGS.history.name,diagnosis:BUILDINGS.diagnosis.name,strategy:BUILDINGS.strategy.name},
+  // 主題副標（取自各館 kicker，例如「古卷圖書館」），名牌在滑鼠移入時顯示
+  subs:{history:BUILDINGS.history.kicker.split("｜")[1],diagnosis:BUILDINGS.diagnosis.kicker.split("｜")[1],strategy:BUILDINGS.strategy.kicker.split("｜")[1]},
+  panelEl:panel};
+
+/* 以網址 #history 等直接開啟 */
+var h=(location.hash||"").replace("#","");
+if(BUILDINGS[h]) setTimeout(function(){open(h);},window.__noWebGL?0:900);
+})();
+</script>
+
+<!-- ================= 3D 場景（Three.js） ================= -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const KI = window.KI;
+if (!window.__noWebGL) {
+try { init(); } catch (err) { console.error(err); KI.showError("3D 場景初始化失敗：" + (err && err.message ? err.message : err) + "。您仍可使用下方建築選單閱讀內容。"); }
+}
+
+function init(){
+// 是否關閉動畫：由下方選單的「動畫」開關決定（預設跟隨系統設定），切換時立即生效
+let REDUCED = KI.motionReduced ? KI.motionReduced() : matchMedia("(prefers-reduced-motion: reduce)").matches;
+addEventListener("ki-motion", e => { REDUCED = !!e.detail.reduced; });
+const canvas = document.getElementById("scene");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:"high-performance" });
+const coarse = matchMedia("(pointer:coarse)").matches;
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.75 : 2));  // adapted at runtime below
+renderer.setSize(innerWidth, innerHeight, false);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0x000000, 0);
+
+const scene = new THREE.Scene();
+// 視窗寬高可能在載入瞬間為 0（隱藏的分頁或框架），一律至少當成 1，避免算出 NaN
+const viewAspect = () => Math.max(innerWidth, 1) / Math.max(innerHeight, 1);
+const camera = new THREE.PerspectiveCamera(35, viewAspect(), 0.5, 400);
+
+/* ---------- lights：黃昏的低角度暖色夕陽（投影）＋紫藍天光＋冷色補光 ---------- */
+scene.add(new THREE.HemisphereLight(0xb9b2ff, 0x5a4460, 1.3));
+const sun = new THREE.DirectionalLight(0xffc089, 2.5);          // 夕陽，從畫面左前方低角度照過來
+sun.position.set(-10, 15, 24);
+sun.castShadow = true;
+sun.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
+Object.assign(sun.shadow.camera, { left:-25, right:25, top:25, bottom:-25, near:1, far:95 });
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0x9aa6ff, 0.6);         // 背光面的紫藍補光，讓陰影帶冷色而不是死黑
+fill.position.set(16, 10, -12); scene.add(fill);
+scene.add(new THREE.AmbientLight(0x9a8fc0, 0.4));
+
+/* ---------- helpers ---------- */
+const matCache = new Map();
+function mat(color, opts){
+  const key = color + JSON.stringify(opts||{});
+  if (!matCache.has(key)) matCache.set(key, new THREE.MeshLambertMaterial(Object.assign({ color, flatShading:true }, opts||{})));
+  return matCache.get(key);
+}
+function mesh(geo, m, cast=true, recv=true){ const o = new THREE.Mesh(geo, m); o.castShadow = cast; o.receiveShadow = recv; return o; }
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(20261113);
+function hash3(x,y,z){ const s = Math.sin(x*12.9898 + y*78.233 + z*37.719) * 43758.5453; return s - Math.floor(s); }
+function jitter(geo, amt, yAmt){
+  const p = geo.attributes.position;
+  for (let i=0;i<p.count;i++){
+    const x=p.getX(i), y=p.getY(i), z=p.getZ(i);
+    const h1 = hash3(+x.toFixed(3), +y.toFixed(3), +z.toFixed(3));
+    const h2 = hash3(+z.toFixed(3)+3.1, +x.toFixed(3), +y.toFixed(3)+1.7);
+    const r = Math.hypot(x,z);
+    if (r > 0.01){ const k = 1 + (h1-0.5)*amt; p.setX(i, x*k); p.setZ(i, z*k); }
+    p.setY(i, y + (h2-0.5)*(yAmt||0));
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+function textTexture(text, { w=512, h=128, bg="#fffaf0", fg="#2d3a2e", font="900 64px", border=null, radius=24 }={}){
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const g = c.getContext("2d");
+  const draw = () => {
+    g.clearRect(0,0,w,h);
+    g.fillStyle = bg; roundRect(g, 4, 4, w-8, h-8, radius); g.fill();
+    if (border){ g.lineWidth = 8; g.strokeStyle = border; roundRect(g, 8, 8, w-16, h-16, radius-4); g.stroke(); }
+    g.fillStyle = fg; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = font + ' "Noto Serif TC","Songti TC","PMingLiU","Noto Sans TC",serif';
+    g.fillText(text, w/2, h/2 + 4);
+  };
+  draw();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ draw(); t.needsUpdate = true; });
+  return t;
+}
+function roundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+
+/* ---------- palette ---------- */
+const C = {
+  grass:0x78ad62, grass2:0x63984f, dirt:0x9a7050, dirt2:0x805c40, rock:0x7d7484, rock2:0x675f74,
+  stone:0xd6cab0, stone2:0xbcae92, wood:0x9a6a42, woodD:0x6b4528, cream:0xe9dcc0, white:0xf3ecdc,
+  blue:0x3d6fc0, blueD:0x264f93, orange:0xd9782b, orangeD:0xa8521a, green:0x3f9658, greenD:0x2a6b3d,
+  leaf1:0x5fa955, leaf2:0x47904a, leaf3:0x86c060, pine:0x357a4e, water:0x5cb2e6, glass:0xffcf7a,
+  dark:0x2c2a35, metal:0xb9c3cc, red:0xb8434e, yellow:0xe9c15a, pink:0xe991ad,
+  castle:0xc2b8a6, castle2:0xa89d8a, slate:0x3c4478, slateD:0x2b315c, brass:0xc9a24a, wine:0x7a2a3a
+};
+/* 會發光的材質（窗戶、燈、魔藥）：不參與滑鼠移過的高亮，避免光被蓋掉 */
+function glow(color, intensity=1){ const m = new THREE.MeshLambertMaterial({ color, emissive:color, emissiveIntensity:intensity, flatShading:true }); m.userData.glow = true; return m; }
+const WIN = glow(0xffc46b, 1.0);
+
+/* ---------- island ---------- */
+const world = new THREE.Group(); scene.add(world);
+const island = new THREE.Group(); world.add(island);
+const Y0 = 0.5;
+
+const top = mesh(jitter(new THREE.CylinderGeometry(11, 10.7, 1, 18, 1), 0.07, 0), mat(C.grass));
+island.add(top);
+const rim = mesh(jitter(new THREE.CylinderGeometry(10.75, 10.2, 0.7, 18, 1), 0.07, 0), mat(C.grass2));
+rim.position.y = -0.8; island.add(rim);
+const dirt = mesh(jitter(new THREE.CylinderGeometry(10.25, 9.2, 1.4, 16, 1), 0.08, 0.15), mat(C.dirt));
+dirt.position.y = -1.85; island.add(dirt);
+const rockG = new THREE.ConeGeometry(10.1, 9.5, 14, 5); rockG.rotateX(Math.PI);
+const rock = mesh(jitter(rockG, 0.28, 0.5), mat(C.rock)); rock.position.y = -2.5 - 4.75; island.add(rock);
+const rock2G = new THREE.ConeGeometry(4.5, 5, 9, 3); rock2G.rotateX(Math.PI);
+const rockB = mesh(jitter(rock2G, 0.35, 0.4), mat(C.rock2)); rockB.position.set(3.4, -6.2, 2.2); island.add(rockB);
+const rockC = mesh(jitter(new THREE.ConeGeometry(3.4, 4, 8, 2).rotateX(Math.PI), 0.35, 0.3), mat(C.rock2)); rockC.position.set(-4.2, -5.4, 3.6); island.add(rockC);
+// floating pebbles
+const pebbles = [];
+[[-12.5,-3.5,3,0.9],[11.5,-5,-6,0.7],[6,-9.5,10,0.55],[-8,-8,-9,0.6]].forEach(([x,y,z,s],i)=>{
+  const g = new THREE.DodecahedronGeometry(s, 0); const m = mesh(jitter(g,0.3,0.2), mat(i%2?C.rock:C.rock2));
+  const cap = mesh(new THREE.CylinderGeometry(s*0.9, s*0.95, s*0.35, 7), mat(C.grass)); cap.position.y = s*0.62;
+  const grp = new THREE.Group(); grp.add(m, cap); grp.position.set(x,y,z); grp.userData = { y0:y, ph:i*1.7 };
+  island.add(grp); pebbles.push(grp);
+});
+
+/* ---------- layout ---------- */
+const V = new THREE.Vector3(1,0,1).normalize();      // toward default camera
+const P = new THREE.Vector3(1,0,-1).normalize();     // screen-right
+const at = (side, depth) => P.clone().multiplyScalar(side).add(V.clone().multiplyScalar(depth));
+const plaza = at(0, 0.9);
+const BPOS = { history: at(-5.7, 0.4), diagnosis: at(0, -5.6), strategy: at(5.7, 0.4) };
+const blockers = []; // {p:Vector3, r}
+
+/* plaza */
+const plazaDisk = mesh(new THREE.CylinderGeometry(1.9, 1.95, 0.12, 10), mat(C.stone), false, true);
+plazaDisk.position.set(plaza.x, Y0+0.05, plaza.z); island.add(plazaDisk);
+const plazaRing = mesh(new THREE.TorusGeometry(1.9, 0.09, 4, 20), mat(C.stone2), false, true);
+plazaRing.rotation.x = Math.PI/2; plazaRing.position.set(plaza.x, Y0+0.1, plaza.z); island.add(plazaRing);
+blockers.push({ p: plaza.clone(), r: 2.6 });
+
+/* stepping-stone paths */
+const slabGeo = new THREE.CylinderGeometry(0.4, 0.44, 0.1, 6);
+const slabMats = [mat(C.stone), mat(C.stone2)];
+const pathPts = [];
+function path(a, b, bend){
+  const mid = a.clone().add(b).multiplyScalar(0.5);
+  const dir = b.clone().sub(a); const len = dir.length(); dir.normalize();
+  const perp = new THREE.Vector3(-dir.z, 0, dir.x);
+  const ctrl = mid.clone().add(perp.multiplyScalar(bend));
+  const curve = new THREE.QuadraticBezierCurve3(a, ctrl, b);
+  const n = Math.max(3, Math.round(len / 0.72));
+  for (let i=0;i<=n;i++){
+    const t = i/n, p = curve.getPoint(t), tan = curve.getTangent(t);
+    const side = (i%2 ? 0.16 : -0.16);
+    const off = new THREE.Vector3(-tan.z, 0, tan.x).multiplyScalar(side);
+    const s = mesh(slabGeo, slabMats[i%2], false, true);
+    s.position.set(p.x+off.x, Y0+0.04, p.z+off.z); s.rotation.y = R()*Math.PI; s.scale.setScalar(0.9 + R()*0.25);
+    island.add(s); pathPts.push(p.clone());
+  }
+}
+
+/* ---------- decorations shared ---------- */
+const trunkGeo = new THREE.CylinderGeometry(0.12, 0.17, 0.9, 6);
+const roundLeafGeo = new THREE.IcosahedronGeometry(0.8, 0);
+const pineGeo = new THREE.ConeGeometry(0.75, 1.4, 7);
+const bushGeo = new THREE.IcosahedronGeometry(0.45, 0);
+const swayers = [];
+const LAMP_MAT = glow(0xffd58a, 1.3);
+let lampLights = 0;
+/* 柔和光暈（加法混色的貼圖精靈），用於燈、蠟燭、月亮 */
+const GLOW_TEX = (()=>{ const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d");
+  const gr = g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,"rgba(255,255,255,1)"); gr.addColorStop(0.25,"rgba(255,255,255,.55)"); gr.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle = gr; g.fillRect(0,0,64,64); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+function glowSprite(color, size, y=0){
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:GLOW_TEX, color, transparent:true, opacity:0.55, depthWrite:false, blending:THREE.AdditiveBlending }));
+  s.scale.setScalar(size); s.position.y = y; return s;
+}
+function tree(x, z, s=1, kind=0){
+  const g = new THREE.Group();
+  const t = mesh(trunkGeo, mat(C.woodD)); t.position.y = 0.45; g.add(t);
+  if (kind === 0){
+    const a = mesh(roundLeafGeo, mat([C.leaf1,C.leaf2,C.leaf3][Math.floor(R()*3)])); a.position.y = 1.35; a.scale.set(1,1.1,1); g.add(a);
+    const b = mesh(roundLeafGeo, mat(C.leaf1)); b.position.set(0.35, 1.0, 0.15); b.scale.setScalar(0.55); g.add(b);
+  } else {
+    const a = mesh(pineGeo, mat(C.pine)); a.position.y = 1.25; g.add(a);
+    const b = mesh(pineGeo, mat(C.pine)); b.position.y = 1.9; b.scale.setScalar(0.72); g.add(b);
+  }
+  g.position.set(x, Y0, z); g.scale.setScalar(s); g.rotation.y = R()*6.28;
+  g.userData.ph = R()*6.28; island.add(g); swayers.push(g);
+  return g;
+}
+function bush(x,z,s=1){ const b = mesh(bushGeo, mat(R()<0.5?C.leaf2:C.leaf1)); b.position.set(x, Y0+0.25*s, z); b.scale.set(s, s*0.8, s); island.add(b); }
+function lamp(x,z){
+  const g = new THREE.Group();
+  const post = mesh(new THREE.CylinderGeometry(0.06,0.08,1.6,6), mat(C.dark)); post.position.y = 0.8; g.add(post);
+  const cap = mesh(new THREE.ConeGeometry(0.26,0.22,6), mat(C.dark)); cap.position.y = 1.93; g.add(cap);
+  const light = mesh(new THREE.BoxGeometry(0.28,0.3,0.28), LAMP_MAT, false, false); light.position.y = 1.72; g.add(light);
+  // 實際照亮周圍的暖光（手機只開兩盞，省電）
+  if (lampLights < (coarse ? 2 : 4)){ const pl = new THREE.PointLight(0xffb45c, 7, 9, 2); pl.position.y = 1.72; g.add(pl); lampLights++; }
+  g.add(glowSprite(0xffc46b, 1.6, 1.72));
+  g.position.set(x, Y0, z); island.add(g);
+}
+function free(x, z, r=1){
+  if (Math.hypot(x,z) > 9.8) return false;
+  for (const b of blockers) if (Math.hypot(x-b.p.x, z-b.p.z) < b.r + r) return false;
+  for (const p of pathPts) if (Math.hypot(x-p.x, z-p.z) < 0.75 + r*0.6) return false;
+  return true;
+}
+
+/* ---------- buildings ---------- */
+const buildings = {};
+function gable(w, h, d, color){
+  const s = new THREE.Shape(); s.moveTo(-w/2,0); s.lineTo(w/2,0); s.lineTo(0,h); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth:d, bevelEnabled:false }); g.translate(0,0,-d/2);
+  return mesh(g, mat(color));
+}
+function box(w,h,d,color){ return mesh(new THREE.BoxGeometry(w,h,d), mat(color)); }
+function cyl(rt,rb,h,seg,color){ return mesh(new THREE.CylinderGeometry(rt,rb,h,seg), mat(color)); }
+
+function buildHistory(){
+  const g = new THREE.Group();
+  const base = box(4.0,0.3,3.5,C.stone); base.position.y = 0.15; g.add(base);
+  const steps = box(1.4,0.16,0.5,C.stone2); steps.position.set(0,0.08,1.95); g.add(steps);
+  const walls = box(3.2,2.0,2.6,C.cream); walls.position.y = 1.3; g.add(walls);
+  const band = box(3.3,0.18,2.7,0xe9dcc0); band.position.y = 2.32; g.add(band);
+  const roof = gable(3.9,1.35,3.4,C.blue); roof.position.y = 2.4; g.add(roof);
+  const ridge = box(0.18,0.18,3.5,C.blueD); ridge.position.y = 3.72; g.add(ridge);
+  const gableFront = gable(3.3,1.12,0.06,C.cream); gableFront.position.set(0,2.42,1.62); g.add(gableFront);
+  [-1.25,-0.45,0.45,1.25].forEach(x=>{ const c = cyl(0.11,0.13,1.95,8,C.white); c.position.set(x,1.27,1.55); g.add(c); });
+  const door = box(0.75,1.15,0.06,C.woodD); door.position.set(0,0.88,1.33); door.scale.x = 0.5; door.position.x = -0.19; g.add(door);   // 半開的門
+  const knob = box(0.08,0.08,0.06,C.yellow); knob.position.set(-0.05,0.88,1.37); g.add(knob);
+  [[-1.62,1.35,0],[1.62,1.35,0]].forEach(([x,y,z])=>{ for (const dz of [-0.6,0.6]){ const w = mesh(new THREE.BoxGeometry(0.06,0.7,0.5), WIN, false, false); w.position.set(x,y,z+dz); g.add(w);} });
+  // 門縫透出的燈光
+  const doorGlow = mesh(new THREE.BoxGeometry(0.62,1.0,0.04), WIN, false, false); doorGlow.position.set(0,0.82,1.305); g.add(doorGlow);
+  // clock on gable
+  const clockFace = cyl(0.42,0.42,0.06,16,C.white); clockFace.rotation.x = Math.PI/2; clockFace.position.set(0,2.85,1.68); g.add(clockFace);
+  const clockRim = mesh(new THREE.TorusGeometry(0.43,0.06,6,16), mat(C.blueD)); clockRim.position.set(0,2.85,1.7); g.add(clockRim);
+  const hourHand = box(0.05,0.22,0.03,C.dark); hourHand.geometry.translate(0,0.1,0); hourHand.position.set(0,2.85,1.73); g.add(hourHand);
+  const minHand = box(0.035,0.32,0.03,C.dark); minHand.geometry.translate(0,0.15,0); minHand.position.set(0,2.85,1.75); g.add(minHand);
+  g.userData.anim = (t)=>{ minHand.rotation.z = -t*0.6; hourHand.rotation.z = -t*0.05; };
+  // flag
+  const pole = cyl(0.03,0.03,1.2,5,C.dark); pole.position.set(1.3,3.4,-0.9); g.add(pole);   // 底部插進屋頂斜面
+  const flag = box(0.5,0.3,0.02,C.yellow); flag.position.set(1.56,3.85,-0.9); g.add(flag);
+  // big books stack
+  const books = new THREE.Group();
+  [[C.red,0],[C.yellow,0.24],[0x4fb3a5,0.48]].forEach(([c,y],i)=>{ const b = box(0.95-i*0.08,0.22,0.68,c); b.position.y = 0.11+y; b.rotation.y = i*0.25; books.add(b);
+    const pages = box(0.9-i*0.08,0.16,0.04,C.white); pages.position.set(0,0.11+y,0.33); pages.rotation.y = i*0.25; books.add(pages); });
+  books.position.set(2.6,0,1.15); g.add(books);   // 整疊放在底座旁的草地上
+  // open book on stand（書架立在草地上）
+  const stand = box(0.08,0.86,0.08,C.woodD); stand.position.set(-2.45,0.43,1.25); g.add(stand);
+  const pageL = box(0.42,0.04,0.55,C.white); pageL.position.set(-2.64,0.9,1.25); pageL.rotation.z = 0.25; g.add(pageL);
+  const pageR = box(0.42,0.04,0.55,C.white); pageR.position.set(-2.26,0.9,1.25); pageR.rotation.z = -0.25; g.add(pageR);
+  // scroll（平放在草地上，避開台階）
+  const scroll = cyl(0.14,0.14,0.85,10,0xf3e6c4); scroll.rotation.z = Math.PI/2; scroll.position.set(-1.65,0.17,2.25); g.add(scroll);
+  [-0.47,0.47].forEach(x=>{ const e = cyl(0.17,0.17,0.08,10,C.red); e.rotation.z = Math.PI/2; e.position.set(-1.65+x,0.17,2.25); g.add(e); });
+  return g;
+}
+
+function gear(r, teeth, thick, color){
+  const g = new THREE.Group();
+  const body = cyl(r, r, thick, 14, color); body.rotation.x = Math.PI/2; g.add(body);
+  const hub = cyl(r*0.35, r*0.35, thick*1.4, 8, C.dark); hub.rotation.x = Math.PI/2; g.add(hub);
+  for (let i=0;i<teeth;i++){ const a = i/teeth*Math.PI*2; const t = box(r*0.32, r*0.32, thick, color); t.position.set(Math.cos(a)*r, Math.sin(a)*r, 0); t.rotation.z = a; g.add(t); }
+  return g;
+}
+
+function buildDiagnosis(){
+  const g = new THREE.Group();
+  const base = box(3.8,0.3,3.4,C.stone); base.position.y = 0.15; g.add(base);
+  const walls = box(2.9,1.9,2.5,0xf6e7cf); walls.position.y = 1.25; g.add(walls);
+  const trim = box(3.0,0.16,2.6,C.wood); trim.position.y = 2.24; g.add(trim);
+  const roofG = new THREE.ConeGeometry(2.35,1.25,4); roofG.rotateY(Math.PI/4); roofG.scale(1.18,1,1.05);
+  const roof = mesh(roofG, mat(C.orange)); roof.position.y = 2.92; g.add(roof);
+  // tower
+  const tower = cyl(0.78,0.82,3.1,8,0xf3dcbc); tower.position.set(1.25,1.85,-0.85); g.add(tower);
+  const tRoof = cyl(0.01,1.05,1.2,8,C.orange); tRoof.position.set(1.25,4.0,-0.85); g.add(tRoof);
+  const tWin = mesh(new THREE.CylinderGeometry(0.25,0.25,0.06,12), WIN, false, false); tWin.rotation.x = Math.PI/2; tWin.position.set(1.25,2.8,-0.06); g.add(tWin);
+  const door = box(0.75,1.15,0.06,C.woodD); door.position.set(-0.3,0.88,1.26); g.add(door);
+  const win = mesh(new THREE.BoxGeometry(0.6,0.55,0.06), WIN, false, false); win.position.set(0.85,1.35,1.26); g.add(win);
+  // 觀星望遠鏡：從塔頂斜伸出來
+  const scope = new THREE.Group();
+  const tube = cyl(0.11,0.15,1.5,10,C.brass); scope.add(tube);
+  const eye = cyl(0.17,0.17,0.12,10,C.dark); eye.position.y = 0.78; scope.add(eye);
+  const ring2 = cyl(0.16,0.16,0.08,10,C.dark); ring2.position.y = -0.3; scope.add(ring2);
+  scope.position.set(1.5,4.15,-0.55); scope.rotation.set(0.35,0,-0.85); g.add(scope);
+  // 塔頂的星星裝飾
+  const star = mesh(new THREE.OctahedronGeometry(0.16,0), glow(0xffe2a0,1.2), false, false); star.position.set(1.25,4.72,-0.85); g.add(star);
+  // question sign above door
+  const qTex = textTexture("?", { w:128, h:128, bg:"#e8833a", fg:"#ffffff", font:"900 96px", radius:64 });
+  const qSign = mesh(new THREE.CircleGeometry(0.32, 20), new THREE.MeshLambertMaterial({ map:qTex }), false, false);
+  qSign.position.set(-0.3,1.85,1.3); g.add(qSign);
+  // giant magnifying glass hovering
+  const mag = new THREE.Group();
+  const ring = mesh(new THREE.TorusGeometry(0.62,0.1,8,20), mat(C.dark)); mag.add(ring);
+  const lens = mesh(new THREE.CircleGeometry(0.6,20), new THREE.MeshLambertMaterial({ color:0xcfeaff, transparent:true, opacity:0.55, side:THREE.DoubleSide }), false, false); mag.add(lens);
+  const handle = cyl(0.09,0.11,0.95,8,C.woodD); handle.position.set(0,-1.1,0); mag.add(handle);
+  const collar = cyl(0.12,0.12,0.15,8,C.metal); collar.position.set(0,-0.65,0); mag.add(collar);
+  mag.position.set(-2.25,1.75,1.0); mag.rotation.z = -0.55; g.add(mag); mag.userData.keep = true; g.userData.mag = mag;   // 握把朝外，鏡框與左牆保持距離
+  // checklist board
+  const ck = textTexture("✓ ✓ ✗", { w:256, h:320, bg:"#ffffff", fg:"#1f9a7a", font:"900 60px", border:"#d9682a", radius:18 });
+  const board = mesh(new THREE.PlaneGeometry(0.9,1.1), new THREE.MeshLambertMaterial({ map:ck }), true, false);
+  board.position.set(2.0,1.15,1.25); board.rotation.y = -0.35; g.add(board);
+  const back = box(0.95,1.15,0.04,C.wood); back.position.set(2.0,1.15,1.23); back.rotation.y = -0.35; g.add(back);
+  [-0.35,0.35].forEach(x=>{ const l = box(0.06,0.7,0.06,C.woodD); l.position.set(2.0+x*Math.cos(0.35),0.4,1.2+x*Math.sin(0.35)); g.add(l); });
+  g.userData.anim = (t)=>{ mag.position.y = 1.75 + Math.sin(t*1.4)*0.08; mag.rotation.y = Math.sin(t*0.7)*0.35; };
+  return g;
+}
+
+function buildStrategy(){
+  const g = new THREE.Group();
+  const base = box(4.0,0.3,3.5,C.stone); base.position.y = 0.15; g.add(base);
+  const walls = box(3.4,1.75,2.6,0xeccc99); walls.position.y = 1.17; g.add(walls);
+  for (let i=-3;i<=3;i++){ const plank = box(0.04,1.7,0.02,0xd4ad73); plank.position.set(i*0.45,1.17,1.31); g.add(plank); }
+  // sawtooth roof
+  [-0.85,0.85].forEach(x=>{
+    const s = new THREE.Shape(); s.moveTo(-0.95,0); s.lineTo(0.95,0); s.lineTo(0.95,1.0); s.closePath();
+    const rg = new THREE.ExtrudeGeometry(s,{depth:3.0,bevelEnabled:false}); rg.translate(0,0,-1.5);
+    const r = mesh(rg, mat(C.green)); r.position.set(x,2.04,0); g.add(r);
+    const sky = mesh(new THREE.BoxGeometry(0.05,0.8,2.6), glow(0x8fe0a8,0.75), false, false); sky.position.set(x+0.92,2.5,0); g.add(sky);   // 工坊天窗透出煉金綠光
+  });
+  const chim = box(0.42,1.1,0.42,0xc0614d); chim.position.set(-1.25,2.6,-0.8); g.add(chim);
+  const door = box(1.3,1.15,0.06,C.greenD); door.position.set(-0.45,0.88,1.33); g.add(door);
+  for (let i=0;i<4;i++){ const ln = box(1.28,0.03,0.07,0x2e5f30); ln.position.set(-0.45,0.5+i*0.27,1.35); g.add(ln); }
+  // gears on facade
+  // 兩個齒輪的齒尖剛好錯開不互穿；大齒輪頂端低於屋簷
+  const g1 = gear(0.5,10,0.16,C.metal); g1.position.set(0.78,1.4,1.42); g.add(g1);
+  const g2 = gear(0.26,8,0.16,C.yellow); g2.position.set(1.33,0.69,1.42); g.add(g2);
+  // giant pencil leaning
+  const pencil = new THREE.Group();
+  const pb = cyl(0.17,0.17,2.2,6,C.yellow); pencil.add(pb);
+  const tip = cyl(0.01,0.17,0.45,6,0xf1d3a5); tip.position.y = -1.32; tip.rotation.x = Math.PI; pencil.add(tip);
+  const lead = cyl(0.01,0.06,0.14,6,C.dark); lead.position.y = -1.5; lead.rotation.x = Math.PI; pencil.add(lead);
+  const fer = cyl(0.18,0.18,0.18,6,C.metal); fer.position.y = 1.19; pencil.add(fer);
+  const eraser = cyl(0.17,0.17,0.25,6,C.pink); eraser.position.y = 1.4; pencil.add(eraser);
+  pencil.position.set(2.45,1.5,0.3); pencil.rotation.z = 0.32; pencil.rotation.x = -0.12; g.add(pencil);   // 筆尖著地、上端靠在屋側
+  // workbench + wrench
+  // 工作台放在底座外的草地上，四支腳都著地、不碰牆
+  const BX = -2.6;
+  const bench = box(1.0,0.08,0.55,C.wood); bench.position.set(BX,0.82,0.9); g.add(bench);
+  [[-0.42,-0.22],[0.42,-0.22],[-0.42,0.22],[0.42,0.22]].forEach(([x,z])=>{ const l = box(0.07,0.78,0.07,C.woodD); l.position.set(BX+x,0.39,0.9+z); g.add(l); });
+  const wr = box(0.55,0.05,0.09,C.metal); wr.position.set(BX,0.89,0.85); wr.rotation.y = 0.5; g.add(wr);
+  const tb = box(0.4,0.22,0.24,C.red); tb.position.set(BX+0.17,0.97,1.0); g.add(tb);
+  // 煉金大鍋：放在門前右側的草地上，冒著綠光
+  const cauldron = new THREE.Group();
+  const pot = mesh(new THREE.SphereGeometry(0.42,10,8,0,Math.PI*2,Math.PI*0.28,Math.PI*0.72), mat(C.dark)); pot.position.y = 0.36; cauldron.add(pot);
+  const brew = mesh(new THREE.CircleGeometry(0.36,12), glow(0x6dff9c,1.1), false, false); brew.rotation.x = -Math.PI/2; brew.position.y = 0.62; cauldron.add(brew);
+  [0,2.1,4.2].forEach(a=>{ const leg = box(0.07,0.2,0.07,C.dark); leg.position.set(Math.cos(a)*0.28,0.08,Math.sin(a)*0.28); cauldron.add(leg); });
+  cauldron.position.set(1.35,0,2.25); g.add(cauldron);
+  // 鍋上與煙囪冒出的魔法煙（綠色、半透明）
+  const puffs = [];
+  for (let i=0;i<3;i++){ const p = mesh(new THREE.IcosahedronGeometry(0.2,0), new THREE.MeshBasicMaterial({ color:0x9dffc0, transparent:true, opacity:0.7, depthWrite:false }), false, false); p.position.set(-1.25,3.3,-0.8); g.add(p); puffs.push(p); }
+  g.userData.anim = (t)=>{
+    g1.rotation.z = t*0.8; g2.rotation.z = -t*0.8*10/8;
+    puffs.forEach((p,i)=>{ const k = ((t*0.35 + i/3) % 1); p.position.set(-1.25 + k*0.4, 3.25 + k*1.6, -0.8); p.scale.setScalar(0.6 + k*1.2); p.material.opacity = 0.75*(1-k); });
+  };
+  return g;
+}
+
+const builders3D = { history:buildHistory, diagnosis:buildDiagnosis, strategy:buildStrategy };
+const hitboxes = [];
+const hoverRings = {};
+for (const id of Object.keys(BPOS)){
+  const pos = BPOS[id];
+  const g = builders3D[id]();
+  g.position.set(pos.x, Y0, pos.z);
+  g.rotation.y = Math.atan2(plaza.x - pos.x, plaza.z - pos.z);
+  // per-building cloned materials for hover glow
+  const clones = new Map();
+  g.traverse(o=>{ if (o.isMesh && o.material && o.material.isMeshLambertMaterial && !o.material.map && !o.material.transparent && !o.material.userData.glow){
+    if (!clones.has(o.material)) clones.set(o.material, o.material.clone()); o.material = clones.get(o.material); } });
+  g.userData.mats = [...clones.values()];
+  island.add(g);
+  // hit box (invisible, generous)
+  const hb = new THREE.Mesh(new THREE.BoxGeometry(4.8, 5.2, 4.6), new THREE.MeshBasicMaterial());
+  hb.visible = false; hb.position.set(0, 2.4, 0.2); hb.userData.id = id; hb.userData.keep = true; g.add(hb); hitboxes.push(hb);
+  // ring
+  const ring = new THREE.Mesh(new THREE.RingGeometry(2.7, 3.0, 32), new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false }));
+  ring.rotation.x = -Math.PI/2; ring.position.set(pos.x, Y0+0.03, pos.z); island.add(ring); hoverRings[id] = ring;
+  buildings[id] = { group:g, pos, hover:0, door: pos.clone().add(plaza.clone().sub(pos).normalize().multiplyScalar(2.15)) };
+  blockers.push({ p: pos.clone(), r: 2.9 });
+}
+for (const id of Object.keys(buildings)){
+  const b = buildings[id];
+  const start = plaza.clone().add(b.pos.clone().sub(plaza).normalize().multiplyScalar(1.9));
+  path(start, b.door, id === "diagnosis" ? 0.6 : (id === "history" ? -0.9 : 0.9));
+}
+// entrance path toward the front edge
+const front = at(0, 9.3);
+path(plaza.clone().add(V.clone().multiplyScalar(1.9)), front, 0.5);
+
+/* ---------- Tripo 模型：載入成功就取代程式繪製的簡易建築；載入失敗則保留簡易版 ---------- */
+/* 每個項目：url 檔案、group 要取代的建築群組、height 目標高度、maxW 佔地上限（兩者取較小的縮放）、
+   y 底部高度、rotY 轉向（模型正面預設朝 +Z，也就是朝向廣場） */
+const MODELS = {
+  history:   { url:"models/library.glb",  group:()=>buildings.history.group,  height:4.6, maxW:4.5 },
+  strategy:  { url:"models/workshop.glb", group:()=>buildings.strategy.group, height:4.4, maxW:4.4 },
+  about:     { url:"models/castle.glb",   group:()=>castle, height:7.5, maxW:6.6, y:0.4 },
+  diagnosis: { url:"models/observatory.glb", group:()=>buildings.diagnosis.group, height:5.0,   // 略降高度，少擋後方城堡入口
+    onSwap(g){ if (g.userData.mag) g.userData.mag.position.x = -2.95; } }   // 放大鏡往外移，避開較寬的模型
+};
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;   // 只影響模型的 PBR 材質（金屬反光用）
+const gltfLoader = new GLTFLoader();
+function swapInModel(cfg, gltf){
+    const g = cfg.group(), model = gltf.scene;
+    const bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), ctr = bb.getCenter(new THREE.Vector3());
+    let s = cfg.height / size.y;
+    if (cfg.maxW) s = Math.min(s, cfg.maxW / Math.max(size.x, size.z));
+    model.scale.setScalar(s);
+    model.position.set(-ctr.x*s, -bb.min.y*s, -ctr.z*s);          // 置中、底部貼地
+    const holder = new THREE.Group(); holder.userData.keep = true; holder.userData.model = true;
+    holder.position.set(cfg.x || 0, cfg.y || 0, cfg.z || 0); holder.rotation.y = cfg.rotY || 0; holder.add(model);
+    const mats = (g.userData.mats ||= []);
+    model.traverse(o=>{
+      if (!o.isMesh) return;
+      o.castShadow = o.receiveShadow = true;
+      const m = o.material; m.envMapIntensity = 0.55;
+      // 用貼圖本身當自發光來源：黃色窗戶會比石牆亮，滑鼠移過時也能整棟提亮
+      if (m.map){ m.emissiveMap = m.map; m.userData.em0 = 0.12; m.emissive.setRGB(0.12,0.12,0.12); mats.push(m); }   // 0.22 → 0.12：石牆不再整片發亮，窗光仍是最亮處
+    });
+    for (const c of g.children) if (!c.userData.keep) c.visible = false;
+    g.add(holder);
+    g.userData.modelTop = (cfg.y || 0) + size.y * s;              // 模型實際高度，名牌位置會跟著調整
+    if (cfg.onSwap) cfg.onSwap(g);
+    window.__modelsLoaded = (window.__modelsLoaded || 0) + 1;
+}
+/* 下載一個檔案；連續 stallMs 毫秒沒有收到任何資料就中斷（看的是「停滯」，不是總時間，慢速網路不會被誤判）。 */
+async function fetchBuffer(url, stallMs = 6000){
+  const ac = new AbortController(); let timer;
+  const arm = ()=>{ clearTimeout(timer); timer = setTimeout(()=> ac.abort(), stallMs); };
+  arm();
+  try {
+    const res = await fetch(url, { signal: ac.signal });
+    if (!res.ok) throw Object.assign(new Error("HTTP " + res.status), { permanent: res.status >= 400 && res.status < 500 });
+    const reader = res.body.getReader(), chunks = []; let len = 0;
+    for (;;){ const { done, value } = await reader.read(); if (done) break; chunks.push(value); len += value.length; arm(); }
+    const out = new Uint8Array(len); let o = 0;
+    for (const c of chunks){ out.set(c, o); o += c.length; }
+    return out.buffer;
+  } finally { clearTimeout(timer); }
+}
+/* 一次載入一個模型；下載中斷或停滯時自動重試（最多共 4 次）。全部失敗就保留簡易建築。 */
+async function loadModel(cfg){
+  const TRIES = 4;
+  for (let attempt = 0; attempt < TRIES; attempt++){
+    try {
+      const gltf = await gltfLoader.parseAsync(await fetchBuffer(cfg.url), "models/");
+      swapInModel(cfg, gltf);
+      return;
+    } catch (err){
+      if (attempt === TRIES - 1 || err.permanent){ console.warn("模型載入失敗，保留簡易建築：" + cfg.url, err); return; }
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+    }
+  }
+}
+(async ()=>{ for (const id in MODELS) await loadModel(MODELS[id]); window.__modelsDone = true; })();
+
+/* signpost at plaza */
+(function signpost(){
+  const g = new THREE.Group();
+  const post = cyl(0.1,0.12,2.3,6,C.wood); post.position.y = 1.15; g.add(post);
+  const capT = cyl(0.01,0.16,0.2,6,C.woodD); capT.position.y = 2.38; g.add(capT);
+  const info = [["history","歷程館","#9cc0ff",1.95],["diagnosis","診斷館","#ffb27a",1.6],["strategy","策略館","#9be6ae",1.25]];
+  info.forEach(([id,txt,col,y])=>{
+    const tex = textTexture(txt, { w:256, h:96, bg:"#3a2418", fg:col, font:"900 54px", border:"#d8b26a", radius:14 });
+    const board = new THREE.Mesh(new THREE.BoxGeometry(1.15,0.36,0.06), [mat(C.wood),mat(C.wood),mat(C.wood),mat(C.wood), new THREE.MeshLambertMaterial({map:tex}), new THREE.MeshLambertMaterial({map:tex})]);
+    board.castShadow = true;
+    const dir = buildings[id].pos.clone().sub(plaza); const ang = Math.atan2(dir.x, dir.z);
+    const holder = new THREE.Group(); holder.rotation.y = ang - Math.PI/2; holder.position.y = y;
+    board.position.x = 0.62; holder.add(board);
+    const tip = mesh(new THREE.ConeGeometry(0.2,0.24,3), mat(C.wood)); tip.rotation.z = -Math.PI/2; tip.position.x = 1.3; holder.add(tip);
+    g.add(holder);
+  });
+  g.position.set(plaza.x, Y0, plaza.z); island.add(g);
+})();
+
+/* welcome sign at the entrance */
+(function welcome(){
+  const tex = textTexture("AI 題目知識島", { w:640, h:150, bg:"#2e1c14", fg:"#f3e0a8", font:"900 72px", border:"#d8b26a", radius:22 });
+  const g = new THREE.Group();
+  const board = new THREE.Mesh(new THREE.BoxGeometry(2.6,0.62,0.1), [mat(C.wood),mat(C.wood),mat(C.wood),mat(C.wood), new THREE.MeshLambertMaterial({map:tex}), mat(C.wood)]);
+  board.position.y = 1.15; board.castShadow = true; g.add(board);
+  [-1.05,1.05].forEach(x=>{ const l = cyl(0.07,0.09,1.4,6,C.woodD); l.position.set(x,0.7,-0.02); g.add(l); });
+  const p = at(1.9, 8.1); g.position.set(p.x, Y0, p.z); g.rotation.y = Math.atan2(V.x, V.z); island.add(g);
+  blockers.push({ p: p.clone(), r: 1.6 });
+})();
+
+/* pond (water theme) */
+const pondPos = at(-6.2, -4.6);
+const pond = mesh(new THREE.CylinderGeometry(1.5,1.5,0.08,12), new THREE.MeshLambertMaterial({ color:C.water, transparent:true, opacity:0.92 }), false, true);
+pond.position.set(pondPos.x, Y0+0.03, pondPos.z); island.add(pond);
+for (let i=0;i<12;i++){ const a=i/12*Math.PI*2; const s = mesh(new THREE.DodecahedronGeometry(0.22,0), mat(i%2?C.stone2:C.rock)); s.position.set(pondPos.x+Math.cos(a)*1.6, Y0+0.08, pondPos.z+Math.sin(a)*1.6); s.scale.y = 0.6; island.add(s); }
+const lily = mesh(new THREE.CylinderGeometry(0.25,0.25,0.03,7), mat(C.leaf3), false, false); lily.position.set(pondPos.x+0.4, Y0+0.09, pondPos.z-0.3); island.add(lily);
+blockers.push({ p: pondPos.clone(), r: 1.9 });
+
+/* ---------- 學院城堡：島後方的浮空岩上，以石橋連接；點選開啟「網站說明」 ---------- */
+const castlePos = at(0, -17.6);
+const CASTLE_SCALE = 1.45, CASTLE_LIFT = 1.4;
+const CASTLE_GROUND = -CASTLE_LIFT / CASTLE_SCALE;   // 主島地面在城堡座標中的高度
+const castle = new THREE.Group();
+(function buildCastle(){
+  const g = castle;
+  // 浮空岩
+  const top = mesh(jitter(new THREE.CylinderGeometry(3.7,3.5,0.8,14,1),0.06,0), mat(C.grass)); g.add(top);
+  const dirt = mesh(jitter(new THREE.CylinderGeometry(3.5,3.0,1.0,12,1),0.08,0.1), mat(C.dirt)); dirt.position.y = -0.9; g.add(dirt);
+  const rk = new THREE.ConeGeometry(3.1,6,10,3); rk.rotateX(Math.PI);
+  const rock = mesh(jitter(rk,0.3,0.4), mat(C.rock)); rock.position.y = -4.4; g.add(rock);
+  for (const o of [top, dirt, rock]) o.userData.keep = true;   // 換成 Tripo 模型時，浮空岩與石階保留
+  const B = 0.4;   // 地面高度（相對城堡群組）
+  // 主堡
+  const keep = box(2.8,4.2,2.2,C.castle); keep.position.set(0,B+2.1,-0.6); g.add(keep);
+  const kRoofG = new THREE.ConeGeometry(2.15,1.8,4); kRoofG.rotateY(Math.PI/4); kRoofG.scale(1.05,1,0.85);
+  const kRoof = mesh(kRoofG, mat(C.slate)); kRoof.position.set(0,B+4.2+0.9,-0.6); g.add(kRoof);
+  // 中央高塔
+  const spire = cyl(0.78,0.85,6.6,10,C.castle2); spire.position.set(0,B+3.3,-1.7); g.add(spire);
+  const spRoof = cyl(0.01,1.05,2.3,10,C.slateD); spRoof.position.set(0,B+6.6+1.15,-1.7); g.add(spRoof);
+  // 四座角塔
+  [[-2.05,0.55,4.4],[2.05,0.55,4.4],[-1.75,-1.9,5.4],[1.75,-1.9,5.4]].forEach(([x,z,h])=>{
+    const t = cyl(0.58,0.64,h,9,C.castle); t.position.set(x,B+h/2,z); g.add(t);
+    const r = cyl(0.01,0.84,1.7,9,C.slate); r.position.set(x,B+h+0.85,z); g.add(r);
+    const fin = mesh(new THREE.OctahedronGeometry(0.11,0), glow(0xffe2a0,1.1), false, false); fin.position.set(x,B+h+1.82,z); g.add(fin);
+    for (const y of [h*0.45, h*0.75]){ const w = mesh(new THREE.BoxGeometry(0.2,0.42,0.05), WIN, false, false); w.position.set(x,B+y,z+0.6); g.add(w); }
+  });
+  // 前方城牆、城垛與發光的城門
+  const wall = box(4.0,2.0,0.5,C.castle2); wall.position.set(0,B+1.0,0.9); g.add(wall);
+  for (let i=0;i<6;i++){ const m = box(0.34,0.34,0.5,C.castle2); m.position.set(-1.5+i*0.6,B+2.17,0.9); g.add(m); }
+  const gate = mesh(new THREE.BoxGeometry(0.85,1.25,0.06), WIN, false, false); gate.position.set(0,B+0.63,1.16); g.add(gate);
+  const arch = mesh(new THREE.TorusGeometry(0.46,0.09,6,12,Math.PI), mat(C.dark)); arch.position.set(0,B+1.25,1.18); g.add(arch);
+  // 主堡正面窗戶
+  for (const x of [-0.75,0,0.75]) for (const y of [2.55,3.45]){ const w = mesh(new THREE.BoxGeometry(0.3,0.52,0.05), WIN, false, false); w.position.set(x,B+y,0.52); g.add(w); }
+  // 酒紅色旗幟（金色星紋，非任何真實學院徽章）
+  const flagTex = textTexture("✦", { w:96, h:192, bg:"#7a2a3a", fg:"#f3e0a8", font:"900 80px", border:"#d8b26a", radius:6 });
+  for (const x of [-1.15,1.15]){ const f = mesh(new THREE.PlaneGeometry(0.5,1.0), new THREE.MeshLambertMaterial({ map:flagTex, side:THREE.DoubleSide }), false, false); f.position.set(x,B+1.35,1.16); g.add(f); }
+  // 漂浮石階：從浮空岩前緣一階一階往下，接到主島邊緣
+  const STEP_N = 8, yTop = 0.36, yBot = CASTLE_GROUND - 0.02, z0 = 3.3, z1 = 5.5;
+  for (let i=0;i<STEP_N;i++){
+    const k = i/(STEP_N-1);
+    const st = box(1.3,0.16,0.36, i%2 ? C.stone : C.stone2);
+    st.position.set(0, yTop + (yBot - yTop)*k, z0 + (z1 - z0)*k); st.userData.keep = true; g.add(st);
+  }
+  g.add(glowSprite(0xffc46b, 2.2, B+0.7)).children.at(-1).position.z = 1.3;
+  g.userData.labelY = B + 9.6;
+})();
+castle.position.set(castlePos.x, Y0 + CASTLE_LIFT, castlePos.z);
+castle.scale.setScalar(CASTLE_SCALE);
+castle.rotation.y = Math.atan2(plaza.x - castlePos.x, plaza.z - castlePos.z);
+island.add(castle);
+// 點選判定（比城堡略大）
+const castleHit = new THREE.Mesh(new THREE.BoxGeometry(6.8, 8.6, 6.8), new THREE.MeshBasicMaterial());
+castleHit.visible = false; castleHit.position.set(0, 4.3, 0); castleHit.userData.id = "about"; castleHit.userData.keep = true; castle.add(castleHit); hitboxes.push(castleHit);
+// 橋頭附近不要種樹
+blockers.push({ p: at(0, -9.6), r: 1.7 });
+
+/* lamps along paths */
+[at(-2.6, 2.2), at(2.6, 2.2), at(-1.7,-1.4), at(1.2, 5.4)].forEach(p=>{ if (free(p.x,p.z,0.2)) lamp(p.x,p.z); else lamp(p.x+0.6,p.z-0.6); blockers.push({p:p.clone(),r:0.5}); });
+
+/* trees, bushes */
+let placed = 0, tries = 0;
+while (placed < 22 && tries < 900){
+  tries++;
+  const a = R()*Math.PI*2, r = 3 + Math.sqrt(R())*6.6;
+  const x = Math.cos(a)*r, z = Math.sin(a)*r;
+  const frontness = (x*V.x + z*V.z) / r;   // >0 means toward camera
+  if (frontness > 0.55 && r < 8.6) continue;   // keep the front view clear
+  if (!free(x,z,1.0)) continue;
+  const s = 0.8 + R()*0.55;
+  tree(x, z, frontness > 0.3 ? s*0.75 : s, R() < 0.35 ? 1 : 0);
+  blockers.push({ p:new THREE.Vector3(x,0,z), r:0.9*s });
+  placed++;
+}
+let bushes = 0; tries = 0;
+while (bushes < 18 && tries < 600){ tries++; const a=R()*6.28, r=2.5+Math.sqrt(R())*7.2; const x=Math.cos(a)*r, z=Math.sin(a)*r; if (!free(x,z,0.4)) continue; bush(x,z,0.6+R()*0.6); blockers.push({p:new THREE.Vector3(x,0,z),r:0.5}); bushes++; }
+
+/* flowers & grass tufts (instanced) */
+const flowerGeo = new THREE.IcosahedronGeometry(0.09, 0);
+const flowers = new THREE.InstancedMesh(flowerGeo, new THREE.MeshLambertMaterial({ flatShading:true }), 90);
+const tuftGeo = new THREE.ConeGeometry(0.08, 0.32, 4);
+const tufts = new THREE.InstancedMesh(tuftGeo, mat(0x6aa94e), 70);
+const m4 = new THREE.Matrix4(), col = new THREE.Color();
+const fc = [0xffffff, 0xf29bb6, 0xf2c443, 0xf39a5b, 0xb9a4f0];
+let fi = 0, ti = 0; tries = 0;
+while ((fi < 90 || ti < 70) && tries < 3000){
+  tries++;
+  const a=R()*6.28, r=1+Math.sqrt(R())*9.3; const x=Math.cos(a)*r, z=Math.sin(a)*r;
+  if (!free(x,z,0.05)) continue;
+  if (fi < 90){ m4.makeTranslation(x, Y0+0.12, z); flowers.setMatrixAt(fi, m4); flowers.setColorAt(fi, col.setHex(fc[fi%fc.length])); fi++; }
+  else { m4.makeTranslation(x, Y0+0.16, z); tufts.setMatrixAt(ti, m4); ti++; }
+}
+flowers.count = fi; tufts.count = ti; island.add(flowers, tufts);
+
+/* ---------- 島上的小角色（程式繪製的 Low Poly 小人與動物） ----------
+   每個角色都在做和所在知識館主題相關的事；動畫關閉時停在原本的姿勢。
+   滑鼠移到角色上（手機點一下）時，角色會打招呼並出現一句對話泡泡；不會開啟面板。 */
+const actors = [];     // { id, node, h(泡泡高度), line(對話), update(t), react(k,t), pauseOnHover, moves }
+const charHits = [];   // 角色的隱形感應區（比角色本身大一點，比較容易移到）
+function addActor(o){
+  o.k = 0; o.lt = 0; o.y0 = o.node.position.y;
+  const hit = new THREE.Mesh(new THREE.SphereGeometry(o.r || 0.75, 8, 6), new THREE.MeshBasicMaterial());
+  hit.visible = false; hit.position.y = o.cy ?? 0.65; hit.userData.charId = o.id; hit.userData.keep = true;
+  o.node.add(hit); charHits.push(hit); actors.push(o); return o;
+}
+/* 揮手：左手往外上方舉起（sx=-1），右手（sx=1）；wave 為擺動幅度 */
+const waveZ = (sx, k, t) => sx * k * (2.35 + (REDUCED ? 0 : Math.sin(t*9)*0.28));
+const hop = (k, t) => REDUCED ? 0 : k * Math.abs(Math.sin(t*6.5)) * 0.1;
+const SKIN = 0xf2cfa8;
+function person(robe, hat){
+  const g = new THREE.Group();
+  const body = mesh(new THREE.CylinderGeometry(0.1,0.3,0.62,7), mat(robe)); body.position.y = 0.31; g.add(body);
+  const head = mesh(new THREE.IcosahedronGeometry(0.17,1), mat(SKIN)); head.position.y = 0.76; g.add(head);
+  const hatG = new THREE.Group(); hatG.position.y = 0.86;
+  const brim = mesh(new THREE.CylinderGeometry(0.27,0.27,0.03,9), mat(hat)); hatG.add(brim);
+  const cone = mesh(new THREE.ConeGeometry(0.17,0.4,7), mat(hat)); cone.position.y = 0.2; cone.rotation.z = 0.12; hatG.add(cone);
+  g.add(hatG);
+  for (const ex of [-0.07,0.07]){ const e = mesh(new THREE.BoxGeometry(0.035,0.045,0.02), mat(0x2c2a35), false, false); e.position.set(ex,0.77,0.16); g.add(e); }
+  const arms = [];
+  for (const sx of [-1,1]){ const a = new THREE.Group(); a.position.set(sx*0.17,0.55,0);
+    const sleeve = mesh(new THREE.CylinderGeometry(0.05,0.07,0.3,5), mat(robe)); sleeve.position.y = -0.15; a.add(sleeve);
+    const hand = mesh(new THREE.IcosahedronGeometry(0.05,0), mat(SKIN), false, false); hand.position.y = -0.32; a.add(hand);
+    g.add(a); arms.push(a); }
+  g.userData = { head, hatG, armL:arms[0], armR:arms[1], keep:true };
+  return g;
+}
+/* 在建築前方找一個沒有樹、灌木、路燈的位置（建築座標：+z 朝向廣場） */
+function spotNear(bGroup, candidates){
+  const v = new THREE.Vector3();
+  for (const [lx,lz] of candidates){
+    v.set(lx,0,lz).applyAxisAngle(new THREE.Vector3(0,1,0), bGroup.rotation.y).add(bGroup.position);
+    let ok = Math.hypot(v.x,v.z) < 9.6;
+    for (const b of blockers){ if (b.r === 2.9 || b.r === 2.6) continue; if (Math.hypot(v.x-b.p.x, v.z-b.p.z) < b.r + 0.45){ ok = false; break; } }
+    if (ok) return [lx,lz];
+  }
+  return candidates[0];
+}
+const SPOTS = [[1.75,3.15],[-1.75,3.15],[2.4,2.6],[-2.4,2.6],[1.1,3.3],[-1.1,3.3]];
+// 1. 歷程館：坐著翻書的小學者（藍袍）
+{
+  const g = buildings.history.group, [x,z] = spotNear(g, SPOTS);
+  const p = person(C.blue, C.blueD); p.position.set(x,0,z); p.rotation.y = x > 0 ? -0.5 : 0.5; p.scale.setScalar(0.95);
+  const stool = mesh(new THREE.CylinderGeometry(0.2,0.22,0.22,7), mat(C.woodD)); stool.position.set(0,0.11,-0.02); p.add(stool);
+  p.children[0].position.y = 0.45; p.userData.head.position.y = 0.9; p.userData.hatG.position.y = 1.0;
+  p.children.filter(c=>c.geometry && c.geometry.type === "BoxGeometry").forEach(e=> e.position.y = 0.91);
+  p.userData.armL.position.y = p.userData.armR.position.y = 0.69; p.userData.armL.rotation.x = p.userData.armR.rotation.x = -1.1;
+  const book = new THREE.Group(); book.position.set(0,0.52,0.36); book.rotation.x = 0.5;
+  const pl = mesh(new THREE.BoxGeometry(0.2,0.02,0.26), mat(C.white)); pl.position.x = -0.1; pl.rotation.z = 0.18; book.add(pl);
+  const pr = mesh(new THREE.BoxGeometry(0.2,0.02,0.26), mat(C.white)); pr.position.x = 0.1; pr.rotation.z = -0.18; book.add(pr);
+  const cover = mesh(new THREE.BoxGeometry(0.44,0.02,0.28), mat(C.red)); cover.position.y = -0.03; book.add(cover);
+  const flipPivot = new THREE.Group(); const flip = mesh(new THREE.BoxGeometry(0.19,0.012,0.25), mat(0xfff7e2), false, false); flip.position.x = 0.095; flipPivot.add(flip); flipPivot.position.y = 0.02; book.add(flipPivot);
+  p.add(book); g.add(p);
+  addActor({ id:"scholar", node:p, h:1.55, cy:0.7,
+    line:"這裡記錄了四輪 AI 命題的歷程，點我身後的歷程館看看！",
+    update(t){ const k = (t*0.22) % 1;                      // 每 4.5 秒翻一頁
+      flipPivot.rotation.z = k < 0.25 ? (k/0.25)*Math.PI*0.92 + 0.1 : 0.1; flipPivot.visible = k < 0.25;
+      p.userData.head.rotation.x = 0.22 + Math.sin(t*0.5)*0.05;
+      p.userData.armL.rotation.set(-1.1, 0, 0); },
+    react(k, t){ p.userData.armL.rotation.set(-1.1*(1-k), 0, waveZ(-1, k, t)); p.userData.head.rotation.x -= 0.45*k; } });
+}
+// 2. 診斷館：拿放大鏡檢查卷軸的天文學徒（橘袍），偶爾抬頭看望遠鏡
+{
+  const g = buildings.diagnosis.group, [x,z] = spotNear(g, SPOTS);
+  const p = person(C.orange, C.orangeD); p.position.set(x,0,z); p.rotation.y = x > 0 ? -0.35 : 0.35;
+  const sheet = mesh(new THREE.BoxGeometry(0.3,0.36,0.015), mat(0xf3e6c4)); sheet.position.set(-0.02,-0.34,0.1); sheet.rotation.x = -0.5; p.userData.armL.add(sheet);
+  p.userData.armL.rotation.set(-1.25,0,0.35);
+  const lens = new THREE.Group(); lens.position.y = -0.36;
+  const ring = mesh(new THREE.TorusGeometry(0.09,0.02,5,10), mat(C.dark)); ring.position.y = -0.14; lens.add(ring);
+  const hd = mesh(new THREE.CylinderGeometry(0.015,0.015,0.1,5), mat(C.woodD)); hd.position.y = -0.03; lens.add(hd);
+  p.userData.armR.add(lens); g.add(p);
+  addActor({ id:"apprentice", node:p, h:1.45,
+    line:"答案正確不等於好題目，每個選項都要逐一檢查喔！",
+    update(t){ const look = Math.max(0, Math.sin(t*0.35 - 1)) ** 6;              // 偶爾抬頭
+      p.userData.armR.rotation.set(-1.15, 0, -0.25 + Math.sin(t*1.1)*0.22 * (1-look));
+      p.userData.head.rotation.x = 0.25 - look*0.75; p.userData.hatG.rotation.x = -look*0.5; },
+    react(k, t){ p.userData.armR.rotation.set(-1.15*(1-k), 0, waveZ(1, k, t)); p.userData.head.rotation.x = 0.25*(1-k) - 0.3*k;
+      p.userData.hatG.rotation.x *= (1-k); p.position.y = hop(k, t); } });
+}
+// 3. 策略館：攪拌煉金鍋的煉金師（綠袍）
+{
+  const g = buildings.strategy.group, [x,z] = spotNear(g, SPOTS);
+  const grp = new THREE.Group(); grp.userData.keep = true; grp.position.set(x,0,z); grp.rotation.y = x > 0 ? -0.4 : 0.4;
+  const p = person(C.green, C.greenD); p.position.set(0,0,-0.1); grp.add(p);
+  const pot = mesh(new THREE.SphereGeometry(0.26,8,6,0,Math.PI*2,Math.PI*0.3,Math.PI*0.7), mat(C.dark)); pot.position.set(0,0.24,0.48); grp.add(pot);
+  const brew = mesh(new THREE.CircleGeometry(0.21,10), glow(0x7dffa6,1.0), false, false); brew.rotation.x = -Math.PI/2; brew.position.set(0,0.37,0.48); grp.add(brew);
+  const stick = mesh(new THREE.CylinderGeometry(0.014,0.014,0.42,5), mat(C.wood)); stick.position.y = -0.48; p.userData.armR.add(stick);
+  const bubbles = []; for (let i=0;i<3;i++){ const b = mesh(new THREE.IcosahedronGeometry(0.035,0), glow(0xa8ffc4,1.1), false, false); grp.add(b); bubbles.push(b); }
+  g.add(grp);
+  addActor({ id:"alchemist", node:grp, h:1.5,
+    line:"修訂就像調配魔藥：先診斷問題，再提出具體的改寫要求。",
+    update(t){ p.userData.armR.rotation.set(-1.0 + Math.sin(t*1.6)*0.14, 0, -0.1 + Math.cos(t*1.6)*0.2);
+      p.userData.armL.rotation.set(-0.3, 0, 0); p.userData.head.rotation.x = 0.2;
+      bubbles.forEach((b,i)=>{ const k = (t*0.3 + i/3) % 1; b.position.set(Math.sin(i*2.4)*0.1, 0.4 + k*0.5, 0.48 + Math.cos(i*2.4)*0.1); b.scale.setScalar(1 - k*0.7); b.visible = !REDUCED; }); },
+    react(k, t){ p.userData.armL.rotation.set(-0.3*(1-k), 0, waveZ(-1, k, t)); p.userData.head.rotation.x = 0.2 - 0.45*k; } });
+}
+// 4. 兩位散步的學生：一位繞著廣場走，一位在入口步道上來回
+function walkPose(p, t, speed){ const s = Math.sin(t*speed);
+  p.userData.armL.rotation.x = s*0.5; p.userData.armR.rotation.x = -s*0.5; p.position.y = Y0 + Math.abs(Math.cos(t*speed))*0.035; }
+{
+  const p = person(C.wine, 0x55182a); p.scale.setScalar(0.92); island.add(p);
+  addActor({ id:"walkerPlaza", node:p, h:1.45, moves:true, pauseOnHover:true,
+    line:"歡迎來到知識島！點選三棟建築，就能開始探索。",
+    update(t){ const a = t*0.16 + 0.6, r = 2.1;   // 走在廣場石板外緣，離路燈有距離
+      p.position.set(plaza.x + Math.cos(a)*r, Y0, plaza.z + Math.sin(a)*r); p.rotation.y = -a; walkPose(p, t, 3.2); },
+    react(k, t){ p.userData.armR.rotation.set(p.userData.armR.rotation.x*(1-k), 0, waveZ(1, k, t)); p.userData.head.rotation.x = -0.3*k; p.position.y += hop(k, t); } });
+}
+{
+  const a0 = plaza.clone().add(V.clone().multiplyScalar(1.9)), b0 = at(0, 9.3);
+  const dir = b0.clone().sub(a0).normalize(), ctrl = a0.clone().add(b0).multiplyScalar(0.5).add(new THREE.Vector3(-dir.z,0,dir.x).multiplyScalar(0.5));
+  const curve = new THREE.QuadraticBezierCurve3(a0, ctrl, b0);
+  const p = person(0x4a5a9c, 0x2f3a70); p.scale.setScalar(0.92); island.add(p);
+  const tan = new THREE.Vector3(), pos = new THREE.Vector3();
+  addActor({ id:"walkerPath", node:p, h:1.45, moves:true, pauseOnHover:true,
+    line:"拖曳可以旋轉島嶼，滾輪可以縮放，換個角度看看吧！",
+    update(t){ const ph = t*0.075, u = 0.22 + (0.5 - 0.5*Math.cos(ph)) * 0.72, back = Math.sin(ph) < 0;
+      curve.getPoint(u, pos); curve.getTangent(u, tan); if (back) tan.negate();
+      p.position.set(pos.x + tan.z*0.22, Y0, pos.z - tan.x*0.22); p.rotation.y = Math.atan2(tan.x, tan.z); walkPose(p, t, 3.0); },
+    react(k, t){ p.userData.armL.rotation.set(p.userData.armL.rotation.x*(1-k), 0, waveZ(-1, k, t)); p.userData.head.rotation.x = -0.3*k; p.position.y += hop(k, t); } });
+}
+// 5. 貓頭鷹：在觀星塔與城堡之間的上空慢慢盤旋
+{
+  const o = new THREE.Group();
+  const body = mesh(new THREE.IcosahedronGeometry(0.22,1), mat(0xf1ece0)); body.scale.set(0.85,1,1.25); o.add(body);
+  const head = mesh(new THREE.IcosahedronGeometry(0.17,1), mat(0xf7f3ea)); head.position.set(0,0.12,0.24); o.add(head);
+  const beak = mesh(new THREE.ConeGeometry(0.035,0.08,4), mat(C.yellow), false, false); beak.rotation.x = Math.PI/2; beak.position.set(0,0.09,0.42); o.add(beak);
+  for (const ex of [-0.07,0.07]){ const e = mesh(new THREE.IcosahedronGeometry(0.03,0), mat(0x2c2a35), false, false); e.position.set(ex,0.16,0.38); o.add(e); }
+  const wings = [];
+  for (const sx of [-1,1]){ const w = new THREE.Group(); w.position.set(sx*0.14,0.05,0);
+    const f = mesh(new THREE.BoxGeometry(0.55,0.03,0.3), mat(0xe2dccb)); f.position.x = sx*0.28; w.add(f); o.add(w); wings.push([w,sx]); }
+  const tail = mesh(new THREE.BoxGeometry(0.2,0.03,0.2), mat(0xe2dccb)); tail.position.set(0,0,-0.3); o.add(tail);
+  const ctr = at(0, -6.5); world.add(o);
+  addActor({ id:"owl", node:o, h:0.6, r:0.75, cy:0.05, moves:true, pauseOnHover:true,
+    line:"咕咕！迷路了嗎？按下方選單的「返回島嶼全景」就能回來。",
+    update(t){ const a = t*0.22, r = 4.6;
+      o.position.set(ctr.x + Math.cos(a)*r, 9.3 + Math.sin(t*0.5)*0.35, ctr.z + Math.sin(a)*r*0.8);
+      o.rotation.set(0, -a, -0.18);
+      const flap = Math.sin(t*5.5)*0.55; for (const [w,sx] of wings) w.rotation.z = sx*flap; },
+    react(k, t){ o.rotation.z = -0.18*(1-k) + (REDUCED ? 0 : Math.sin(t*3)*0.15*k);   // 停在空中、歪頭
+      head.rotation.z = 0.35*k; o.position.y += hop(k, t)*0.6;
+      const flap = REDUCED ? 0.4 : Math.sin(t*11)*0.75; for (const [w,sx] of wings) w.rotation.z = w.rotation.z*(1-k) + sx*flap*k; } });
+}
+// 6. 黑貓：在廣場石板上打盹，尾巴輕輕擺動
+{
+  const c = new THREE.Group(), BLACK = 0x26232e;
+  const body = mesh(new THREE.IcosahedronGeometry(0.18,1), mat(BLACK)); body.scale.set(1.35,0.75,1); body.position.y = 0.13; c.add(body);
+  const head = mesh(new THREE.IcosahedronGeometry(0.11,1), mat(BLACK)); head.position.set(0.24,0.14,0.06); c.add(head);
+  for (const ez of [-0.05,0.05]){ const e = mesh(new THREE.ConeGeometry(0.04,0.08,4), mat(BLACK), false, false); e.position.set(0.25,0.25,0.06+ez); c.add(e); }
+  const tailP = new THREE.Group(); tailP.position.set(-0.22,0.1,0);
+  const tail = mesh(new THREE.CylinderGeometry(0.02,0.03,0.3,5), mat(BLACK)); tail.rotation.z = Math.PI/2; tail.position.x = -0.14; tailP.add(tail); c.add(tailP);
+  const cp = at(-1.0, 1.6); c.position.set(cp.x, Y0 + 0.11, cp.z); c.rotation.y = 0.9; island.add(c);
+  addActor({ id:"cat", node:c, h:0.55, r:0.5, cy:0.15,
+    line:"喵～（伸個懶腰，翻身繼續睡）",
+    update(t){ tailP.rotation.y = Math.sin(t*1.3)*0.5; body.scale.y = 0.75 + Math.sin(t*1.1)*0.025; head.position.y = 0.14; head.rotation.z = 0; },
+    react(k, t){ head.position.y = 0.14 + 0.09*k; head.rotation.z = 0.35*k; body.scale.y = 0.75 + 0.12*k;   // 抬頭醒來
+      tailP.rotation.y = tailP.rotation.y*(1-k) + (REDUCED ? 0.6 : Math.sin(t*4.5)*0.8)*k; } });
+}
+for (const a of actors) a.update(0);   // 先擺好初始姿勢（動畫關閉時就停在這個姿勢）
+
+/* clouds */
+const clouds = [];
+const cloudGeo = new THREE.IcosahedronGeometry(1, 0);
+const mkCloudMat = () => new THREE.MeshLambertMaterial({ color:0xe2dce8, flatShading:true, emissive:0x6a6488, emissiveIntensity:0.4, transparent:true, opacity:0.95 });   // 淡灰紫色的傍晚雲
+for (let i=0;i<9;i++){
+  const g = new THREE.Group(); const cloudMat = mkCloudMat(); g.userData.mat = cloudMat;
+  const n = 3 + Math.floor(R()*3);
+  for (let k=0;k<n;k++){ const m = new THREE.Mesh(cloudGeo, cloudMat); m.position.set((k-n/2)*1.2 + R()*0.4, R()*0.5, R()*0.8-0.4); m.scale.setScalar(0.8 + R()*0.8); m.scale.y *= 0.75; g.add(m); }
+  const low = i >= 6;
+  Object.assign(g.userData, { a: R()*Math.PI*2, r: low ? 15 + R()*5 : 23 + R()*7, y: low ? -11 - R()*4 : 14 + R()*6, sp: (0.012 + R()*0.02) * (R()<0.5?1:-1) });
+  g.scale.setScalar(low ? 1.1 : 0.85 + R()*0.45);
+  // 先放到軌道上的初始位置；減少動態效果時動畫迴圈不會移動雲，若不在這裡設定，雲會停在島中央
+  g.position.set(Math.cos(g.userData.a)*g.userData.r, g.userData.y, Math.sin(g.userData.a)*g.userData.r);
+  g.rotation.y = -g.userData.a;
+  scene.add(g); clouds.push(g);
+}
+
+/* ---------- 黃昏天空與魔法特效 ---------- */
+scene.fog = new THREE.Fog(0x8a87ac, 62, 170);   // 很淡的環境霧：只讓遠處的雲、小岩塊、島底淡出，增加景深
+const pointsMat = (color, size, opacity=1) => new THREE.PointsMaterial({ color, size, map:GLOW_TEX, transparent:true, opacity, depthWrite:false, blending:THREE.AdditiveBlending, fog:false });
+// 星星：島嶼漂浮在夜空中，四周（含下方）都有星星
+{
+  const N = coarse ? 500 : 900, pos = new Float32Array(N*3), col = new Float32Array(N*3), c = new THREE.Color();
+  for (let i=0;i<N;i++){
+    const th = R()*Math.PI*2, ph = Math.acos(1 - 2*R()), r = 170 + R()*30;
+    pos.set([r*Math.sin(ph)*Math.cos(th), r*Math.cos(ph), r*Math.sin(ph)*Math.sin(th)], i*3);
+    c.setHSL(0.58 + R()*0.12, 0.5, 0.72 + R()*0.28); col.set([c.r, c.g, c.b], i*3);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos,3)); g.setAttribute("color", new THREE.BufferAttribute(col,3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ size:1.6, sizeAttenuation:false, vertexColors:true, transparent:true, opacity:0.5, depthWrite:false, fog:false })   /* 黃昏：星星剛出現，比較淡 */));
+}
+// 環繞島嶼的金色光帶（略微傾斜的橢圓）
+const magicRing = new THREE.Group(); magicRing.rotation.set(0.16, 0, -0.08); world.add(magicRing);
+{
+  const N = coarse ? 100 : 150, pos = new Float32Array(N*3);   // 精簡：光帶點數約減 60%
+  for (let i=0;i<N;i++){
+    const a = i/N*Math.PI*2, r = 13.2 + (R()-0.5)*0.9;
+    pos.set([Math.cos(a)*r, -1.2 + (R()-0.5)*0.5 + Math.sin(a*3)*0.25, Math.sin(a)*r*0.92], i*3);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos,3));
+  magicRing.add(new THREE.Points(g, pointsMat(0xf0cf8a, 0.36, 0.5)));
+}
+// 漂浮蠟燭：精簡為 12 支，只放在島嶼外圍的兩側與後方、城堡尖塔以下，不擋住建築與畫面上方
+const CANDLE_N = 12;
+const candles = [];
+const candleBody = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.09,0.1,0.36,6), new THREE.MeshLambertMaterial({ color:0xf3e8cf, emissive:0x4a3a20, emissiveIntensity:0.6, flatShading:true }), CANDLE_N);
+candleBody.castShadow = false;
+const flameGeo = new THREE.BufferGeometry(); const flamePos = new Float32Array(CANDLE_N*3);
+{
+  let n = 0, tries = 0;
+  while (n < CANDLE_N && tries < 800){
+    tries++;
+    const a = R()*Math.PI*2, r = 9.5 + R()*4.5, y = 4.2 + R()*3.0;
+    const x = Math.cos(a)*r, z = Math.sin(a)*r;
+    if ((x*V.x + z*V.z) / r > 0.25) continue;                                // 鏡頭正前方不放，避免擋住建築
+    if (Math.hypot(x - castlePos.x, z - castlePos.z) < 7.2) continue;        // 不要插進城堡
+    candles.push({ x, y0:y, z, ph:R()*6.28 }); n++;
+  }
+  candleBody.count = candles.length;
+  flameGeo.setAttribute("position", new THREE.BufferAttribute(flamePos,3));
+}
+const flames = new THREE.Points(flameGeo, pointsMat(0xf5c47a, 1.5, 0.85));
+world.add(candleBody, flames);
+const _m4 = new THREE.Matrix4();
+function placeCandles(t){
+  candles.forEach((c,i)=>{
+    const y = c.y0 + (REDUCED ? 0 : Math.sin(t*0.45 + c.ph)*0.2);   // 緩慢漂浮
+    _m4.makeTranslation(c.x, y, c.z); candleBody.setMatrixAt(i, _m4);
+    flamePos[i*3] = c.x; flamePos[i*3+1] = y + 0.3; flamePos[i*3+2] = c.z;
+  });
+  candleBody.instanceMatrix.needsUpdate = true; flameGeo.attributes.position.needsUpdate = true;
+}
+placeCandles(0);
+// 螢火蟲光點
+const fireflies = [];
+const FF_N = 24;   // 精簡：60 → 24
+const ffGeo = new THREE.BufferGeometry(); const ffPos = new Float32Array(FF_N*3);
+for (let i=0;i<FF_N;i++){ const a = R()*Math.PI*2, r = 2 + R()*8.5; fireflies.push({ x:Math.cos(a)*r, y:Y0 + 0.6 + R()*2.4, z:Math.sin(a)*r, ph:R()*6.28 }); }
+ffGeo.setAttribute("position", new THREE.BufferAttribute(ffPos,3));
+const ffPoints = new THREE.Points(ffGeo, pointsMat(0xf2dc9a, 0.3, 0.7)); island.add(ffPoints);
+function placeFireflies(t){
+  fireflies.forEach((f,i)=>{ ffPos[i*3] = f.x + Math.sin(t*0.5 + f.ph)*0.4; ffPos[i*3+1] = f.y + Math.sin(t*0.9 + f.ph*2)*0.25; ffPos[i*3+2] = f.z + Math.cos(t*0.45 + f.ph)*0.4; });
+  ffGeo.attributes.position.needsUpdate = true;
+}
+placeFireflies(0);
+// 滑鼠移到建築（或名牌）上時，才在該建築周圍緩緩升起少量暖金光點；動畫關閉時不顯示
+const SPK_N = 18, spkPos = new Float32Array(SPK_N*3), spkSeed = [];
+for (let i=0;i<SPK_N;i++) spkSeed.push({ a:R()*Math.PI*2, r:2.2 + R()*1.2, ph:R(), sp:0.18 + R()*0.12 });
+const spkGeo = new THREE.BufferGeometry(); spkGeo.setAttribute("position", new THREE.BufferAttribute(spkPos,3));
+const spkMat = pointsMat(0xffdca0, 0.42, 0); const sparkles = new THREE.Points(spkGeo, spkMat); sparkles.visible = false; island.add(sparkles);
+let spkFor = null;
+function updateSparkles(t, dt, id){
+  const want = (!REDUCED && id) ? 0.85 : 0;
+  spkMat.opacity += (want - spkMat.opacity) * damp(want ? 4 : 6, dt);
+  sparkles.visible = spkMat.opacity > 0.02;
+  if (want) spkFor = id;
+  if (!sparkles.visible || !spkFor) return;
+  const isCastle = spkFor === "about";
+  const c = isCastle ? castle.position : buildings[spkFor].pos, base = isCastle ? Y0 + CASTLE_LIFT : Y0, sc = isCastle ? 1.6 : 1;
+  spkSeed.forEach((s,i)=>{ const k = (t*s.sp + s.ph) % 1;
+    spkPos[i*3] = c.x + Math.cos(s.a + t*0.15)*s.r*sc; spkPos[i*3+1] = base + 0.4 + k*4.2*sc; spkPos[i*3+2] = c.z + Math.sin(s.a + t*0.15)*s.r*sc; });
+  spkGeo.attributes.position.needsUpdate = true;
+}
+// 瀑布：從島嶼左右兩側邊緣流下（呼應「水的流動」）
+const fallTex = (()=>{ const c = document.createElement("canvas"); c.width = 64; c.height = 256; const g = c.getContext("2d");
+  for (let i=0;i<46;i++){ const x = Math.random()*64, w = 1 + Math.random()*3; const gr = g.createLinearGradient(0,0,0,256);
+    gr.addColorStop(0,"rgba(255,255,255,0)"); gr.addColorStop(0.3+Math.random()*0.3,"rgba(255,255,255,.9)"); gr.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(x, 0, w, 256); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t; })();
+const falls = [];
+[at(-11.25, 1.2), at(11.25, -1.6)].forEach(p=>{
+  const dir = new THREE.Vector3(p.x, 0, p.z).normalize();
+  const tex = fallTex.clone(); tex.needsUpdate = true; tex.repeat.set(1, 1.6);
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 7.5), new THREE.MeshBasicMaterial({ map:tex, color:0xcfeaff, transparent:true, opacity:0.8, depthWrite:false, side:THREE.DoubleSide }));
+  plane.position.set(p.x, Y0 - 3.6, p.z); plane.rotation.y = Math.atan2(dir.x, dir.z);   // 面朝島外
+  island.add(plane);
+  const lip = mesh(new THREE.BoxGeometry(1.5, 0.08, 1.2), new THREE.MeshLambertMaterial({ color:C.water, transparent:true, opacity:0.85 }), false, false);
+  lip.position.set(p.x - dir.x*0.5, Y0 + 0.03, p.z - dir.z*0.5); lip.rotation.y = Math.atan2(dir.x, dir.z); island.add(lip);
+  const mist = glowSprite(0xcfe6ff, 3.2, Y0 - 7.2); mist.position.x = p.x; mist.position.z = p.z; mist.material.opacity = 0.35; island.add(mist);
+  falls.push(tex);
+});
+
+/* ---------- camera & controls ---------- */
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.055;   // 拖曳放開後的慣性滑行
+controls.enablePan = false;
+controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.8;
+controls.minPolarAngle = 0.32; controls.maxPolarAngle = 1.32;
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
+const HOME_TARGET = at(0, -3.6).setY(2.6);   // 稍微往後、往上，讓後方的城堡也完整進入全景
+const POLAR = 0.98;   // 稍微再俯視一點：後方城堡的大門與階梯會高過中央塔樓
+const HOME_DIR = new THREE.Vector3(Math.sin(Math.PI/4)*Math.sin(POLAR), Math.cos(POLAR), Math.cos(Math.PI/4)*Math.sin(POLAR)).normalize();
+function homeDistance(){
+  const aspect = viewAspect();
+  const vHalf = THREE.MathUtils.degToRad(camera.fov/2);
+  const hHalf = Math.atan(Math.tan(vHalf)*aspect);
+  const radius = aspect < 0.8 ? 15.2 : 15.8;
+  const d = radius / Math.sin(Math.min(vHalf, hHalf));
+  return Math.max(30, Math.min(d, 95));
+}
+function updateLimits(){ const hd = homeDistance(); controls.minDistance = 11; controls.maxDistance = hd * 1.3; return hd; }
+let hd = updateLimits();
+camera.position.copy(HOME_TARGET).addScaledVector(HOME_DIR, hd);
+controls.target.copy(HOME_TARGET);
+controls.update();
+
+/* frame-rate independent smoothing: fraction to move this frame for a given "speed" */
+const damp = (speed, dt) => 1 - Math.exp(-speed * dt);
+
+/* view offset (shift scene left when the desktop panel is open) */
+let viewShift = 0, viewShiftTarget = 0;
+/* 手機直式：標題卡橫跨上方，把場景往下移到「標題卡下緣～底部選單上緣」的正中間，城堡才不會被標題卡蓋住 */
+let viewShiftY = 0, viewShiftYTarget = 0;
+function applyViewOffset(){
+  const w = Math.max(innerWidth, 1), h = Math.max(innerHeight, 1);
+  if (Math.abs(viewShift) < 0.25 && Math.abs(viewShiftY) < 0.25) camera.clearViewOffset();
+  else camera.setViewOffset(w, h, viewShift, -viewShiftY, w, h);
+}
+function panelShift(open){
+  if (!open || KI.isMobile()) return 0;
+  const pw = KI.panelEl.getBoundingClientRect().width || Math.min(620, innerWidth);
+  return Math.min(pw, innerWidth*0.6) / 2;
+}
+
+/* ---------- smooth wheel zoom (mouse / trackpad) ---------- */
+let zoomGoal = null, lastWheel = 0;
+const _off = new THREE.Vector3();
+window.addEventListener("wheel", e=>{
+  if (e.target !== canvas && !(e.target.closest && e.target.closest(".blabel"))) return;
+  e.preventDefault(); e.stopPropagation();          // 交給下面的平滑縮放，不讓 OrbitControls 一格一格跳
+  if (tween) return;
+  let dy = e.deltaY; if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= innerHeight;
+  dy = THREE.MathUtils.clamp(dy, -240, 240);
+  const cur = zoomGoal ?? camera.position.distanceTo(controls.target);
+  zoomGoal = THREE.MathUtils.clamp(cur * Math.exp(dy * 0.0009), controls.minDistance, controls.maxDistance);
+  lastWheel = performance.now(); bumpIdle();
+}, { capture:true, passive:false });
+function stepZoom(dt){
+  if (zoomGoal === null) return;
+  _off.copy(camera.position).sub(controls.target);
+  const d = _off.length();
+  const nd = d + (zoomGoal - d) * damp(9, dt);
+  camera.position.copy(controls.target).addScaledVector(_off.normalize(), nd);
+  if (Math.abs(zoomGoal - nd) < 0.01) zoomGoal = null;
+}
+
+/* ---------- cinematic camera flights: arc around the target, not a straight line ---------- */
+let tween = null;
+const easeInOut = t => t < 0.5 ? 16*t*t*t*t*t : 1 - Math.pow(-2*t + 2, 5)/2;      // quintic: 起步與停下都很柔
+const easeOutTarget = t => 1 - Math.pow(1 - t, 3);
+const sph0 = new THREE.Spherical(), sph1 = new THREE.Spherical(), sphT = new THREE.Spherical();
+function flyTo(pos, target){
+  zoomGoal = null;
+  const p0 = camera.position.clone(), t0 = controls.target.clone();
+  sph0.setFromVector3(p0.clone().sub(t0)); sph1.setFromVector3(pos.clone().sub(target));
+  let dTheta = sph1.theta - sph0.theta;
+  dTheta = Math.atan2(Math.sin(dTheta), Math.cos(dTheta));               // 走最短的旋轉方向
+  const travel = Math.abs(dTheta) * 8 + Math.abs(sph1.radius - sph0.radius) + t0.distanceTo(target);
+  // 減少動態效果：不繞弧線、不拉高，改成約 0.35 秒的直線平移，避免瞬間跳動又不造成大幅晃動
+  const dur = REDUCED ? 350 : THREE.MathUtils.clamp(900 + travel * 28, 1100, 1900);
+  const lift = REDUCED ? 0 : Math.min(0.12, Math.abs(dTheta) * 0.08) * Math.max(sph0.radius, sph1.radius);  // 轉大角度時略微拉遠，像空拍
+  tween = { reduced: REDUCED, t0, t1: target.clone(), p0, p1: pos.clone(), r0: sph0.radius, r1: sph1.radius, ph0: sph0.phi, ph1: sph1.phi, th0: sph0.theta, dTheta, lift, start: performance.now(), dur };
+  controls.enabled = false;
+}
+function stepTween(now){
+  if (!tween) return;
+  const k = Math.min(1, (now - tween.start)/tween.dur);
+  if (tween.reduced){   // 用開始飛行當下的模式走完，飛到一半切換開關也不會跳動
+    const e = easeOutTarget(k);
+    controls.target.lerpVectors(tween.t0, tween.t1, e);
+    camera.position.lerpVectors(tween.p0, tween.p1, e);
+    camera.lookAt(controls.target);
+    if (k >= 1){ tween = null; controls.enabled = true; controls.update(); }
+    return;
+  }
+  const e = easeInOut(k), et = easeOutTarget(Math.min(1, k*1.15));
+  controls.target.lerpVectors(tween.t0, tween.t1, et);
+  sphT.radius = THREE.MathUtils.lerp(tween.r0, tween.r1, e) + Math.sin(Math.PI * e) * tween.lift;
+  sphT.phi = THREE.MathUtils.lerp(tween.ph0, tween.ph1, e);
+  sphT.theta = tween.th0 + tween.dTheta * e;
+  camera.position.setFromSpherical(sphT).add(controls.target);
+  camera.lookAt(controls.target);
+  if (k >= 1){ tween = null; controls.enabled = true; controls.update(); }
+}
+function cancelTween(){ if (tween){ tween = null; controls.enabled = true; } }
+
+/* ---------- gentle idle auto-rotate (eases in/out, stops on any interaction) ---------- */
+let lastInteract = performance.now(), autoSpeed = 0;
+function bumpIdle(){ lastInteract = performance.now(); }
+["pointerdown","keydown","touchstart"].forEach(ev => addEventListener(ev, bumpIdle, { passive:true }));
+
+/* ---------- labels ---------- */
+const labelLayer = document.getElementById("labels");
+const labels = {};
+const nums = { history:"1", diagnosis:"2", strategy:"3" };
+for (const id of Object.keys(buildings)){
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "blabel b-" + id;
+  b.innerHTML = '<span class="num">' + nums[id] + '</span><span>' + KI.names[id] + '</span><span class="go">｜' + (KI.subs ? KI.subs[id] + '・' : '') + '點我進入</span>';
+  b.setAttribute("aria-label", "開啟" + KI.names[id]);
+  b.addEventListener("click", ()=> KI.open(id));
+  b.addEventListener("pointerenter", ()=> setHover(id));
+  b.addEventListener("pointerleave", ()=> setHover(null));
+  labelLayer.appendChild(b); labels[id] = b;
+}
+// 城堡名牌：開啟網站說明
+{
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "blabel b-about";
+  b.innerHTML = '<span class="num">✦</span><span>學院城堡</span><span class="go">｜網站說明</span>';
+  b.setAttribute("aria-label", "開啟網站說明與資料聲明");
+  b.addEventListener("click", ()=> KI.open("about"));
+  b.addEventListener("pointerenter", ()=> setHover("about"));
+  b.addEventListener("pointerleave", ()=> setHover(null));
+  labelLayer.appendChild(b); labels.about = b;
+}
+const anchors = {
+  history:[buildings.history.group, 4.4], diagnosis:[buildings.diagnosis.group, 6.9],
+  strategy:[buildings.strategy.group, 4.4], about:[castle, castle.userData.labelY]
+};
+const tmpV = new THREE.Vector3();
+const topbarEl = document.getElementById("topbar"), dockEl = document.getElementById("dock");
+/* 角色對話泡泡：跟著被移到（或點到）的角色，畫在角色頭上 */
+const bubbleEl = document.getElementById("charBubble"); let bubbleFor = null;
+const _bv = new THREE.Vector3();
+function updateBubble(){
+  const a = charHovered && actors.find(x => x.id === charHovered);
+  if (!a || panelOpen){ bubbleEl.classList.remove("show"); return; }
+  if (bubbleFor !== a.id){ bubbleEl.textContent = a.line; bubbleFor = a.id; }
+  _bv.set(0, a.h, 0); a.node.localToWorld(_bv); _bv.project(camera);
+  if (_bv.z > 1){ bubbleEl.classList.remove("show"); return; }
+  const bw = bubbleEl.offsetWidth, bh = bubbleEl.offsetHeight;
+  const x = Math.min(Math.max((_bv.x*0.5 + 0.5) * innerWidth, bw/2 + 8), innerWidth - bw/2 - 8);
+  const y = Math.max((-_bv.y*0.5 + 0.5) * innerHeight, bh + 12);
+  bubbleEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, calc(-100% - 8px))`;
+  bubbleEl.classList.add("show");
+}
+function updateLabels(){
+  const w = innerWidth, h = innerHeight;
+  // 先讀取版面尺寸（全部讀完再寫入，避免每幀強制重排）
+  const tb = topbarEl ? topbarEl.getBoundingClientRect() : null;
+  const dk = dockEl ? dockEl.getBoundingClientRect() : null;
+  const sizes = {};
+  for (const id in labels) sizes[id] = [labels[id].offsetWidth, labels[id].offsetHeight];
+  // 手機或直式螢幕（例如直放的平板）：把場景下移到標題卡與底部選單之間
+  viewShiftYTarget = (tb && dk && tb.width > 0 && dk.width > 0 && (KI.isMobile() || w < h) && !panelOpen) ? Math.max(0, (tb.bottom - (h - dk.top)) / 2) : 0;
+  for (const id in labels){
+    const [obj, ay0] = anchors[id];
+    const ay = obj.userData.modelTop ? obj.userData.modelTop + 1.0 : ay0;   // 換成模型後，名牌放在模型頂端上方
+    tmpV.set(0, ay, 0); obj.localToWorld(tmpV);
+    const camDist = tmpV.distanceTo(camera.position);
+    tmpV.project(camera);
+    const el = labels[id];
+    if (tmpV.z > 1 || tmpV.z < -1){ el.style.display = "none"; continue; }
+    el.style.display = "";
+    // 投影矩陣已經包含畫面平移（setViewOffset），這裡不可以再扣一次 viewShift，否則面板打開時名牌會偏離建築
+    const x = (tmpV.x*0.5 + 0.5) * w; let y = (-tmpV.y*0.5 + 0.5) * h;
+    // 標籤若被左上標題卡或下方選單蓋住，就移到它們旁邊，維持可讀、可點
+    const [lw, lh] = sizes[id], GAP = 6, ARROW = 6;
+    const overlapsX = r => r && r.width > 0 && x + lw/2 > r.left - GAP && x - lw/2 < r.right + GAP;
+    // 標籤本體在 y 上方（高 lh），小箭頭在 y 下方（高 ARROW）
+    if (overlapsX(tb) && y - lh < tb.bottom + GAP && y + ARROW > tb.top - GAP) y = tb.bottom + GAP + lh;
+    if (overlapsX(dk) && y + ARROW > dk.top - GAP && y - lh < dk.bottom + GAP) y = dk.top - GAP - ARROW;
+    el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -100%)`;
+    el.style.zIndex = String(1000 - Math.round(camDist*10));
+  }
+}
+
+/* ---------- picking & hover ---------- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let hovered = null, charHovered = null, charTapTimer = 0;
+const pickTargets = [...hitboxes, ...charHits];
+/* 取最靠近鏡頭的建築或角色：角色站在建築前面時，以角色為準 */
+function pickAny(cx, cy){
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((cx - r.left)/r.width)*2 - 1, -((cy - r.top)/r.height)*2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickTargets, false)[0];
+  if (!hit) return null;
+  return hit.object.userData.charId ? { char:true, id:hit.object.userData.charId } : { char:false, id:hit.object.userData.id };
+}
+function pick(cx, cy){ const h = pickAny(cx, cy); return h && !h.char ? h.id : null; }
+function setCharHover(id){ if (charHovered !== id){ charHovered = id; clearTimeout(charTapTimer); } }
+function setHover(id){
+  hovered = id;
+  for (const k in labels) labels[k].classList.toggle("hot", k === id);
+  canvas.style.cursor = id ? "pointer" : "grab";
+}
+let down = null;
+canvas.addEventListener("pointerdown", e=>{ cancelTween(); zoomGoal = null; down = { x:e.clientX, y:e.clientY, t:performance.now() }; if (e.pointerType === "mouse") canvas.style.cursor = "grabbing"; });
+canvas.addEventListener("pointermove", e=>{ if (e.pointerType !== "mouse" || (down && e.buttons)) return;
+  const h = pickAny(e.clientX, e.clientY); setHover(h && !h.char ? h.id : null); setCharHover(h && h.char ? h.id : null); });
+canvas.addEventListener("pointerleave", ()=>{ setHover(null); setCharHover(null); });
+window.addEventListener("pointerup", e=>{
+  if (!down) return;
+  const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t;
+  const wasOnCanvas = e.target === canvas; down = null;
+  if (e.pointerType === "mouse") setHover(wasOnCanvas ? pick(e.clientX, e.clientY) : null);
+  if (wasOnCanvas && moved < (e.pointerType === "mouse" ? 6 : 12) && dt < 700){
+    const h = pickAny(e.clientX, e.clientY);
+    if (h && h.char){   // 點到角色：打招呼 3.5 秒（手機沒有滑鼠移入，用點一下代替）
+      setCharHover(h.id); const id = h.id;
+      charTapTimer = setTimeout(()=>{ if (charHovered === id) charHovered = null; }, 3500);
+    } else if (h) KI.open(h.id);
+  }
+});
+canvas.style.cursor = "grab";
+
+/* ---------- public API used by the panel ---------- */
+let focusedId = null, panelOpen = false;
+window.Island3D = {
+  focus(id){
+    const b = buildings[id]; if (!b) return;
+    focusedId = id; panelOpen = true; bumpIdle();
+    const target = new THREE.Vector3(); b.group.getWorldPosition(target); target.y += 1.2;
+    const front = plaza.clone().sub(b.pos).setY(0).normalize();
+    const dir = front.multiplyScalar(0.78).add(new THREE.Vector3(0,0.62,0)).add(V.clone().multiplyScalar(0.25)).normalize();
+    const dist = KI.isMobile() ? 24 : 29;
+    flyTo(target.clone().addScaledVector(dir, dist), target);
+    viewShiftTarget = panelShift(true);
+  },
+  panelChanged(open){ panelOpen = open; viewShiftTarget = panelShift(open); },
+  home(){
+    focusedId = null; panelOpen = false; viewShiftTarget = 0; bumpIdle();
+    hd = updateLimits();
+    flyTo(HOME_TARGET.clone().addScaledVector(HOME_DIR, hd), HOME_TARGET);
+  }
+};
+
+/* ---------- resize ---------- */
+function onResize(){
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = viewAspect(); camera.updateProjectionMatrix();
+  const old = hd; hd = updateLimits();
+  // 萬一鏡頭位置已經壞掉（NaN），直接回到島嶼全景位置
+  const broken = !Number.isFinite(camera.position.x + camera.position.y + camera.position.z);
+  if (broken){
+    tween = null; zoomGoal = null; controls.enabled = true;
+    controls.target.copy(HOME_TARGET);
+    camera.position.copy(HOME_TARGET).addScaledVector(HOME_DIR, hd);
+    controls.update();
+  } else if (!focusedId && !tween && Math.abs(camera.position.distanceTo(controls.target) - old) < 0.5){
+    // 先算好方向再移動鏡頭；若先 copy 再算方向，方向會變成 0，鏡頭會掉到目標點上
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir, hd);
+  }
+  viewShiftTarget = panelShift(panelOpen);
+}
+addEventListener("resize", onResize);
+addEventListener("orientationchange", ()=> setTimeout(onResize, 200));
+
+/* ---------- adaptive resolution: keep the frame rate smooth on slower devices ---------- */
+const maxDPR = Math.min(devicePixelRatio || 1, coarse ? 1.75 : 2);
+let curDPR = maxDPR, fpsAcc = 0, fpsN = 0, fpsCheck = performance.now() + 2500;
+function adaptQuality(dt, now){
+  fpsAcc += dt; fpsN++;
+  if (now < fpsCheck) return;
+  const fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; fpsCheck = now + 2000;
+  let next = curDPR;
+  if (fps < 45 && curDPR > 1) next = Math.max(1, curDPR - 0.25);
+  else if (fps > 58 && curDPR < maxDPR) next = Math.min(maxDPR, curDPR + 0.25);
+  if (next !== curDPR){ curDPR = next; renderer.setPixelRatio(curDPR); renderer.setSize(innerWidth, innerHeight, false); }
+}
+
+/* ---------- loop ---------- */
+const clock = new THREE.Clock();
+let first = true, skipped = false;
+function frame(now){
+  requestAnimationFrame(frame);
+  // mobile: panel covers everything, skip rendering to save battery
+  if (panelOpen && KI.isMobile() && !tween && !first){ skipped = true; return; }
+  let dt = clock.getDelta(); const t = clock.elapsedTime;
+  if (skipped){ dt = 0.016; skipped = false; }
+  dt = Math.min(dt, 0.05);
+  if (!first) adaptQuality(dt, now);
+
+  // idle auto-rotate, eased so it never starts or stops abruptly
+  const idle = !panelOpen && !tween && !REDUCED && (now - lastInteract > 7000);
+  autoSpeed += ((idle ? 0.35 : 0) - autoSpeed) * damp(idle ? 0.8 : 6, dt);
+  controls.autoRotate = autoSpeed > 0.002; controls.autoRotateSpeed = autoSpeed;
+
+  stepTween(now);
+  if (!tween){ stepZoom(dt); controls.update(dt); }
+  viewShift += (viewShiftTarget - viewShift) * damp(REDUCED ? 14 : 5.5, dt);   // 減少動態時也用很快的滑動，不直接跳
+  viewShiftY += (viewShiftYTarget - viewShiftY) * (first ? 1 : damp(REDUCED ? 14 : 5.5, dt));
+  applyViewOffset();
+  if (!REDUCED){
+    island.position.y = Math.sin(t*0.6)*0.14;
+    for (const s of swayers){ s.rotation.z = Math.sin(t*1.1 + s.userData.ph)*0.025; s.rotation.x = Math.cos(t*0.9 + s.userData.ph)*0.018; }
+    for (const p of pebbles){ p.position.y = p.userData.y0 + Math.sin(t*0.8 + p.userData.ph)*0.3; p.rotation.y = t*0.1 + p.userData.ph; }
+    for (const c of clouds){ c.userData.a += c.userData.sp * dt; c.position.set(Math.cos(c.userData.a)*c.userData.r, c.userData.y + Math.sin(t*0.3 + c.userData.r)*0.3, Math.sin(c.userData.a)*c.userData.r); c.rotation.y = -c.userData.a; }
+    for (const id in buildings){ const a = buildings[id].group.userData.anim; if (a) a(t); }
+    magicRing.rotation.y = t*0.06;
+    placeCandles(t); placeFireflies(t);
+    for (const tx of falls) tx.offset.y = (tx.offset.y + dt*0.55) % 1;
+  }
+  // 雲只要比島嶼中心更靠近鏡頭就淡出，避免擋在島前面
+  const camToTarget = camera.position.distanceTo(controls.target);
+  for (const c of clouds){
+    const d = c.position.distanceTo(camera.position);
+    const goal = Math.min(THREE.MathUtils.clamp((d - 22) / 14, 0, 0.95), THREE.MathUtils.clamp((d - camToTarget - 4) / 10, 0, 0.95));
+    c.userData.mat.opacity += (goal - c.userData.mat.opacity) * damp(4, dt);
+    c.visible = c.userData.mat.opacity > 0.02;
+  }
+  // 島上角色：動畫開啟時各自做事；被滑鼠移到時平滑轉成打招呼（走路的角色會停下來）
+  for (const a of actors){
+    const want = charHovered === a.id ? 1 : 0;
+    a.k = REDUCED ? want : a.k + (want - a.k) * damp(want ? 8 : 5, dt);
+    if (!REDUCED) a.lt += dt * (a.pauseOnHover ? 1 - a.k : 1);
+    a.update(a.lt);                                  // 每幀都重設姿勢，打招呼結束後會自然回到原本動作
+    if (!a.moves) a.node.position.y = a.y0;
+    if (a.k > 0.005 && a.react) a.react(a.k, t);
+  }
+  updateSparkles(t, dt, hovered);
+  // hover / focus highlight
+  for (const id in buildings){
+    const b = buildings[id];
+    const on = (hovered === id) || (focusedId === id && panelOpen && KI.current() === id);   // 切到其他面板（例如網站說明）時熄掉光環
+    b.hover += ((on ? 1 : 0) - b.hover) * damp(on ? 10 : 6, dt);
+    const s = 1 + b.hover*0.035; b.group.scale.setScalar(s);
+    for (const m of b.group.userData.mats){ const e0 = m.userData.em0 || 0; m.emissive.setRGB(e0 + 0.16*b.hover, e0 + 0.13*b.hover, e0 + 0.06*b.hover); }
+    hoverRings[id].material.opacity = 0.55*b.hover;
+  }
+  renderer.render(scene, camera);
+  updateLabels();
+  updateBubble();
+  if (first){ first = false; window.__islandReady = true; KI.hideLoading(); }
+}
+requestAnimationFrame(frame);
+window.__islandBuilt = true;   // 場景已建立完成（第一幀要等分頁顯示時才會畫）
+}
+</script>
+</body>
+</html>
