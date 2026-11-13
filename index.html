@@ -41,12 +41,12 @@ button{font-family:inherit;color:inherit}
 
 /* ---------- Top bar ---------- */
 #topbar{position:fixed;top:14px;left:14px;max-width:min(430px,calc(100vw - 28px));z-index:20;color:var(--parch);
-  background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  border:1px solid var(--glass-line);border-radius:var(--radius);box-shadow:0 12px 32px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.04);padding:14px 18px 12px}
+  background:radial-gradient(ellipse 90% 120% at 0% 0%,rgba(110,128,220,.2),transparent 60%),linear-gradient(180deg,rgba(26,30,66,.7),rgba(14,17,40,.78));backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);
+  border:1px solid var(--glass-line);border-radius:var(--radius);box-shadow:0 12px 32px rgba(0,0,0,.4),0 0 34px rgba(150,160,240,.14),inset 0 0 0 1px rgba(255,255,255,.06);padding:14px 18px 12px}
 #topbar .orn{display:flex;align-items:center;gap:.5rem;font-family:var(--serif);font-size:.72rem;letter-spacing:.32em;color:var(--gold);font-weight:700;margin-bottom:.15rem}
 #topbar .orn::before,#topbar .orn::after{content:"";flex:1;max-width:2.2rem;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
 #topbar .orn::after{background:linear-gradient(90deg,var(--gold),transparent)}
-#topbar h1{margin:0;font-family:var(--serif);font-size:1.6rem;font-weight:900;letter-spacing:.06em;line-height:1.25;display:flex;align-items:center;gap:.45rem;color:var(--gold-l);text-shadow:0 0 18px rgba(243,224,168,.35),0 2px 0 rgba(0,0,0,.4)}
+#topbar h1{margin:0;font-family:var(--serif);font-size:1.6rem;font-weight:900;letter-spacing:.1em;line-height:1.25;display:flex;align-items:center;gap:.45rem;color:var(--gold-l);text-shadow:0 0 18px rgba(243,224,168,.35),0 2px 0 rgba(0,0,0,.4)}
 #topbar h1 .logo{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8a3446,var(--wine-d));border:1.5px solid var(--gold);color:var(--gold-l);font-size:.95rem;text-shadow:none;box-shadow:0 0 12px rgba(216,178,106,.45)}
 #topbar .sub{margin:.3rem 0 0;font-family:var(--serif);font-size:.95rem;color:#eadfc4;font-weight:600;font-style:italic}
 #topbar details{margin-top:.55rem}
@@ -64,9 +64,9 @@ button{font-family:inherit;color:inherit}
 #labels{position:fixed;inset:0;pointer-events:none;z-index:10;overflow:hidden}
 .blabel{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;border:0;
   display:flex;align-items:center;gap:.35rem;white-space:nowrap;padding:.26rem .65rem .26rem .3rem;border-radius:999px;
-  background:rgba(20,25,56,.86);border:1px solid rgba(216,190,140,.55);color:#f1e3bd;
-  box-shadow:0 3px 10px rgba(10,12,30,.35);font-family:var(--serif);font-size:.82rem;font-weight:700;letter-spacing:.02em;
-  transform:translate(-50%,-100%);transform-origin:50% 100%;transition:background .2s,border-color .2s,scale .2s;will-change:transform}
+  background:rgba(16,20,48,.93);border:1px solid rgba(226,200,150,.7);color:#f6e9c6;text-shadow:0 1px 2px rgba(0,0,0,.6);
+  box-shadow:0 3px 10px rgba(10,12,30,.45),0 0 0 3px rgba(10,12,30,.18);font-family:var(--serif);font-size:.82rem;font-weight:700;letter-spacing:.02em;
+  transform:translate(-50%,-100%);transform-origin:50% 100%;transition:background .2s,border-color .2s,scale .2s,box-shadow .2s;will-change:transform}
 .blabel .num{display:inline-grid;place-items:center;width:1.25rem;height:1.25rem;border-radius:50%;color:#fff;font-size:.72rem;font-weight:900;flex:none;font-family:var(--font)}
 .blabel .go{font-size:.72rem;font-weight:600;color:#cdbb92;max-width:0;overflow:hidden;transition:max-width .3s cubic-bezier(.22,1,.36,1)}
 .blabel::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);border:6px solid transparent;border-bottom:0;border-top-color:rgba(216,190,140,.75)}
@@ -84,20 +84,62 @@ button{font-family:inherit;color:inherit}
 #charBubble.show{opacity:1}
 /* 第一次進站的導覽小卡（只出現一次，位置貼著下方選單上緣） */
 #guide{position:fixed;left:50%;bottom:90px;transform:translate(-50%,8px);z-index:21;width:min(360px,calc(100vw - 24px));
-  padding:12px 14px 12px 16px;border-radius:14px;background:#fbf4e3;color:var(--ink);border:1px solid var(--gold-d);
-  box-shadow:0 14px 34px rgba(10,12,30,.45);opacity:0;transition:opacity .3s,transform .3s;display:flex;gap:10px;align-items:flex-start}
+  padding:14px 14px 14px 18px;border-radius:16px;color:var(--parch);border:1px solid var(--gold);
+  background:radial-gradient(ellipse 90% 120% at 0% 0%,rgba(110,128,220,.3),transparent 62%),linear-gradient(180deg,rgba(30,36,82,.94),rgba(15,18,44,.96));
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 14px 34px rgba(6,8,24,.55),0 0 26px rgba(243,208,120,.28),inset 0 0 0 1px rgba(255,255,255,.05);opacity:0;transition:opacity .35s,transform .35s cubic-bezier(.22,1,.36,1);display:flex;gap:10px;align-items:flex-start}
+#guide .gttl{font-family:var(--serif);font-weight:900;color:var(--gold-l);font-size:1rem;letter-spacing:.08em;margin-bottom:2px;text-shadow:0 0 12px rgba(243,224,168,.35)}
 #guide.show{opacity:1;transform:translate(-50%,0)}
 #guide[hidden]{display:none}
-#guide::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border:8px solid transparent;border-bottom:0;border-top-color:#fbf4e3}
+#guide::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border:8px solid transparent;border-bottom:0;border-top-color:var(--gold)}
 #guide .gtxt{flex:1;font-size:.92rem;line-height:1.65}
-#guide .gtxt b{color:var(--blue-d)}
+#guide .gtxt b{color:var(--gold-l)}
 #guide .gbtns{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
-#guide .gstart{border:0;border-radius:999px;padding:.45rem .95rem;background:var(--blue-d);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer}
-#guide .gstart:hover{background:var(--blue)}
-#guide .gx{flex:none;border:0;background:transparent;font-size:1.25rem;line-height:1;width:32px;height:32px;border-radius:8px;cursor:pointer;color:var(--ink2)}
-#guide .gx:hover{background:rgba(168,130,60,.18)}
-#guide button:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px}
+#guide .gstart{border:0;border-radius:999px;padding:.45rem 1.05rem;background:linear-gradient(180deg,var(--gold-l),var(--gold));color:#1b1408;font-family:var(--serif);font-weight:900;font-size:.92rem;letter-spacing:.05em;cursor:pointer}
+#guide .gstart:hover{background:linear-gradient(180deg,#fff0c0,var(--gold-l))}
+#guide .gx{flex:none;border:0;background:transparent;font-size:1.25rem;line-height:1;width:32px;height:32px;border-radius:8px;cursor:pointer;color:#d9cfb8}
+#guide .gx:hover{background:rgba(216,178,106,.2);color:var(--gold-l)}
+#guide button:focus-visible{outline:2px solid var(--gold-l);outline-offset:2px}
 html.reduce-motion #guide{transition:none}
+/* ===== 2026-11-14 第二輪：資訊呈現的轉場、重點標記、閱讀動線 ===== */
+:root{--mglow:0 0 0 1px rgba(243,224,168,.55),0 0 14px rgba(243,208,120,.42)}   /* 統一的「魔法光」hover 回饋 */
+#dock button:hover,.iconbtn:hover,.p-nav button:hover,.blabel.hot,.blabel:hover,.blabel:focus-visible,#guide .gstart:hover,.nextstop button:hover{box-shadow:var(--mglow)}
+@keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fadeSwap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+.p-body.enter>*{animation:riseIn .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*75ms + 120ms)}
+.cc-body.swap,.tl-detail.swap{animation:fadeSwap .3s ease both}
+.casecard.slide{animation:slideIn .38s cubic-bezier(.22,1,.36,1) both}
+html.reduce-motion .p-body.enter>*,html.reduce-motion .cc-body.swap,html.reduce-motion .tl-detail.swap,html.reduce-motion .casecard.slide{animation:none}
+/* 統計長條：捲到時從 0 長出來 */
+.bars .seg{transition:width .9s cubic-bezier(.22,1,.36,1)}
+.bars.pre .seg{width:0!important}
+.bars.pre .seg>span:first-child{opacity:0}
+.bars .seg>span:first-child{transition:opacity .4s .5s}
+html.reduce-motion .bars .seg,html.reduce-motion .bars .seg>span:first-child{transition:none}
+/* 面板閱讀進度條 */
+.p-prog{position:absolute;left:0;right:0;bottom:-2px;height:3px;pointer-events:none;overflow:hidden}
+.p-prog i{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--gold-l),#fff3c4);box-shadow:0 0 8px var(--gold-l);transition:transform .15s linear}
+/* 螢光筆：只替既有文字加底色，進場時由左往右畫上 */
+.hl{font-weight:700;background:linear-gradient(transparent 58%,rgba(255,205,86,.62) 58%) no-repeat 0 0/100% 100%;border-radius:2px;padding:0 .08em}
+.p-body.enter .hl,.cc-body.swap .hl{animation:hlDraw .7s ease-out .45s both}
+@keyframes hlDraw{from{background-size:0 100%}to{background-size:100% 100%}}
+html.reduce-motion .hl{animation:none!important}
+body.read-mode .hl{background-image:linear-gradient(transparent 50%,rgba(255,190,40,.8) 50%)}
+/* 修訂前後對照：修訂後題幹中與原題不同的文字 */
+.chg{background:rgba(63,150,88,.2);border-bottom:2px solid var(--pass);border-radius:2px}
+.chg-note{font-size:.84rem;color:var(--ink2);margin:6px 0 0}
+.chg-note i{display:inline-block;width:1.6em;height:.8em;vertical-align:-.05em;margin-right:.3em;background:rgba(63,150,88,.2);border-bottom:2px solid var(--pass)}
+/* 每館最後的「下一站」 */
+.nextstop{margin:6px 0 0;text-align:center}
+.nextstop button{border:1px solid var(--gold-d);background:linear-gradient(180deg,#1f2654,#141938);color:var(--gold-l);font-family:var(--serif);font-weight:700;font-size:1rem;letter-spacing:.04em;
+  border-radius:999px;padding:.7rem 1.4rem;cursor:pointer;transition:transform .15s,box-shadow .2s}
+.nextstop button:hover{transform:translateY(-1px)}
+.nextstop button:focus-visible{outline:2px solid var(--gold-d);outline-offset:2px}
+.nextstop small{display:block;margin-top:6px;color:var(--muted);font-size:.82rem}
+/* 底部選單：看過的建築，圓點上打勾 */
+#dock .dot{position:relative}
+#dock button.visited .dot::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-size:.56rem;line-height:1;color:#fff;font-weight:900;font-family:var(--font)}
 /* 學院城堡不是知識館：用較小、較淡的次要名牌 */
 .blabel.b-about{font-size:.74rem;padding:.2rem .55rem .2rem .25rem;background:rgba(20,25,56,.7)}
 .blabel.b-about .num{width:1.05rem;height:1.05rem;font-size:.62rem}
@@ -170,8 +212,12 @@ html.reduce-motion #musicBtn .note{animation:none!important}   /* 跟著下方�
   #dock button{padding:.55rem .45rem;font-size:.8rem;gap:.28rem;letter-spacing:0}
   #dock .dot{width:.6rem;height:.6rem}
   #dock .long{display:none}#dock .short{display:inline}
-  #topbar{top:10px;left:10px;padding:10px 12px}
-  #topbar h1{font-size:1.2rem}
+  #topbar{top:10px;left:10px;padding:8px 12px 8px}
+  #topbar h1{font-size:1.12rem}
+  #topbar .orn{display:none}
+  #topbar details{margin-top:.15rem}
+  #topbar summary{font-size:.78rem}
+  #topbar:not(.exp) .sub,#topbar:not(.exp) .hint{display:none}   /* 手機把畫面讓給島嶼：副標與操作提示要展開才顯示 */
   #topbar .sub{font-size:.8rem}
   .blabel{font-size:.74rem;padding:.22rem .5rem .22rem .26rem}
   .blabel .num{width:1.1rem;height:1.1rem;font-size:.66rem}
@@ -452,7 +498,7 @@ html.reduce-motion *{transition:none!important;animation:none!important}
 </nav>
 
 <div id="guide" role="dialog" aria-label="第一次來的建議路線" hidden>
-  <div class="gtxt">第一次來嗎？建議從 <b>① AI 命題歷程館</b>開始，依序看完三棟建築。
+  <div class="gtxt"><div class="gttl">✦ 第一次來嗎？</div>建議從 <b>① AI 命題歷程館</b>開始，依序看完三棟建築。
     <div class="gbtns"><button type="button" class="gstart">開始探索</button></div></div>
   <button type="button" class="gx" aria-label="關閉建議" title="關閉">×</button>
 </div>
@@ -472,6 +518,7 @@ html.reduce-motion *{transition:none!important;animation:none!important}
     </div>
     <p class="p-intro" id="pIntro"></p>
     <div class="p-nav" id="pNav" aria-label="面板內導覽"></div>
+    <div class="p-prog" aria-hidden="true"><i id="pProg"></i></div>
   </div>
   <div class="p-body" id="pBody" tabindex="-1"></div>
 </aside>
@@ -660,10 +707,39 @@ function el(html){var t=document.createElement("template");t.innerHTML=html.trim
 function bChips(ids){return ids.map(function(b){return '<span class="chip b-'+b+'">'+esc(BUILDINGS[b].name)+'</span>';}).join("");}
 
 /* ---------------- 題目渲染 ---------------- */
-function renderQuestion(v, mode){
+/* 螢光筆：只在既有文字上替關鍵詞加底色（每段文字每個詞只標第一次），不改任何字 */
+var HL_TERMS=["雙重答案","兩個合理答案","直接提示答案","容易以常識排除","缺乏概念診斷價值","明顯比其他選項長","互相提示","太容易排除","定義「色水」","有瑕疵的實驗設計","應保持一致的條件","重新設計題目","衝突情境","迷思診斷價值","跨題互查","非學科線索","控制變因","逐一確認其他選項不會同時成立","容易混淆的概念"];
+function hl(text){
+  var h=esc(text);
+  HL_TERMS.forEach(function(t){
+    var k=esc(t), i=h.indexOf(k);
+    if(i<0) return;
+    if(h.lastIndexOf("<span",i)>h.lastIndexOf("</span>",i)) return;   // 已在別的標記裡面，不重疊
+    h=h.slice(0,i)+'<span class="hl">'+k+'</span>'+h.slice(i+k.length);
+  });
+  return h;
+}
+/* 修訂前後對照：逐字比對原題與修訂後題幹，回傳加了底色的修訂後題幹；差異太大（幾乎整題重寫）時回傳 null，不標記 */
+function diffStem(a,b){
+  var n=a.length,m=b.length,i,j,dp=[];
+  for(i=0;i<=n;i++){dp.push(new Uint16Array(m+1));}
+  for(i=n-1;i>=0;i--)for(j=m-1;j>=0;j--)dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  if(dp[0][0]/Math.max(n,m)<0.45) return null;
+  var out="",run="",same="";i=0;j=0;
+  function flush(){ if(same){out+=esc(same);same="";} }
+  function flushRun(){ if(run){out+='<span class="chg">'+esc(run)+'</span>';run="";} }
+  while(j<m){
+    if(i<n&&a[i]===b[j]){flushRun();same+=b[j];i++;j++;}
+    else if(i<n&&dp[i+1][j]>=dp[i][j+1]){i++;}
+    else{flush();run+=b[j];j++;}
+  }
+  flush();flushRun();
+  return out;
+}
+function renderQuestion(v, mode, stemHtml){
   var h='<div class="q"><div class="q-meta"><span class="vtag '+v.cls+'">'+esc(v.tag)+'</span><span class="qnum">'+esc(v.num)+'</span></div>';
   if(v.examHeader){h+='<div class="examhead"><span class="tag">原始試卷上方的大標題（會提示答案）</span>'+esc(v.examHeader)+'</div>';}
-  h+='<p class="stem">'+esc(v.stem)+'</p><ol class="opts">';
+  h+='<p class="stem">'+(stemHtml||esc(v.stem))+'</p><ol class="opts">';
   v.options.forEach(function(o){
     var cls="",badge="";
     if(v.answer && o[0]===v.answer){cls="correct";badge='<span class="badge ok">✓ 正確答案</span>';}
@@ -710,21 +786,24 @@ function renderCaseCard(c, building){
     else if(t==="v2") h=renderQuestion(c.v2);
     else if(t==="revised") h=renderQuestion(c.revised);
     else if(t==="compare"){
-      h='<div class="compare"><div>'+renderQuestion(c.original)+'</div><div>'+renderQuestion(c.revised)+'</div></div>';
+      var dh=diffStem(c.original.stem,c.revised.stem);
+      h='<div class="compare"><div>'+renderQuestion(c.original)+'</div><div>'+renderQuestion(c.revised,null,dh)+'</div></div>';
+      if(dh) h+='<p class="chg-note"><i></i>綠色底色：修訂後題幹中，和原始題目不同的文字（由程式逐字比對標示）。</p>';
       if(c.v2) h+='<div class="callout warn" style="margin-top:10px">本案例在初版與第三版之間，還有一個出現<b>雙重答案</b>的第二版（第二版第 20 題），請點選「⚠ 第二版問題」查看。</div>';
-      h+='<div class="dg" style="margin-top:10px"><div class="item fix"><h5>修訂原因</h5><p>'+esc(c.reason)+'</p></div></div>';
+      h+='<div class="dg" style="margin-top:10px"><div class="item fix"><h5>修訂原因</h5><p>'+hl(c.reason)+'</p></div></div>';
     }
     else if(t==="diag"){
-      h='<div class="dg"><div class="item prob"><h5>品質問題</h5><p>'+esc(c.problem)+'</p></div><div class="item fix"><h5>修訂原因</h5><p>'+esc(c.reason)+'</p></div></div>';
+      h='<div class="dg"><div class="item prob"><h5>品質問題</h5><p>'+hl(c.problem)+'</p></div><div class="item fix"><h5>修訂原因</h5><p>'+hl(c.reason)+'</p></div></div>';
       if(c.pending) h+='<div class="callout warn">'+esc(c.pending)+'</div>';
     }
     else if(t==="princ"){
       var rp=relatedPrinciples(c.id);
-      h='<div class="dg"><div class="item pr"><h5>本案例的命題原則</h5><p>'+esc(c.principle)+'</p></div></div>';
+      h='<div class="dg"><div class="item pr"><h5>本案例的命題原則</h5><p>'+hl(c.principle)+'</p></div></div>';
       if(rp.length){h+='<p class="note" style="margin:10px 0 6px">對應「命題修訂策略館」的六項命題設計原則：</p><div class="princ">'+rp.map(function(p){return '<div class="pr-card"><h4><span class="pn">原則 '+p.n+'</span>'+esc(p.title)+'</h4><p>'+esc(p.desc)+'</p></div>';}).join("")+'</div>';}
     }
     if(t!=="diag" && c.pending && (t==="revised"||t==="compare")) h+='<div class="callout warn" style="margin-top:10px">'+esc(c.pending)+'</div>';
     body.innerHTML=h;
+    body.classList.remove("swap"); void body.offsetWidth; body.classList.add("swap");   // 分頁切換：內容淡入
   }
   card.querySelector(".cc-tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-t]");if(b)show(b.dataset.t);});
   card.querySelector(".cc-tabs").addEventListener("keydown",function(e){
@@ -746,7 +825,7 @@ function renderCasePicker(ids, building, container){
   wrap.appendChild(pick);wrap.appendChild(slot);
   function select(id, tab){
     pick.querySelectorAll("button").forEach(function(b){var on=b.dataset.case===id;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);});
-    slot.innerHTML="";var card=renderCaseCard(CASE_BY_ID[id],building);slot.appendChild(card);
+    slot.innerHTML="";var card=renderCaseCard(CASE_BY_ID[id],building);card.classList.add("slide");slot.appendChild(card);
     if(tab) card._show(tab);
     return card;
   }
@@ -787,6 +866,7 @@ builders.history=function(body){
     det.innerHTML='<h4>'+esc(r.title)+'</h4>'+r.html+(r.rel.length?'<div class="relcase">'+r.rel.map(function(x){return caseLinkBtn(x[0],x[1],"history");}).join("")+'</div>':'');
     det.querySelectorAll(".xref").forEach(function(x){var c=CASE_BY_ID[x.dataset.case];
       x.outerHTML=' <button type="button" class="linkbtn linkcase" data-case="'+c.id+'" data-b="'+x.dataset.b+'">→ 見案例 '+c.no+'（'+esc(BUILDINGS[x.dataset.b].name)+'）</button>';});
+    det.classList.remove("swap"); void det.offsetWidth; det.classList.add("swap");
   }
   tl.querySelector(".tl").addEventListener("click",function(e){var b=e.target.closest("button[data-r]");if(b)showRound(+b.dataset.r);});
   showRound(0);
@@ -821,7 +901,7 @@ builders.history=function(body){
 };
 
 builders.diagnosis=function(body){
-  body.appendChild(el('<div class="card sumcard"><p class="big">初版 25 題的「答案正確」全數通過，但「誘答性」有 22 題未通過——答案正確不等於題目品質良好。</p>'+
+  body.appendChild(el('<div class="card sumcard"><p class="big">初版 25 題的「答案正確」全數通過，但<span class="hl">「誘答性」有 22 題未通過</span>——<span class="hl">答案正確不等於題目品質良好</span>。</p>'+
     '<p class="note" style="margin-bottom:0">數字是命題者對初版題目的品質檢核結果，不是學生作答錯誤題數。<button type="button" class="linkbtn" data-goto="diagnosis" data-sec="d-stats">（看統計）</button></p></div>'));
   var s1=sec("d-ind",1,"四項品質指標");
   s1.appendChild(el('<div><div class="grid2">'+
@@ -842,7 +922,7 @@ builders.diagnosis=function(body){
       '</div></div>';}).join("");
   var tbl='<table class="data"><caption class="sr-only">初版 25 題品質檢核統計</caption><thead><tr><th>品質指標</th><th class="r">通過題數</th><th class="r">未通過題數</th></tr></thead><tbody>'+
     STATS.map(function(s){return '<tr><td>'+esc(s.name)+'</td><td class="r">'+s.pass+'</td><td class="r">'+s.fail+'</td></tr>';}).join("")+'</tbody></table>';
-  var chart=el('<div class="card"><div class="legend"><span><i style="background:var(--pass)"></i>通過題數</span><span><i style="background:var(--fail)"></i>未通過題數</span><span style="color:var(--muted)">每列合計 25 題</span></div><div class="bars">'+rows+'</div>'+
+  var chart=el('<div class="card"><div class="legend"><span><i style="background:var(--pass)"></i>通過題數</span><span><i style="background:var(--fail)"></i>未通過題數</span><span style="color:var(--muted)">每列合計 25 題</span></div><div class="bars growbars">'+rows+'</div>'+
     '<button type="button" class="linkbtn toggle-table" aria-expanded="false">以表格檢視</button><div class="tblwrap" hidden>'+tbl+'</div>'+
     '<p class="note" style="margin-bottom:0">數字為學生在原始分析表中，依四項指標對<b>初版 25 題</b>逐題檢核的結果（題數），<b>不是學生作答錯誤題數</b>。</p></div>');
   chart.querySelector(".toggle-table").addEventListener("click",function(){var w=chart.querySelector(".tblwrap");w.hidden=!w.hidden;this.setAttribute("aria-expanded",!w.hidden);this.textContent=w.hidden?"以表格檢視":"隱藏表格";});
@@ -851,7 +931,7 @@ builders.diagnosis=function(body){
   body.appendChild(s2);
 
   var s3=sec("d-lure",3,"誘答性問題的重點說明");
-  s3.appendChild(el('<div class="card"><div class="statbig"><div class="num">22<small> / 25 題</small></div><div><b>初版 25 題中，有 22 題的「誘答性」未通過</b>，是這份初版試卷最普遍的品質問題。</div></div>'+
+  s3.appendChild(el('<div class="card"><div class="statbig"><div class="num"><span class="cnt" data-to="22">22</span><small> / 25 題</small></div><div><b>初版 25 題中，有 <span class="hl">22 題的「誘答性」未通過</span></b>，是這份初版試卷最普遍的品質問題。</div></div>'+
     '<p>常見情形包括：錯誤選項過於荒謬（例如「毛巾會自己製造水」「水受到磁力吸引」）、正確選項明顯較長、絕對字眼只出現在錯誤選項等，學生不需要理解科學概念也能排除。</p>'+
     '<p class="note" style="margin-bottom:0">注意：這是命題者對題目的品質檢核結果，並非實際學生作答結果；目前沒有國小學生施測資料，因此也未測出鑑別度或信度。</p>'+
     '<div class="relcase">'+caseLinkBtn("case-2","","diagnosis")+caseLinkBtn("case-6","","diagnosis")+'</div></div>'));
@@ -928,7 +1008,7 @@ builders.about=function(body){
     '<p style="margin-bottom:0"><button type="button" class="linkbtn" data-goto="strategy" data-sec="s-pending">查看「待確認的科學與命題問題」→</button></p></div>'));
   body.appendChild(s3);
   var s4=sec("a-tech",4,"技術與隱私");
-  s4.appendChild(el('<div class="card"><ul><li>以 Three.js（WebGL）即時繪製 3D 場景，從 jsDelivr CDN 載入；建築模型以 Tripo 生成後放在網站資料夾中。</li><li>不需要登入、API Key 或後端；不收集任何使用者資料，也沒有追蹤或分析程式。</li><li>動畫、音樂、音效與閱讀模式的開關選擇只存在你自己的瀏覽器裡，不會上傳。</li></ul></div>'));
+  s4.appendChild(el('<div class="card"><ul><li>以 Three.js（WebGL）即時繪製 3D 場景，從 jsDelivr CDN 載入；建築模型以 Tripo 生成後放在網站資料夾中。</li><li>不需要登入、API Key 或後端；不收集任何使用者資料，也沒有追蹤或分析程式。</li><li>動畫、音樂、音效與閱讀模式的開關選擇，以及「看過哪幾棟建築」的打勾紀錄，只存在你自己的瀏覽器裡，不會上傳。</li></ul></div>'));
   body.appendChild(s4);
 };
 
@@ -955,14 +1035,52 @@ function fill(id){
     bt.addEventListener("click",function(){scrollToSec(s.id);});
     pNav.appendChild(bt);
   });
-  pBody.scrollTop=0;
+  // 下一站：把三館串成 歷程 → 診斷 → 策略
+  var NEXT={history:["diagnosis","下一站：② 題目品質診斷館 →"],diagnosis:["strategy","下一站：③ 命題修訂策略館 →"]};
+  if(NEXT[id]) pBody.appendChild(el('<div class="nextstop"><button type="button" data-goto="'+NEXT[id][0]+'">'+NEXT[id][1]+'</button></div>'));
+  else if(id==="strategy"){ var ns=el('<div class="nextstop"><button type="button">⟲ 返回島嶼全景</button><small>三棟建築的建議路線到這裡結束。</small></div>'); ns.querySelector("button").addEventListener("click",home); pBody.appendChild(ns); }
+  pBody.scrollTop=0; pProg.style.transform="scaleX(0)";
   setNavOn(pNav.firstElementChild&&pNav.firstElementChild.dataset.sec);
+  // 進場：各區段依序淡入上移（跟著動畫開關）
+  var kids=pBody.children; for(var i=0;i<kids.length;i++) kids[i].style.setProperty("--i",Math.min(i,6));
+  pBody.classList.remove("enter"); void pBody.offsetWidth; pBody.classList.add("enter");
+  clearTimeout(fill._t); fill._t=setTimeout(function(){pBody.classList.remove("enter");},1600);
+  setupReveal();
 }
+var pProg=document.getElementById("pProg");
+/* 捲到才啟動的效果：統計長條從 0 長出、「22」從 0 數上來。動畫關閉或瀏覽器不支援時直接顯示最後結果 */
+var revealIO=null;
+function setupReveal(){
+  if(revealIO){revealIO.disconnect();revealIO=null;}
+  var bars=pBody.querySelectorAll(".growbars"), cnts=pBody.querySelectorAll(".cnt");
+  if(motionReduced()||!("IntersectionObserver" in window)) return;
+  bars.forEach(function(b){b.classList.add("pre");});
+  revealIO=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting) return; revealIO.unobserve(e.target);
+    if(e.target.classList.contains("growbars")) e.target.classList.remove("pre"); else countUp(e.target);
+  });},{root:pBody,threshold:0.35});
+  bars.forEach(function(b){revealIO.observe(b);}); cnts.forEach(function(c){revealIO.observe(c);});
+}
+function countUp(elm){
+  var to=+elm.dataset.to, t0=performance.now(), dur=900, done=false;
+  function fin(){ if(!done){done=true;elm.textContent=to;} }
+  (function step(now){ if(done)return; var k=Math.min(1,((now||performance.now())-t0)/dur); elm.textContent=Math.round(to*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(step); else fin(); })();
+  setTimeout(fin,dur+400);
+}
+/* 看過的建築：底部選單圓點打勾（只存在這個瀏覽器） */
+var visited={};
+try{ (localStorage.getItem("ki-visited")||"").split(",").forEach(function(k){ if(k) visited[k]=1; }); }catch(e){}
+function markVisited(id){
+  if(id&&id!=="about"&&!visited[id]){ visited[id]=1; try{ localStorage.setItem("ki-visited",Object.keys(visited).join(",")); }catch(e){} }
+  document.querySelectorAll("#dock [data-open]").forEach(function(b){ b.classList.toggle("visited",!!visited[b.dataset.open]); });
+}
+markVisited();
 function setNavOn(sid){pNav.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.sec===sid);});}
 function scrollToSec(sid){var s=document.getElementById(sid);if(!s)return;pBody.scrollTo({top:s.offsetTop-pBody.offsetTop-6,behavior:"smooth"});setNavOn(sid);}
 pBody.addEventListener("scroll",function(){
   var secs=pBody.querySelectorAll("section.sec"),top=pBody.scrollTop+pBody.offsetTop+40,cur=null;
   secs.forEach(function(s){if(s.offsetTop<=top)cur=s.id;});
+  var max=pBody.scrollHeight-pBody.clientHeight; pProg.style.transform="scaleX("+(max>4?Math.min(1,pBody.scrollTop/max):0)+")";
   if(cur){setNavOn(cur);var b=pNav.querySelector('[data-sec="'+cur+'"]');if(b&&b.scrollIntoView){var r=b.getBoundingClientRect(),nr=pNav.getBoundingClientRect();if(r.left<nr.left||r.right>nr.right)pNav.scrollLeft+=r.left-nr.left-20;}}
 },{passive:true});
 
@@ -972,7 +1090,7 @@ function open(id, opts){
   if(typeof dismissGuide==="function") dismissGuide();
   if(!panel.classList.contains("open")) lastFocus=document.activeElement;
   if(current!==id) fill(id);
-  current=id;
+  current=id; markVisited(id);
   panel.classList.add("open"); document.body.classList.add("panel-open");
   document.getElementById("introBox").open=false;
   panel.setAttribute("aria-label",BUILDINGS[id].name);
@@ -1244,12 +1362,15 @@ syncSfxBtn();
 // 所以開啟建築或關閉面板時只會聽到對應的開啟／關閉音
 document.addEventListener("click",function(e){
   // 評審建議：音效只留給重要操作（開關面板另有音效；這裡是切換案例、切換分頁、時間線與幾個開關）
-  var t=e.target.closest&&e.target.closest(".casepick button, .cc-tabs [role=tab], .tl button, .linkcase, #pRead, #motionBtn, .gstart");
+  var t=e.target.closest&&e.target.closest(".casepick button, .cc-tabs [role=tab], .tl button, .linkcase, #pRead, #motionBtn, .gstart, .nextstop button");
   if(!t||t===sfxBtn||t.disabled)return;
   playSfx("tap");
 });
 window.KISfx={play:playSfx,charVoice:playCharVoice};
 
+/* 手機：標題卡預設只留標題，展開「關於這座島」才顯示副標與操作提示 */
+(function(){ var tb=document.getElementById("topbar"), ib=document.getElementById("introBox");
+  ib.addEventListener("toggle",function(){ tb.classList.toggle("exp",ib.open); }); })();
 /* 簡介框：桌面預設展開 */
 /* ---------------- Netlify 標誌避讓 ----------------
    Netlify 免費方案會在右下角插入「Powered by Netlify」標誌（iframe#nl-badge-frame，固定在最上層、非同步載入）。
@@ -2549,7 +2670,7 @@ function frame(now){
     const on = (hovered === id) || (focusedId === id && panelOpen && KI.current() === id);   // 切到其他面板（例如網站說明）時熄掉光環
     b.hover += ((on ? 1 : 0) - b.hover) * damp(on ? 10 : 6, dt);
     const s = 1 + b.hover*0.035; b.group.scale.setScalar(s);
-    for (const m of b.group.userData.mats){ const e0 = m.userData.em0 || 0; m.emissive.setRGB(e0 + 0.16*b.hover, e0 + 0.13*b.hover, e0 + 0.06*b.hover); }
+    for (const m of b.group.userData.mats){ const e0 = m.userData.em0 || 0; m.emissive.setRGB(e0 + 0.26*b.hover, e0 + 0.21*b.hover, e0 + 0.1*b.hover); }
     hoverRings[id].material.opacity = 0.55*b.hover;
   }
   renderer.render(scene, camera);
